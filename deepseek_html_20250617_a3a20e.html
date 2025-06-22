@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Lotto PRNG Analyzer</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --warning-color: #f39c12;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            color: var(--dark-color);
+            margin-top: 0;
+        }
+        h1 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            margin: -25px -25px 20px -25px;
+            border-radius: 8px 8px 0 0;
+        }
+        textarea, input, select, button {
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            font-family: monospace;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+        button.secondary {
+            background-color: var(--secondary-color);
+        }
+        button.secondary:hover {
+            background-color: #27ae60;
+        }
+        button.warning {
+            background-color: var(--warning-color);
+        }
+        button.warning:hover {
+            background-color: #d35400;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: var(--light-color);
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+        }
+        .highlight {
+            background-color: #fffacd;
+        }
+        .cold {
+            background-color: #e6f7ff;
+        }
+        .chart-container {
+            height: 350px;
+            margin: 25px 0;
+            position: relative;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .tab button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 12px 20px;
+            transition: 0.3s;
+            color: #333;
+            font-weight: bold;
+            border-radius: 0;
+            flex-grow: 1;
+            text-align: center;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 0;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            animation: fadeEffect 0.5s;
+        }
+        @keyframes fadeEffect {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            border-bottom: 1px dotted #777;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            margin-right: 5px;
+        }
+        .badge.primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .badge.secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .badge.warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            line-height: 20px;
+        }
+        .number-ball {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            margin: 3px;
+            font-weight: bold;
+        }
+        .number-ball.special {
+            background-color: var(--accent-color);
+        }
+        .generator-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .advanced-options {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            border-left: 3px solid var(--primary-color);
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .tab button {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Lotto PRNG Analyzer</h1>
+        <p>Comprehensive tool for analyzing lottery patterns, reverse engineering PRNG seeds, and generating numbers</p>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'Analyzer')">PRNG Analyzer</button>
+            <button class="tablinks" onclick="openTab(event, 'Generator')">Number Generator</button>
+            <button class="tablinks" onclick="openTab(event, 'SeedDetector')">Seed Reverse Engineering</button>
+            <button class="tablinks" onclick="openTab(event, 'Predictor')">Smart Predictor</button>
+            <button class="tablinks" onclick="openTab(event, 'About')">About</button>
+        </div>
+
+        <!-- PRNG Analyzer Tab -->
+        <div id="Analyzer" class="tabcontent" style="display: block;">
+            <div class="section">
+                <div class="section-title">
+                    <h2>Lottery PRNG Pattern Analyzer</h2>
+                </div>
+                <h3>Input Historical Draws</h3>
+                <textarea id="lotteryNumbers" placeholder="Enter lottery numbers, one draw per line (e.g., 5 12 23 34 45 6)"></textarea>
+                <div>
+                    <button onclick="analyzeNumbers()">Analyze Numbers</button>
+                    <button class="secondary" onclick="loadSampleData()">Load Sample Data</button>
+                    <button class="warning" onclick="clearAnalysis()">Clear All</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    <h2>Analysis Results</h2>
+                </div>
+                <div id="analysisResults"></div>
+                <div id="frequencyChart" class="chart-container"></div>
+                <div id="gapChart" class="chart-container"></div>
+                <div id="pairChart" class="chart-container"></div>
+                <div id="positionChart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- Number Generator Tab -->
+        <div id="Generator" class="tabcontent">
+            <div class="section">
+                <div class="section-title">
+                    <h2>Advanced Lotto Number Generator</h2>
+                </div>
+                
+                <div class="generator-options">
+                    <div>
+                        <label for="generatorType">Generator Algorithm:</label>
+                        <select id="generatorType">
+                            <option value="lcg">Linear Congruential</option>
+                            <option value="mersenne">Mersenne Twister</option>
+                            <option value="xorshift">Xorshift</option>
+                            <option value="fibonacci">Fibonacci</option>
+                            <option value="combined">Combined LCG+Xorshift</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="drawsToGenerate">Number of Draws:</label>
+                        <input type="number" id="drawsToGenerate" value="5" min="1" max="100">
+                    </div>
+                    
+                    <div>
+                        <label for="numbersPerDraw">Numbers per Draw:</label>
+                        <input type="number" id="numbersPerDraw" value="6" min="1" max="20">
+                    </div>
+                    
+                    <div>
+                        <label for="maxNumber">Maximum Number:</label>
+                        <input type="number" id="maxNumber" value="50" min="10" max="1000">
+                    </div>
+                </div>
+                
+                <div class="advanced-options">
+                    <h4>Advanced Options</h4>
+                    <div>
+                        <label for="customSeed">Custom Seed (optional):</label>
+                        <input type="number" id="customSeed" placeholder="Leave blank for random seed">
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox" id="avoidConsecutive" checked>
+                            Avoid consecutive numbers
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox" id="balancedDistribution" checked>
+                            Balanced number distribution
+                        </label>
+                    </div>
+                </div>
+                
+                <button onclick="generateLottoNumbers()">Generate Numbers</button>
+                <button class="secondary" onclick="saveGeneratedNumbers()">Save to Analyzer</button>
+                
+                <div id="generatorResults" class="result" style="margin-top: 20px;"></div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">
+                    <h2>Generator Algorithms Explained</h2>
+                </div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Linear Congruential</h3>
+                        <p>Simple but widely used PRNG algorithm. Fast but may exhibit patterns in lower bits.</p>
+                        <span class="badge">Fast</span>
+                        <span class="badge warning">Moderate quality</span>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Mersenne Twister</h3>
+                        <p>High-quality PRNG with long period (2^19937-1). Used in many programming languages.</p>
+                        <span class="badge">High quality</span>
+                        <span class="badge warning">Slower</span>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Xorshift</h3>
+                        <p>Very fast PRNG with good statistical properties. Used in game development.</p>
+                        <span class="badge">Very fast</span>
+                        <span class="badge secondary">Good quality</span>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Fibonacci</h3>
+                        <p>Based on lagged Fibonacci sequence. Good for simulations requiring long periods.</p>
+                        <span class="badge">Long period</span>
+                        <span class="badge warning">Memory intensive</span>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Combined</h3>
+                        <p>Hybrid approach combining LCG and Xorshift for improved quality while maintaining speed.</p>
+                        <span class="badge primary">Best balance</span>
+                        <span class="badge secondary">Recommended</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seed Reverse Engineering Tab -->
+        <div id="SeedDetector" class="tabcontent">
+            <div class="section">
+                <div class="section-title">
+                    <h2>PRNG Seed Reverse Engineering</h2>
+                </div>
+                
+                <h3>Input Known Sequence</h3>
+                <textarea id="historicalDraws" placeholder="Enter known lottery numbers in exact order, one draw per line"></textarea>
+                
+                <div class="generator-options">
+                    <div>
+                        <label for="seedAlgorithm">PRNG Algorithm:</label>
+                        <select id="seedAlgorithm">
+                            <option value="lcg">Linear Congruential</option>
+                            <option value="xorshift">Xorshift</option>
+                            <option value="combined">Combined LCG+Xorshift</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="maxSeedValue">Max Seed Value:</label>
+                        <input type="number" id="maxSeedValue" value="100000" min="1000" max="100000000">
+                    </div>
+                    
+                    <div>
+                        <label for="numbersToPredict">Numbers to Predict:</label>
+                        <input type="number" id="numbersToPredict" value="10" min="1" max="100">
+                    </div>
+                </div>
+                
+                <div class="advanced-options">
+                    <h4>Advanced Seed Detection</h4>
+                    <div>
+                        <label>
+                            <input type="checkbox" id="useMultiThread" checked>
+                            Use Web Workers for faster search
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox" id="extendedVerification">
+                            Extended verification (more accurate but slower)
+                        </label>
+                    </div>
+                </div>
+                
+                <button onclick="reverseEngineerSeed()">Reverse Engineer Seed</button>
+                <button class="secondary" onclick="testSeedPrediction()">Test Prediction</button>
+                
+                <div id="seedProgress" class="progress-container" style="display: none;">
+                    <div id="seedProgressBar" class="progress-bar">0%</div>
+                </div>
+                
+                <div id="seedResults"></div>
+                <div id="predictionResults"></div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">
+                    <h2>Seed Reverse Engineering Techniques</h2>
+                </div>
+                
+                <h3>How It Works</h3>
+                <p>This tool attempts to reverse engineer the PRNG seed that could generate your sequence of numbers:</p>
+                <ol>
+                    <li><strong>Brute-force search:</strong> Tests possible seed values to find matches</li>
+                    <li><strong>Pattern analysis:</strong> Looks for mathematical patterns in the sequence</li>
+                    <li><strong>Statistical matching:</strong> Compares generated sequences to your input</li>
+                </ol>
+                
+                <h3>Limitations</h3>
+                <ul>
+                    <li>Real lottery systems may use more complex algorithms</li>
+                    <li>Some PRNGs are cryptographically secure and can't be reversed</li>
+                    <li>Large seed spaces require significant computation time</li>
+                </ul>
+                
+                <div class="result">
+                    <p><strong>Note:</strong> Even with a correct seed, future draws may use different algorithms or additional randomization steps.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Predictor Tab -->
+        <div id="Predictor" class="tabcontent">
+            <div class="section">
+                <div class="section-title">
+                    <h2>Smart Number Predictor</h2>
+                </div>
+                
+                <h3>Prediction Methods</h3>
+                <div class="generator-options">
+                    <div>
+                        <label for="predictionMethod">Primary Method:</label>
+                        <select id="predictionMethod">
+                            <option value="frequency">Frequency Analysis</option>
+                            <option value="gap">Gap Analysis</option>
+                            <option value="positional">Positional Analysis</option>
+                            <option value="markov">Markov Chain</option>
+                            <option value="neural">Neural Network (Experimental)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="predictionCount">Number of Predictions:</label>
+                        <input type="number" id="predictionCount" value="5" min="1" max="20">
+                    </div>
+                </div>
+                
+                <div class="advanced-options">
+                    <h4>Advanced Prediction</h4>
+                    <div>
+                        <label>
+                            <input type="checkbox" id="useCombinedMethods" checked>
+                            Combine multiple prediction methods
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <input type="checkbox" id="weightRecent" checked>
+                            Weight recent draws more heavily
+                        </label>
+                    </div>
+                </div>
+                
+                <button onclick="generateSmartPredictions()">Generate Predictions</button>
+                
+                <div id="predictionOutput" class="result"></div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">
+                    <h2>Prediction Methodology</h2>
+                </div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Frequency Analysis</h3>
+                        <p>Identifies numbers that appear most/least frequently in historical data.</p>
+                        <span class="badge">Basic</span>
+                        <span class="badge secondary">Most lotteries</span>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Gap Analysis</h3>
+                        <p>Predicts numbers that are "due" based on time since last appearance.</p>
+                        <span class="badge">Intermediate</span>
+                        <span class="badge warning">Variable results</span>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Positional Analysis</h3>
+                        <p>Analyzes which numbers appear in specific positions in the sequence.</p>
+                        <span class="badge">Advanced</span>
+                        <span class="badge primary">Powerful</span>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Markov Chain</h3>
+                        <p>Models probability of number sequences based on previous states.</p>
+                        <span class="badge">Advanced</span>
+                        <span class="badge warning">Compute intensive</span>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Neural Network</h3>
+                        <p>Experimental deep learning approach to identify complex patterns.</p>
+                        <span class="badge">Cutting edge</span>
+                        <span class="badge warning">Experimental</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Tab -->
+        <div id="About" class="tabcontent">
+            <div class="section">
+                <div class="section-title">
+                    <h2>About Advanced Lotto PRNG Analyzer</h2>
+                </div>
+                
+                <h3>Tool Overview</h3>
+                <p>This advanced tool provides comprehensive analysis of lottery number patterns, PRNG (Pseudo-Random Number Generator) reverse engineering, and intelligent number prediction.</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>PRNG Analysis:</strong> Detailed statistical analysis of number frequencies, gaps, and positional patterns</li>
+                    <li><strong>Multiple Generators:</strong> Generate numbers using different PRNG algorithms (LCG, Mersenne Twister, Xorshift, etc.)</li>
+                    <li><strong>Seed Reverse Engineering:</strong> Attempt to discover the PRNG seed from known number sequences</li>
+                    <li><strong>Smart Prediction:</strong> Advanced prediction methods combining statistical analysis and machine learning approaches</li>
+                    <li><strong>Visualization:</strong> Interactive charts to visualize patterns and trends</li>
+                </ul>
+                
+                <h3>How to Use</h3>
+                <ol>
+                    <li>Enter historical draws in the Analyzer tab to identify patterns</li>
+                    <li>Use the Generator to create new number sequences with different algorithms</li>
+                    <li>Try to reverse engineer PRNG seeds from known sequences</li>
+                    <li>Generate predictions using various statistical methods</li>
+                </ol>
+                
+                <h3>Technical Details</h3>
+                <p>This tool implements several PRNG algorithms in JavaScript:</p>
+                <ul>
+                    <li><strong>Linear Congruential Generator (LCG):</strong> Simple and fast, but with known limitations</li>
+                    <li><strong>Xorshift:</strong> Very fast with good statistical properties</li>
+                    <li><strong>Mersenne Twister:</strong> High-quality PRNG with long period</li>
+                    <li><strong>Combined generators:</strong> Hybrid approaches for improved quality</li>
+                </ul>
+                
+                <h3>Disclaimer</h3>
+                <div class="result" style="background-color: #ffecec; border-left-color: var(--accent-color);">
+                    <p>This tool is for educational and entertainment purposes only. There is no guarantee that these methods can predict actual lottery results, as modern lottery systems may use more complex randomization techniques than simple PRNGs.</p>
+                    <p>Always gamble responsibly and within your means. The developers of this tool are not responsible for any losses incurred from using this software.</p>
+                </div>
+                
+                <h3>Version Information</h3>
+                <p>Advanced Lotto PRNG Analyzer v2.1.0</p>
+                <p>&copy; 2023 Lottery Analysis Tools</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Global variables
+        let frequencyChart, gapChart, pairChart, positionChart;
+        let currentGeneratedNumbers = [];
+        let seedDetectionWorker = null;
+        
+        // Tab functionality
+        function openTab(evt, tabName) {
+            let tabcontent = document.getElementsByClassName("tabcontent");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            
+            let tablinks = document.getElementsByClassName("tablinks");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+            
+            // Redraw charts when tab becomes visible
+            setTimeout(() => {
+                if (frequencyChart) frequencyChart.resize();
+                if (gapChart) gapChart.resize();
+                if (pairChart) pairChart.resize();
+                if (positionChart) positionChart.resize();
+            }, 100);
+        }
+
+        // PRNG Analyzer Functions
+        function analyzeNumbers() {
+            const input = document.getElementById("lotteryNumbers").value.trim();
+            if (!input) {
+                alert("Please enter lottery numbers to analyze.");
+                return;
+            }
+
+            const draws = parseInput(input);
+            if (draws.length === 0) {
+                alert("Invalid input format. Please enter one draw per line with space-separated numbers.");
+                return;
+            }
+
+            const analysis = performAdvancedAnalysis(draws);
+            displayAnalysisResults(analysis, draws);
+            createCharts(analysis, draws);
+        }
+
+        function parseInput(input) {
+            const lines = input.split('\n');
+            const draws = [];
+            
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed) {
+                    const numbers = trimmed.split(/\s+/).map(Number);
+                    if (numbers.length > 1 && numbers.every(n => !isNaN(n))) {
+                        draws.push(numbers);
+                    }
+                }
+            }
+            
+            return draws;
+        }
+
+        function performAdvancedAnalysis(draws) {
+            // Initialize analysis objects
+            const frequency = {};
+            const lastSeen = {};
+            const gaps = {};
+            const pairs = {};
+            const triplets = {};
+            const positions = {};
+            const numberRanges = {
+                '1-10': 0,
+                '11-20': 0,
+                '21-30': 0,
+                '31-40': 0,
+                '41-50': 0,
+                '51+': 0
+            };
+            
+            const totalNumbers = draws[0].length;
+            for (let i = 0; i < totalNumbers; i++) {
+                positions[`Position ${i+1}`] = {};
+            }
+            
+            // Process each draw
+            for (let i = 0; i < draws.length; i++) {
+                const draw = draws[i];
+                
+                for (let j = 0; j < draw.length; j++) {
+                    const num = draw[j];
+                    
+                    // Frequency count
+                    frequency[num] = (frequency[num] || 0) + 1;
+                    
+                    // Position analysis
+                    positions[`Position ${j+1}`][num] = (positions[`Position ${j+1}`][num] || 0) + 1;
+                    
+                    // Gap analysis
+                    if (lastSeen[num] !== undefined) {
+                        const gap = i - lastSeen[num];
+                        gaps[num] = gaps[num] || [];
+                        gaps[num].push(gap);
+                    }
+                    lastSeen[num] = i;
+                    
+                    // Number range count
+                    if (num <= 10) numberRanges['1-10']++;
+                    else if (num <= 20) numberRanges['11-20']++;
+                    else if (num <= 30) numberRanges['21-30']++;
+                    else if (num <= 40) numberRanges['31-40']++;
+                    else if (num <= 50) numberRanges['41-50']++;
+                    else numberRanges['51+']++;
+                    
+                    // Pair analysis (for numbers in the same draw)
+                    for (let k = j + 1; k < draw.length; k++) {
+                        const pair = [num, draw[k]].sort((a,b) => a-b).join('-');
+                        pairs[pair] = (pairs[pair] || 0) + 1;
+                    }
+                    
+                    // Triplet analysis (three numbers in same draw)
+                    for (let k = j + 1; k < draw.length; k++) {
+                        for (let l = k + 1; l < draw.length; l++) {
+                            const triplet = [num, draw[k], draw[l]].sort((a,b) => a-b).join('-');
+                            triplets[triplet] = (triplets[triplet] || 0) + 1;
+                        }
+                    }
+                }
+            }
+            
+            // Calculate statistics
+            const avgGaps = {};
+            const gapStdDev = {};
+            for (const num in gaps) {
+                const gapArray = gaps[num];
+                const sum = gapArray.reduce((a, b) => a + b, 0);
+                avgGaps[num] = sum / gapArray.length;
+                
+                // Calculate standard deviation
+                const squaredDiffs = gapArray.map(g => Math.pow(g - avgGaps[num], 2));
+                const variance = squaredDiffs.reduce((a, b) => a + b, 0) / gapArray.length;
+                gapStdDev[num] = Math.sqrt(variance);
+            }
+            
+            // Sort frequencies
+            const sortedFrequency = Object.entries(frequency).sort((a, b) => b[1] - a[1]);
+            const hotNumbers = sortedFrequency.slice(0, Math.ceil(sortedFrequency.length * 0.2)).map(x => x[0]); // Top 20%
+            const coldNumbers = sortedFrequency.slice(-Math.ceil(sortedFrequency.length * 0.2)).map(x => x[0]); // Bottom 20%
+            
+            // Sort pairs and triplets
+            const sortedPairs = Object.entries(pairs).sort((a, b) => b[1] - a[1]);
+            const commonPairs = sortedPairs.slice(0, 10);
+            const sortedTriplets = Object.entries(triplets).sort((a, b) => b[1] - a[1]);
+            const commonTriplets = sortedTriplets.slice(0, 5);
+            
+            // Calculate positional frequencies
+            const positionalFreq = {};
+            for (const pos in positions) {
+                positionalFreq[pos] = Object.entries(positions[pos]).sort((a, b) => b[1] - a[1]);
+            }
+            
+            return {
+                frequency,
+                positions: positionalFreq,
+                gaps: avgGaps,
+                gapStdDev,
+                numberRanges,
+                hotNumbers,
+                coldNumbers,
+                commonPairs,
+                commonTriplets,
+                totalDraws: draws.length,
+                firstDraw: draws[0],
+                lastDraw: draws[draws.length - 1]
+            };
+        }
+
+        function displayAnalysisResults(analysis, draws) {
+            let html = `<h3>Comprehensive Analysis of ${analysis.totalDraws} Draws</h3>`;
+            
+            // Summary statistics
+            html += `<div class="grid">
+                <div class="card">
+                    <h4>First Draw</h4>
+                    <p>${analysis.firstDraw.join(', ')}</p>
+                </div>
+                <div class="card">
+                    <h4>Last Draw</h4>
+                    <p>${analysis.lastDraw.join(', ')}</p>
+                </div>
+                <div class="card">
+                    <h4>Unique Numbers</h4>
+                    <p>${Object.keys(analysis.frequency).length}</p>
+                </div>
+                <div class="card">
+                    <h4>Most Frequent</h4>
+                    <p>${Object.entries(analysis.frequency).sort((a,b) => b[1]-a[1])[0][0]} (${Object.entries(analysis.frequency).sort((a,b) => b[1]-a[1])[0][1]}x)</p>
+                </div>
+            </div>`;
+            
+            // Frequency table
+            html += `<h4>Number Frequency Analysis</h4>
+            <div style="overflow-x: auto;">
+                <table>
+                    <tr>
+                        <th>Number</th>
+                        <th>Frequency</th>
+                        <th>Percentage</th>
+                        <th>Avg Gap</th>
+                        <th>Gap Std Dev</th>
+                        <th>Last Seen</th>
+                        <th>Status</th>
+                    </tr>`;
+            
+            const sortedFreq = Object.entries(analysis.frequency).sort((a, b) => b[1] - a[1]);
+            for (const [num, count] of sortedFreq) {
+                const percentage = ((count / analysis.totalDraws) * 100).toFixed(2);
+                const avgGap = analysis.gaps[num] ? analysis.gaps[num].toFixed(1) : 'N/A';
+                const gapDev = analysis.gapStdDev[num] ? analysis.gapStdDev[num].toFixed(1) : 'N/A';
+                const isHot = analysis.hotNumbers.includes(num);
+                const isCold = analysis.coldNumbers.includes(num);
+                let status = '';
+                let rowClass = '';
+                
+                if (isHot) {
+                    status = 'Hot';
+                    rowClass = 'highlight';
+                } else if (isCold) {
+                    status = 'Cold';
+                    rowClass = 'cold';
+                }
+                
+                html += `<tr class="${rowClass}">
+                    <td>${num}</td>
+                    <td>${count}</td>
+                    <td>${percentage}%</td>
+                    <td>${avgGap}</td>
+                    <td>${gapDev}</td>
+                    <td>${analysis.lastDraw.includes(Number(num)) ? 'Last draw' : 'Earlier'}</td>
+                    <td>${status}</td>
+                </tr>`;
+            }
+            html += `</table></div>`;
+            
+            // Hot/Cold numbers
+            html += `<div class="grid">
+                <div class="card">
+                    <h4>Hot Numbers (Top 20%)</h4>
+                    <p>${analysis.hotNumbers.join(', ')}</p>
+                </div>
+                <div class="card">
+                    <h4>Cold Numbers (Bottom 20%)</h4>
+                    <p>${analysis.coldNumbers.join(', ')}</p>
+                </div>
+            </div>`;
+            
+            // Number ranges
+            html += `<h4>Number Range Distribution</h4>
+            <div style="overflow-x: auto;">
+                <table>
+                    <tr>
+                        <th>Range</th>
+                        <th>Count</th>
+                        <th>Percentage</th>
+                        <th>Expected %</th>
+                        <th>Deviation</th>
+                    </tr>`;
+            
+            const totalBalls = analysis.totalDraws * draws[0].length;
+            const expectedPercentage = (1 / Object.keys(analysis.numberRanges).length * 100).toFixed(1);
+            
+            for (const [range, count] of Object.entries(analysis.numberRanges)) {
+                const percentage = ((count / totalBalls) * 100).toFixed(1);
+                const deviation = (percentage - expectedPercentage).toFixed(1);
+                                html += `<tr>
+                    <td>${range}</td>
+                    <td>${count}</td>
+                    <td>${percentage}%</td>
+                    <td>${expectedPercentage}%</td>
+                    <td>${deviation}%</td>
+                </tr>`;
+            }
+            html += `</table></div>`;
+            
+            // Common pairs and triplets
+            html += `<div class="grid">
+                <div class="card">
+                    <h4>Most Common Pairs</h4>
+                    <ol>`;
+            for (const [pair, count] of analysis.commonPairs) {
+                html += `<li>${pair.replace('-', ', ')} (${count}x)</li>`;
+            }
+            html += `</ol></div>
+                
+                <div class="card">
+                    <h4>Most Common Triplets</h4>
+                    <ol>`;
+            for (const [triplet, count] of analysis.commonTriplets) {
+                html += `<li>${triplet.replace(/-/g, ', ')} (${count}x)</li>`;
+            }
+            html += `</ol></div>
+            </div>`;
+            
+            // Positional analysis
+            html += `<h4>Positional Frequency Analysis</h4>
+            <div style="overflow-x: auto;">
+                <table>
+                    <tr>
+                        <th>Position</th>
+                        <th>Most Common Numbers</th>
+                    </tr>`;
+            
+            for (const [position, numbers] of Object.entries(analysis.positions)) {
+                const topNumbers = numbers.slice(0, 3).map(x => `${x[0]} (${x[1]}x)`).join(', ');
+                html += `<tr>
+                    <td>${position}</td>
+                    <td>${topNumbers}</td>
+                </tr>`;
+            }
+            html += `</table></div>`;
+            
+            document.getElementById("analysisResults").innerHTML = html;
+        }
+
+        function createCharts(analysis, draws) {
+            // Destroy existing charts if they exist
+            if (frequencyChart) frequencyChart.destroy();
+            if (gapChart) gapChart.destroy();
+            if (pairChart) pairChart.destroy();
+            if (positionChart) positionChart.destroy();
+            
+            // Frequency Chart
+            const freqCtx = document.getElementById('frequencyChart').getContext('2d');
+            const sortedFreq = Object.entries(analysis.frequency).sort((a, b) => a[0] - b[0]);
+            
+            frequencyChart = new Chart(freqCtx, {
+                type: 'bar',
+                data: {
+                    labels: sortedFreq.map(x => x[0]),
+                    datasets: [{
+                        label: 'Number Frequency',
+                        data: sortedFreq.map(x => x[1]),
+                        backgroundColor: sortedFreq.map(x => 
+                            analysis.hotNumbers.includes(x[0]) ? '#e74c3c' : 
+                            analysis.coldNumbers.includes(x[0]) ? '#3498db' : '#2ecc71'
+                        ),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Frequency Count'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Number'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const num = context.label;
+                                    const freq = context.raw;
+                                    const percentage = (freq / analysis.totalDraws * 100).toFixed(2);
+                                    return `Frequency: ${freq} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gap Chart
+            const gapCtx = document.getElementById('gapChart').getContext('2d');
+            const gapData = Object.entries(analysis.gaps).sort((a, b) => a[0] - b[0]);
+            
+            gapChart = new Chart(gapCtx, {
+                type: 'line',
+                data: {
+                    labels: gapData.map(x => x[0]),
+                    datasets: [{
+                        label: 'Average Gap Between Appearances',
+                        data: gapData.map(x => x[1]),
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Average Gap (in draws)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Number'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Pair Chart (Top 20 pairs)
+            const pairCtx = document.getElementById('pairChart').getContext('2d');
+            const topPairs = Object.entries(analysis.commonPairs).slice(0, 20);
+            
+            pairChart = new Chart(pairCtx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: topPairs.map(x => x[0].replace('-', ', ')),
+                    datasets: [{
+                        label: 'Pair Frequency',
+                        data: topPairs.map(x => x[1]),
+                        backgroundColor: '#3498db',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Frequency Count'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Position Chart
+            const posCtx = document.getElementById('positionChart').getContext('2d');
+            const positionData = [];
+            const positionLabels = [];
+            
+            for (const [position, numbers] of Object.entries(analysis.positions)) {
+                positionLabels.push(position);
+                positionData.push(numbers[0][1]); // Frequency of most common number in position
+            }
+            
+            positionChart = new Chart(posCtx, {
+                type: 'radar',
+                data: {
+                    labels: positionLabels,
+                    datasets: [{
+                        label: 'Most Frequent Number Count',
+                        data: positionData,
+                        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                        borderColor: '#2ecc71',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#2ecc71'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadSampleData() {
+            const sampleData = `3 15 22 28 35 42
+5 12 19 27 33 44
+8 14 21 29 36 45
+2 11 18 26 34 41
+7 13 20 30 37 43
+1 10 17 25 32 40
+4 9 16 24 31 39
+6 12 19 27 35 42
+3 11 20 28 36 44
+5 14 22 29 37 45`;
+            document.getElementById("lotteryNumbers").value = sampleData;
+        }
+
+        function clearAnalysis() {
+            document.getElementById("lotteryNumbers").value = "";
+            document.getElementById("analysisResults").innerHTML = "";
+            
+            if (frequencyChart) frequencyChart.destroy();
+            if (gapChart) gapChart.destroy();
+            if (pairChart) pairChart.destroy();
+            if (positionChart) positionChart.destroy();
+        }
+
+        // Number Generator Functions
+        function generateLottoNumbers() {
+            const generatorType = document.getElementById("generatorType").value;
+            const drawsToGenerate = parseInt(document.getElementById("drawsToGenerate").value);
+            const numbersPerDraw = parseInt(document.getElementById("numbersPerDraw").value);
+            const maxNumber = parseInt(document.getElementById("maxNumber").value);
+            const customSeed = document.getElementById("customSeed").value;
+            const avoidConsecutive = document.getElementById("avoidConsecutive").checked;
+            const balancedDistribution = document.getElementById("balancedDistribution").checked;
+            
+            // Validate inputs
+            if (numbersPerDraw >= maxNumber) {
+                alert("Numbers per draw must be less than the maximum number");
+                return;
+            }
+            
+            // Generate seed if not provided
+            const seed = customSeed ? parseInt(customSeed) : Math.floor(Math.random() * 1000000);
+            
+            // Generate numbers based on selected algorithm
+            let generatorFn;
+            switch (generatorType) {
+                case 'lcg':
+                    generatorFn = generateLCG;
+                    break;
+                case 'mersenne':
+                    generatorFn = generateMersenne;
+                    break;
+                case 'xorshift':
+                    generatorFn = generateXorshift;
+                    break;
+                case 'fibonacci':
+                    generatorFn = generateFibonacci;
+                    break;
+                case 'combined':
+                    generatorFn = generateCombined;
+                    break;
+                default:
+                    generatorFn = generateLCG;
+            }
+            
+            currentGeneratedNumbers = [];
+            let html = `<h3>Generated Numbers (Seed: ${seed})</h3>`;
+            html += `<div class="grid">`;
+            
+            for (let i = 0; i < drawsToGenerate; i++) {
+                const draw = generatorFn(numbersPerDraw, maxNumber, seed + i, avoidConsecutive, balancedDistribution);
+                currentGeneratedNumbers.push(draw);
+                
+                html += `<div class="card">
+                    <h4>Draw ${i+1}</h4>
+                    <div>`;
+                
+                // Display each number as a ball
+                for (let j = 0; j < draw.length; j++) {
+                    const isSpecial = (j === draw.length - 1); // Last number is often special in lotteries
+                    html += `<span class="number-ball ${isSpecial ? 'special' : ''}">${draw[j]}</span>`;
+                }
+                
+                html += `</div></div>`;
+            }
+            
+            html += `</div>`;
+            document.getElementById("generatorResults").innerHTML = html;
+        }
+
+        // PRNG Algorithms
+        function generateLCG(count, max, seed, avoidConsecutive, balanced) {
+            // Linear Congruential Generator
+            const a = 1664525;
+            const c = 1013904223;
+            const m = Math.pow(2, 32);
+            
+            let current = seed;
+            const numbers = new Set();
+            
+            while (numbers.size < count) {
+                current = (a * current + c) % m;
+                const num = (current % max) + 1;
+                
+                // Skip if we already have this number
+                if (numbers.has(num)) continue;
+                
+                // Skip consecutive numbers if enabled
+                if (avoidConsecutive && numbers.size > 0) {
+                    const hasConsecutive = Array.from(numbers).some(n => Math.abs(n - num) === 1);
+                    if (hasConsecutive) continue;
+                }
+                
+                // For balanced distribution, ensure numbers are spread across ranges
+                if (balanced) {
+                    const rangeSize = Math.ceil(max / count);
+                    const targetRange = Math.floor((numbers.size) * rangeSize);
+                    if (num < targetRange || num > targetRange + rangeSize) continue;
+                }
+                
+                numbers.add(num);
+            }
+            
+            return Array.from(numbers).sort((a, b) => a - b);
+        }
+
+        function generateMersenne(count, max, seed, avoidConsecutive, balanced) {
+            // Simplified Mersenne Twister implementation
+            const state = new Array(624);
+            state[0] = seed;
+            
+            for (let i = 1; i < 624; i++) {
+                state[i] = (1812433253 * (state[i-1] ^ (state[i-1] >>> 30)) + i) >>> 0;
+            }
+            
+            let index = 0;
+            const numbers = new Set();
+            
+            while (numbers.size < count) {
+                if (index === 0) twist();
+                
+                let y = state[index];
+                y ^= (y >>> 11);
+                y ^= ((y << 7) & 0x9d2c5680);
+                y ^= ((y << 15) & 0xefc60000);
+                y ^= (y >>> 18);
+                
+                index = (index + 1) % 624;
+                const num = (y % max) + 1;
+                
+                // Skip if we already have this number
+                if (numbers.has(num)) continue;
+                
+                // Skip consecutive numbers if enabled
+                if (avoidConsecutive && numbers.size > 0) {
+                    const hasConsecutive = Array.from(numbers).some(n => Math.abs(n - num) === 1);
+                    if (hasConsecutive) continue;
+                }
+                
+                // For balanced distribution
+                if (balanced) {
+                    const rangeSize = Math.ceil(max / count);
+                    const targetRange = Math.floor((numbers.size) * rangeSize);
+                    if (num < targetRange || num > targetRange + rangeSize) continue;
+                }
+                
+                numbers.add(num);
+            }
+            
+            function twist() {
+                for (let i = 0; i < 624; i++) {
+                    const y = ((state[i] & 0x80000000) + (state[(i+1)%624] & 0x7fffffff)) >>> 0;
+                    state[i] = state[(i+397)%624] ^ (y >>> 1);
+                    if (y % 2 !== 0) {
+                        state[i] ^= 0x9908b0df;
+                    }
+                }
+            }
+            
+            return Array.from(numbers).sort((a, b) => a - b);
+        }
+
+        function generateXorshift(count, max, seed, avoidConsecutive, balanced) {
+            // Xorshift algorithm
+            let x = seed || 1;
+            let y = 0;
+            let z = 0;
+            let w = 0;
+            
+            // Initialize state if seed is provided
+            if (seed) {
+                y = seed ^ 0x87654321;
+                z = seed ^ 0x12345678;
+                w = seed ^ 0x56781234;
+            }
+            
+            const numbers = new Set();
+            
+            while (numbers.size < count) {
+                let t = x ^ (x << 11);
+                x = y;
+                y = z;
+                z = w;
+                w = w ^ (w >>> 19) ^ (t ^ (t >>> 8));
+                
+                const num = (w % max) + 1;
+                
+                // Skip if we already have this number
+                if (numbers.has(num)) continue;
+                
+                // Skip consecutive numbers if enabled
+                if (avoidConsecutive && numbers.size > 0) {
+                    const hasConsecutive = Array.from(numbers).some(n => Math.abs(n - num) === 1);
+                    if (hasConsecutive) continue;
+                }
+                
+                // For balanced distribution
+                if (balanced) {
+                    const rangeSize = Math.ceil(max / count);
+                    const targetRange = Math.floor((numbers.size) * rangeSize);
+                    if (num < targetRange || num > targetRange + rangeSize) continue;
+                }
+                
+                numbers.add(num);
+            }
+            
+            return Array.from(numbers).sort((a, b) => a - b);
+        }
+
+        function generateFibonacci(count, max, seed, avoidConsecutive, balanced) {
+            // Lagged Fibonacci generator
+            const fibState = new Array(55);
+            fibState[0] = seed;
+            
+            // Initialize state
+            for (let i = 1; i < 55; i++) {
+                fibState[i] = (fibState[i-1] * 69069 + 1) >>> 0;
+            }
+            
+            let j = 23;
+            let k = 54;
+            const numbers = new Set();
+            
+            while (numbers.size < count) {
+                fibState[k] = (fibState[k] + fibState[j]) >>> 0;
+                const num = (fibState[k] % max) + 1;
+                
+                j = (j + 1) % 55;
+                k = (k + 1) % 55;
+                
+                // Skip if we already have this number
+                if (numbers.has(num)) continue;
+                
+                // Skip consecutive numbers if enabled
+                if (avoidConsecutive && numbers.size > 0) {
+                    const hasConsecutive = Array.from(numbers).some(n => Math.abs(n - num) === 1);
+                    if (hasConsecutive) continue;
+                }
+                
+                // For balanced distribution
+                if (balanced) {
+                    const rangeSize = Math.ceil(max / count);
+                    const targetRange = Math.floor((numbers.size) * rangeSize);
+                    if (num < targetRange || num > targetRange + rangeSize) continue;
+                }
+                
+                numbers.add(num);
+            }
+            
+            return Array.from(numbers).sort((a, b) => a - b);
+        }
+
+        function generateCombined(count, max, seed, avoidConsecutive, balanced) {
+            // Combined LCG + Xorshift
+            const lcgA = 1664525;
+            const lcgC = 1013904223;
+            const lcgM = Math.pow(2, 32);
+            
+            let lcgState = seed;
+            let xorshiftState = seed ^ 0x12345678;
+            
+            const numbers = new Set();
+            
+            while (numbers.size < count) {
+                // LCG step
+                lcgState = (lcgA * lcgState + lcgC) % lcgM;
+                
+                // Xorshift step
+                xorshiftState ^= xorshiftState << 13;
+                xorshiftState ^= xorshiftState >>> 17;
+                xorshiftState ^= xorshiftState << 5;
+                
+                // Combine results
+                const combined = (lcgState ^ xorshiftState) >>> 0;
+                const num = (combined % max) + 1;
+                
+                // Skip if we already have this number
+                if (numbers.has(num)) continue;
+                
+                // Skip consecutive numbers if enabled
+                if (avoidConsecutive && numbers.size > 0) {
+                    const hasConsecutive = Array.from(numbers).some(n => Math.abs(n - num) === 1);
+                    if (hasConsecutive) continue;
+                }
+                
+                // For balanced distribution
+                if (balanced) {
+                    const rangeSize = Math.ceil(max / count);
+                    const targetRange = Math.floor((numbers.size) * rangeSize);
+                    if (num < targetRange || num > targetRange + rangeSize) continue;
+                }
+                
+                numbers.add(num);
+            }
+            
+            return Array.from(numbers).sort((a, b) => a - b);
+        }
+
+        function saveGeneratedNumbers() {
+            if (currentGeneratedNumbers.length === 0) {
+                alert("No generated numbers to save. Please generate numbers first.");
+                return;
+            }
+            
+            const existingNumbers = document.getElementById("lotteryNumbers").value;
+            let newNumbers = "";
+            
+            if (existingNumbers) {
+                newNumbers = existingNumbers + "\n";
+            }
+            
+            newNumbers += currentGeneratedNumbers.map(draw => draw.join(" ")).join("\n");
+            document.getElementById("lotteryNumbers").value = newNumbers;
+            
+            alert("Generated numbers have been added to the analyzer input.");
+        }
+
+        // Seed Reverse Engineering Functions
+        function reverseEngineerSeed() {
+            const input = document.getElementById("historicalDraws").value.trim();
+            if (!input) {
+                alert("Please enter historical draws to analyze.");
+                return;
+            }
+            
+            const draws = parseInput(input);
+            if (draws.length < 3) {
+                alert("Please enter at least 3 draws for seed detection.");
+                return;
+            }
+            
+            const algorithm = document.getElementById("seedAlgorithm").value;
+            const maxSeed = parseInt(document.getElementById("maxSeedValue").value);
+            const useMultiThread = document.getElementById("useMultiThread").checked;
+            const extendedVerification = document.getElementById("extendedVerification").checked;
+            
+            // Flatten the draws into a single sequence
+            const sequence = draws.flat();
+            
+            // Show progress bar
+            document.getElementById("seedProgress").style.display = "block";
+            document.getElementById("seedProgressBar").style.width = "0%";
+            document.getElementById("seedProgressBar").innerText = "0%";
+            
+            // Clear previous results
+            document.getElementById("seedResults").innerHTML = "";
+            document.getElementById("predictionResults").innerHTML = "";
+            
+            if (useMultiThread && window.Worker) {
+                // Use Web Worker for parallel processing
+                if (seedDetectionWorker) {
+                    seedDetectionWorker.terminate();
+                }
+                
+                seedDetectionWorker = new Worker(URL.createObjectURL(new Blob([`
+                    onmessage = function(e) {
+                        const { algorithm, sequence, maxSeed, extendedVerification } = e.data;
+                        const foundSeeds = [];
+                        
+                        for (let seed = 0; seed <= maxSeed; seed++) {
+                            // Report progress every 1000 seeds
+                            if (seed % 1000 === 0) {
+                                postMessage({ type: 'progress', seed, maxSeed });
+                            }
+                            
+                            if (verifySeed(algorithm, seed, sequence, extendedVerification)) {
+                                foundSeeds.push(seed);
+                                postMessage({ type: 'found', seed });
+                            }
+                        }
+                        
+                        postMessage({ type: 'complete', foundSeeds });
+                    }
+                    
+                    function verifySeed(algorithm, seed, sequence, extended) {
+                        let genSequence = [];
+                        let generatorFn;
+                        
+                        switch (algorithm) {
+                            case 'lcg':
+                                generatorFn = generateLCG;
+                                break;
+                            case 'xorshift':
+                                generatorFn = generateXorshift;
+                                break;
+                            case 'combined':
+                                generatorFn = generateCombined;
+                                break;
+                            default:
+                                generatorFn = generateLCG;
+                        }
+                        
+                        // Generate enough numbers to match the input sequence
+                        const numbersNeeded = sequence.length;
+                        const maxNumber = Math.max(...sequence) + 10; // Add buffer
+                        
+                        genSequence = generatorFn(numbersNeeded, maxNumber, seed, false, false);
+                        
+                        // Check if sequences match
+                        for (let i = 0; i < sequence.length; i++) {
+                            if (genSequence[i] !== sequence[i]) {
+                                return false;
+                            }
+                        }
+                        
+                        // Extended verification checks more numbers
+                        if (extended) {
+                            const extraNumbers = generatorFn(10, maxNumber, seed, false, false);
+                            for (let i = 0; i < extraNumbers.length; i++) {
+                                if (extraNumbers[i] !== sequence[i % sequence.length]) {
+                                    return false;
+                                }
+                            }
+                        }
+                        
+                        return true;
+                    }
+                    
+                    function generateLCG(count, max, seed) {
+                        const a = 1664525;
+                        const c = 1013904223;
+                        const m = Math.pow(2, 32);
+                        
+                        let current = seed;
+                        const numbers = [];
+                        
+                        for (let i = 0; i < count; i++) {
+                            current = (a * current + c) % m;
+                            numbers.push((current % max) + 1);
+                        }
+                        
+                        return numbers;
+                    }
+                    
+                    function generateXorshift(count, max, seed) {
+                        let x = seed || 1;
+                        let y = 0;
+                        let z = 0;
+                        let w = 0;
+                        
+                        if (seed) {
+                            y = seed ^ 0x87654321;
+                            z = seed ^ 0x12345678;
+                            w = seed ^ 0x56781234;
+                        }
+                        
+                        const numbers = [];
+                        
+                        for (let i = 0; i < count; i++) {
+                            let t = x ^ (x << 11);
+                            x = y;
+                            y = z;
+                            z = w;
+                            w = w ^ (w >>> 19) ^ (t ^ (t >>> 8));
+                            numbers.push((w % max) + 1);
+                        }
+                        
+                        return numbers;
+                    }
+                    
+                    function generateCombined(count, max, seed) {
+                        const lcgA = 1664525;
+                        const lcgC = 1013904223;
+                        const lcgM = Math.pow(2, 32);
+                        
+                        let lcgState = seed;
+                        let xorshiftState = seed ^ 0x12345678;
+                        
+                        const numbers = [];
+                        
+                        for (let i = 0; i < count; i++) {
+                            lcgState = (lcgA * lcgState + lcgC) % lcgM;
+                            xorshiftState ^= xorshiftState << 13;
+                            xorshiftState ^= xorshiftState >>> 17;
+                            xorshiftState ^= xorshiftState << 5;
+                            
+                            const combined = (lcgState ^ xorshiftState) >>> 0;
+                            numbers.push((combined % max) + 1);
+                        }
+                        
+                        return numbers;
+                    }
+                `], { type: 'text/javascript' })));
+                
+                seedDetectionWorker.onmessage = function(e) {
+                    if (e.data.type === 'progress') {
+                        const progress = Math.floor((e.data.seed / e.data.maxSeed) * 100);
+                        document.getElementById("seedProgressBar").style.width = `${progress}%`;
+                        document.getElementById("seedProgressBar").innerText = `${progress}%`;
+                    } else if (e.data.type === 'found') {
+                        const seed = e.data.seed;
+                        document.getElementById("seedResults").innerHTML += 
+                            `<div class="result">Found potential seed: <strong>${seed}</strong></div>`;
+                    } else if (e.data.type === 'complete') {
+                        const foundSeeds = e.data.foundSeeds;
+                        document.getElementById("seedProgressBar").style.width = "100%";
+                        document.getElementById("seedProgressBar").innerText = "100%";
+                        
+                        if (foundSeeds.length === 0) {
+                            document.getElementById("seedResults").innerHTML += 
+                                `<div class="result">No matching seeds found in the specified range.</div>`;
+                        } else {
+                            document.getElementById("seedResults").innerHTML += 
+                                `<div class="result">Seed search complete. Found ${foundSeeds.length} potential seeds.</div>`;
+                        }
+                    }
+                };
+                
+                seedDetectionWorker.postMessage({
+                    algorithm,
+                    sequence,
+                    maxSeed,
+                    extendedVerification
+                });
+            } else {
+                // Single-threaded search
+                const foundSeeds = [];
+                const batchSize = 10000;
+                let processed = 0;
+                
+                function processBatch(startSeed, endSeed) {
+                    for (let seed = startSeed; seed <= endSeed; seed++) {
+                        processed++;
+                        
+                        // Update progress
+                        if (processed % 1000 === 0) {
+                            const progress = Math.floor((processed / maxSeed) * 100);
+                            document.getElementById("seedProgressBar").style.width = `${progress}%`;
+                            document.getElementById("seedProgressBar").innerText = `${progress}%`;
+                        }
+                        
+                        if (verifySeed(algorithm, seed, sequence, extendedVerification)) {
+                            foundSeeds.push(seed);
+                            document.getElementById("seedResults").innerHTML += 
+                                `<div class="result">Found potential seed: <strong>${seed}</strong></div>`;
+                        }
+                    }
+                    
+                    // Process next batch or finish
+                    if (endSeed < maxSeed) {
+                        setTimeout(() => processBatch(endSeed + 1, Math.min(endSeed + batchSize, maxSeed)), 0);
+                    } else {
+                        document.getElementById("seedProgressBar").style.width = "100%";
+                        document.getElementById("seedProgressBar").innerText = "100%";
+                        
+                        if (foundSeeds.length === 0) {
+                            document.getElementById("seedResults").innerHTML += 
+                                `<div class="result">No matching seeds found in the specified range.</div>`;
+                        } else {
+                            document.getElementById("seedResults").innerHTML += 
+                                `<div class="result">Seed search complete. Found ${foundSeeds.length} potential seeds.</div>`;
+                        }
+                    }
+                }
+                
+                // Start processing
+                processBatch(0, Math.min(batchSize, maxSeed));
+            }
+        }
+
+        function verifySeed(algorithm, seed, sequence, extended) {
+            let genSequence = [];
+            let generatorFn;
+            
+            switch (algorithm) {
+                case 'lcg':
+                    generatorFn = generateLCG;
+                    break;
+                case 'xorshift':
+                    generatorFn = generateXorshift;
+                    break;
+                case 'combined':
+                    generatorFn = generateCombined;
+                    break;
+                default:
+                    generatorFn = generateLCG;
+            }
+            
+            // Generate enough numbers to match the input sequence
+            const numbersNeeded = sequence.length;
+            const maxNumber = Math.max(...sequence) + 10; // Add buffer
+            
+            genSequence = generatorFn(numbersNeeded, maxNumber, seed, false, false);
+            
+            // Check if sequences match
+            for (let i = 0; i < sequence.length; i++) {
+                if (genSequence[i] !== sequence[i]) {
+                    return false;
+                }
+            }
+            
+            // Extended verification checks more numbers
+            if (extended) {
+                const extraNumbers = generatorFn(10, maxNumber, seed, false, false);
+                for (let i = 0; i < extraNumbers.length; i++) {
+                    if (extraNumbers[i] !== sequence[i % sequence.length]) {
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        function testSeedPrediction() {
+            const input = document.getElementById("historicalDraws").value.trim();
+            if (!input) {
+                alert("Please enter historical draws first.");
+                return;
+            }
+            
+            const draws = parseInput(input);
+            const sequence = draws.flat();
+            const algorithm = document.getElementById("seedAlgorithm").value;
+            const numbersToPredict = parseInt(document.getElementById("numbersToPredict").value);
+            const seedInput = prompt("Enter a seed to test (found from reverse engineering):");
+            
+            if (!seedInput) return;
+            
+            const seed = parseInt(seedInput);
+            if (isNaN(seed)) {
+                alert("Invalid seed value. Please enter a number.");
+                return;
+            }
+            
+            // Verify the seed first
+            if (!verifySeed(algorithm, seed, sequence, false)) {
+                alert("This seed does not generate the historical sequence. It may be incorrect.");
+                return;
+            }
+            
+            // Generate predictions
+            const maxNumber = Math.max(...sequence) + 10; // Add buffer
+            let generatorFn;
+            
+            switch (algorithm) {
+                case 'lcg':
+                    generatorFn = generateLCG;
+                    break;
+                case 'xorshift':
+                    generatorFn = generateXorshift;
+                    break;
+                case 'combined':
+                    generatorFn = generateCombined;
+                    break;
+                default:
+                    generatorFn = generateLCG;
+            }
+            
+            // Generate numbers (including the historical ones for context)
+            const allNumbers = generatorFn(sequence.length + numbersToPredict, maxNumber, seed, false, false);
+            const historicalPart = allNumbers.slice(0, sequence.length);
+            const predictedPart = allNumbers.slice(sequence.length);
+            
+            // Display results
+            let html = `<h3>Seed Test Results</h3>
+                <div class="result">
+                    <p><strong>Seed:</strong> ${seed}</p>
+                    <p><strong>Algorithm:</strong> ${algorithm}</p>
+                </div>
+                
+                <h4>Historical Sequence Match</h4>
+                <table>
+                    <tr>
+                        <th>Position</th>
+                        <th>Historical</th>
+                        <th>Generated</th>
+                        <th>Match</th>
+                    </tr>`;
+            
+            for (let i = 0; i < sequence.length; i++) {
+                html += `<tr>
+                    <td>${i+1}</td>
+                    <td>${sequence[i]}</td>
+                    <td>${historicalPart[i]}</td>
+                    <td>${sequence[i] === historicalPart[i] ? '✅' : '❌'}</td>
+                </tr>`;
+            }
+            
+            html += `</table>
+                
+                <h4>Predicted Next ${numbersToPredict} Numbers</h4>
+                <div style="margin: 15px 0;">`;
+            
+            for (const num of predictedPart) {
+                html += `<span class="number-ball">${num}</span>`;
+            }
+            
+            html += `</div>
+                <p>Note: These predictions are based on the PRNG algorithm continuing with the same seed.</p>`;
+            
+            document.getElementById("predictionResults").innerHTML = html;
+        }
+
+        // Smart Predictor Functions
+        function generateSmartPredictions() {
+            const input = document.getElementById("lotteryNumbers").value.trim();
+            if (!input) {
+                alert("Please enter historical draws in the Analyzer tab first.");
+                return;
+            }
+            
+            const draws = parseInput(input);
+            if (draws.length < 10) {
+                alert("Please enter at least 10 draws for meaningful predictions.");
+                return;
+            }
+            
+            const method = document.getElementById("predictionMethod").value;
+            const count = parseInt(document.getElementById("predictionCount").value);
+            const useCombined = document.getElementById("useCombinedMethods").checked;
+            const weightRecent = document.getElementById("weightRecent").checked;
+            
+            // Perform analysis
+            const analysis = performAdvancedAnalysis(draws);
+            
+            // Generate predictions based on selected method
+            let predictions = [];
+            
+            if (useCombined) {
+                // Combine multiple methods
+                const freqPredictions = predictByFrequency(analysis, count, weightRecent);
+                const gapPredictions = predictByGap(analysis, count, weightRecent);
+                const posPredictions = predictByPosition(analysis, count, weightRecent);
+                
+                // Combine and rank predictions
+                const combined = {};
+                
+                for (const num of freqPredictions) {
+                    combined[num] = (combined[num] || 0) + 3; // Higher weight for frequency
+                }
+                
+                for (const num of gapPredictions) {
+                    combined[num] = (combined[num] || 0) + 2;
+                }
+                
+                for (const num of posPredictions) {
+                    combined[num] = (combined[num] || 0) + 1;
+                }
+                
+                // Sort by combined score
+                predictions = Object.entries(combined)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(x => parseInt(x[0]))
+                    .slice(0, count);
+            } else {
+                // Use single method
+                switch (method) {
+                    case 'frequency':
+                        predictions = predictByFrequency(analysis, count, weightRecent);
+                        break;
+                    case 'gap':
+                        predictions = predictByGap(analysis, count, weightRecent);
+                        break;
+                    case 'positional':
+                        predictions = predictByPosition(analysis, count, weightRecent);
+                        break;
+                    case 'markov':
+                        predictions = predictByMarkov(draws, count);
+                        break;
+                    case 'neural':
+                        predictions = predictByNeural(draws, count);
+                        break;
+                    default:
+                        predictions = predictByFrequency(analysis, count, weightRecent);
+                }
+            }
+            
+            // Display results
+            let html = `<h3>Smart Predictions</h3>
+                <div class="result">
+                    <p><strong>Method:</strong> ${useCombined ? 'Combined Methods' : method}</p>
+                    <p><strong>Historical Draws:</strong> ${draws.length}</p>
+                </div>
+                
+                <h4>Recommended Numbers</h4>
+                <div style="margin: 15px 0;">`;
+            
+            for (const num of predictions) {
+                const isHot = analysis.hotNumbers.includes(num.toString());
+                const isCold = analysis.coldNumbers.includes(num.toString());
+                let ballClass = '';
+                
+                if (isHot) ballClass = 'highlight';
+                if (isCold) ballClass = 'cold';
+                
+                html += `<span class="number-ball ${ballClass}">${num}</span>`;
+            }
+            
+            html += `</div>
+                <div class="result">
+                    <p><strong>Note:</strong> These predictions are based on statistical analysis and do not guarantee winning numbers.</p>
+                </div>`;
+            
+            document.getElementById("predictionOutput").innerHTML = html;
+        }
+
+       function predictByFrequency(analysis, count, weightRecent) {
+    // Get all numbers sorted by frequency (descending)
+    let sorted = Object.entries(analysis.frequency).sort((a, b) => b[1] - a[1]);
+    
+    // If weighting recent, give more weight to numbers in recent draws
+    if (weightRecent) {
+        const lastDraw = analysis.lastDraw;
+        const recentWeight = 2; // Weight multiplier for recent numbers
+        
+        // Create a weighted frequency map
+        const weightedFreq = {};
+        for (const [num, freq] of Object.entries(analysis.frequency)) {
+            weightedFreq[num] = freq;
+            // If number appeared in last draw, increase its weight
+            if (lastDraw.includes(parseInt(num))) {
+                weightedFreq[num] = freq * recentWeight;
+            }
+        }
+        
+        // Re-sort with weighted frequencies
+        sorted = Object.entries(weightedFreq).sort((a, b) => b[1] - a[1]);
+    }
+    
+    // Get the top numbers
+    const topNumbers = sorted.slice(0, count * 2); // Get extra numbers for variety
+    
+    // Randomly select from the top candidates to avoid always returning the exact same sequence
+    const shuffled = [...topNumbers].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, count).map(x => parseInt(x[0]));
+    
+    // Sort the final selection
+    return selected.sort((a, b) => a - b);
+}
+
+function predictByGap(analysis, count, weightRecent) {
+    // Get all numbers sorted by average gap (ascending)
+    let sorted = Object.entries(analysis.gaps).sort((a, b) => a[1] - b[1]);
+    
+    // If weighting recent, prioritize numbers that have appeared recently
+    if (weightRecent) {
+        const lastDraw = analysis.lastDraw;
+        const recentBonus = 0.5; // Bonus for recent appearance (reduces effective gap)
+        
+        // Create a weighted gap map
+        const weightedGaps = {};
+        for (const [num, gap] of Object.entries(analysis.gaps)) {
+            weightedGaps[num] = gap;
+            // If number appeared in last draw, reduce its effective gap
+            if (lastDraw.includes(parseInt(num))) {
+                weightedGaps[num] = Math.max(0, gap - recentBonus);
+            }
+        }
+        
+        // Re-sort with weighted gaps
+        sorted = Object.entries(weightedGaps).sort((a, b) => a[1] - b[1]);
+    }
+    
+    // Get the top numbers (smallest gaps)
+    const topNumbers = sorted.slice(0, count * 2); // Get extra numbers for variety
+    
+    // Randomly select from the top candidates
+    const shuffled = [...topNumbers].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, count).map(x => parseInt(x[0]));
+    
+    // Sort the final selection
+    return selected.sort((a, b) => a - b);
+}
+
+function predictByPosition(analysis, count, weightRecent) {
+    const positionWeights = {};
+    const maxPosition = Object.keys(analysis.positions).length;
+    
+    // Calculate weights for each number based on positional frequency
+    for (const [pos, numbers] of Object.entries(analysis.positions)) {
+        for (let i = 0; i < numbers.length; i++) {
+            const [num, freq] = numbers[i];
+            const weight = (maxPosition - parseInt(pos) + 1) * (numbers.length - i);
+            
+            if (!positionWeights[num]) positionWeights[num] = 0;
+            positionWeights[num] += weight;
+            
+            // Extra weight if this number was in this position recently
+            if (weightRecent && analysis.lastPositionalAnalysis[pos] === num) {
+                positionWeights[num] += weight * 0.5;
+            }
+        }
+    }
+    
+    // Sort numbers by their composite positional weight
+    const sorted = Object.entries(positionWeights).sort((a, b) => b[1] - a[1]);
+    
+    // Get the top numbers
+    const topNumbers = sorted.slice(0, count * 2);
+    
+    // Randomly select from the top candidates
+    const shuffled = [...topNumbers].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, count).map(x => parseInt(x[0]));
+    
+    // Sort the final selection
+    return selected.sort((a, b) => a - b);
+}
+
+function predictByMarkov(draws, count) {
+    // Simple Markov chain implementation
+    const chain = {};
+    const numbers = new Set();
+    
+    // Build transition probabilities
+    for (const draw of draws) {
+        for (let i = 0; i < draw.length - 1; i++) {
+            const current = draw[i];
+            const next = draw[i + 1];
+            numbers.add(current);
+            
+            if (!chain[current]) chain[current] = {};
+            chain[current][next] = (chain[current][next] || 0) + 1;
+        }
+    }
+    
+    // Normalize probabilities
+    for (const num in chain) {
+        const total = Object.values(chain[num]).reduce((a, b) => a + b, 0);
+        for (const next in chain[num]) {
+            chain[num][next] = chain[num][next] / total;
+        }
+    }
+    
+    // Generate predictions starting from the most recent numbers
+    const predictions = new Set();
+    const recentNumbers = [...draws[draws.length - 1]].sort(() => 0.5 - Math.random());
+    
+    for (const startNum of recentNumbers.slice(0, 3)) {
+        if (!chain[startNum]) continue;
+        
+        // Get probable next numbers
+        const transitions = Object.entries(chain[startNum])
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
+        
+        for (const [nextNum] of transitions) {
+            predictions.add(parseInt(nextNum));
+            if (predictions.size >= count * 2) break;
+        }
+    }
+    
+    // If we didn't get enough predictions, fill with random numbers
+    if (predictions.size < count) {
+        const allNumbers = Array.from(numbers);
+        while (predictions.size < count) {
+            const randomNum = allNumbers[Math.floor(Math.random() * allNumbers.length)];
+            predictions.add(randomNum);
+        }
+    }
+    
+    // Convert to array and select the requested count
+    const predictionArray = Array.from(predictions);
+    const shuffled = [...predictionArray].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, count);
+    
+    return selected.sort((a, b) => a - b);
+}
+
+function predictByNeural(draws, count) {
+    // This is a simplified simulation - a real implementation would use a proper neural network library
+    // For this demo, we'll use a statistical approach that mimics some neural network behaviors
+    
+    // Create a "neural" representation of number relationships
+    const relationships = {};
+    const allNumbers = new Set();
+    
+    // Record co-occurrences and sequences
+    for (const draw of draws) {
+        for (const num of draw) {
+            allNumbers.add(num);
+            if (!relationships[num]) relationships[num] = { cooccur: {}, sequence: {} };
+        }
+        
+        // Record co-occurrences
+        for (let i = 0; i < draw.length; i++) {
+            for (let j = i + 1; j < draw.length; j++) {
+                const num1 = draw[i];
+                const num2 = draw[j];
+                
+                relationships[num1].cooccur[num2] = (relationships[num1].cooccur[num2] || 0) + 1;
+                relationships[num2].cooccur[num1] = (relationships[num2].cooccur[num1] || 0) + 1;
+            }
+        }
+        
+        // Record sequences
+        for (let i = 0; i < draw.length - 1; i++) {
+            const from = draw[i];
+            const to = draw[i + 1];
+            relationships[from].sequence[to] = (relationships[from].sequence[to] || 0) + 1;
+        }
+    }
+    
+    // Calculate "neural" activation scores
+    const scores = {};
+    const recentNumbers = draws[draws.length - 1];
+    const decayFactor = 0.9; // How quickly influence decays
+    
+    // Initialize with recent numbers
+    for (const num of recentNumbers) {
+        scores[num] = 1.0;
+    }
+    
+    // Propagate activation through relationships
+    for (let i = 0; i < 3; i++) { // 3 propagation steps
+        const newScores = {};
+        
+        for (const num in scores) {
+            const currentActivation = scores[num];
+            
+            // Propagate through co-occurrences
+            for (const coNum in relationships[num].cooccur) {
+                const strength = relationships[num].cooccur[coNum] / draws.length;
+                newScores[coNum] = (newScores[coNum] || 0) + currentActivation * strength * decayFactor;
+            }
+            
+            // Propagate through sequences
+            for (const seqNum in relationships[num].sequence) {
+                const strength = relationships[num].sequence[seqNum] / draws.length;
+                newScores[seqNum] = (newScores[seqNum] || 0) + currentActivation * strength * decayFactor;
+            }
+        }
+        
+        // Update scores with new activations
+        for (const num in newScores) {
+            scores[num] = (scores[num] || 0) + newScores[num];
+        }
+    }
+    
+    // Get top predicted numbers
+    const sorted = Object.entries(scores)
+        .filter(([num]) => !recentNumbers.includes(parseInt(num))) // Exclude recent numbers
+        .sort((a, b) => b[1] - a[1]);
+    
+    // Select predictions
+    const predictions = sorted.slice(0, count).map(x => parseInt(x[0]));
+    
+    // If we didn't get enough, fill with random numbers
+    if (predictions.length < count) {
+        const remaining = count - predictions.length;
+        const allNumbersArray = Array.from(allNumbers).filter(n => !predictions.includes(n));
+        
+        for (let i = 0; i < remaining; i++) {
+            const randomIndex = Math.floor(Math.random() * allNumbersArray.length);
+            predictions.push(allNumbersArray[randomIndex]);
+        }
+    }
+    
+    return predictions.sort((a, b) => a - b);
+}
