@@ -1438,26 +1438,25 @@
         let cryptoPredictionWorker = null;
 
         // DOM Ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize theme
-            initTheme();
-            
-            // Set up event listeners
-            document.getElementById('prng-algorithm').addEventListener('change', updateAlgorithmParams);
-            document.getElementById('lotto-game-type').addEventListener('change', updateLottoParams);
-            document.getElementById('lotto-reverse-game-type').addEventListener('change', updateLottoReverseParams);
-            document.getElementById('compare-mode').addEventListener('change', updateCompareFields);
-            
-            // Initialize algorithm info
-            updateAlgorithmParams();
-            
-            // Load sample data for visualization
-            sampleVisualizationData();
-            
-            // Set up tab switching
-            setupTabs();
-        });
-
+       document.addEventListener('DOMContentLoaded', function() {
+    // Initialize theme
+    initTheme();
+    
+    // Set up event listeners
+    document.getElementById('prng-algorithm').addEventListener('change', updateAlgorithmParams);
+    document.getElementById('lotto-game-type').addEventListener('change', updateLottoParams);
+    document.getElementById('lotto-reverse-game-type').addEventListener('change', updateLottoReverseParams);
+    document.getElementById('compare-mode').addEventListener('change', updateCompareFields);
+    
+    // Initialize algorithm info
+    updateAlgorithmParams();
+    
+    // Load sample data for visualization
+    sampleVisualizationData();
+    
+    // Set up tab switching
+    setupTabs();
+});
          function setupTabs() {
     const tabs = document.querySelectorAll('.tab');
     
