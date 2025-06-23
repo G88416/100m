@@ -1102,108 +1102,803 @@
         </div>
         
         <!-- Lotto Reverse Engineer Tab (Improved Version) -->
-        <div id="lotto-reverse" class="tab-content">
-            <div class="grid">
-                <div>
-                    <label for="lotto-reverse-game-type">Lottery Game:</label>
-                    <select id="lotto-reverse-game-type" onchange="updateLottoReverseParams()">
-                        <option value="powerball">Powerball (5/69 + 1/26)</option>
-                        <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
-                        <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
-                        <option value="custom-reverse">Custom Game</option>
-                    </select>
-                    
-                    <div id="lotto-custom-reverse-params" style="display: none;">
-                        <div class="grid">
-                            <div>
-                                <label for="lotto-reverse-main-numbers">Main Numbers Pool:</label>
-                                <input type="number" id="lotto-reverse-main-numbers" min="1" value="69">
-                            </div>
-                            <div>
-                                <label for="lotto-reverse-pick-numbers">Numbers to Pick:</label>
-                                <input type="number" id="lotto-reverse-pick-numbers" min="1" value="5">
-                            </div>
-                        </div>
-                        <div class="grid">
-                            <div>
-                                <label for="lotto-reverse-bonus-numbers">Bonus Numbers Pool:</label>
-                                <input type="number" id="lotto-reverse-bonus-numbers" min="0" value="26">
-                            </div>
-                            <div>
-                                <label for="lotto-reverse-pick-bonus">Bonus Numbers to Pick:</label>
-                                <input type="number" id="lotto-reverse-pick-bonus" min="0" value="1">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <label for="lotto-observed-numbers">Observed Numbers (one draw per line, format: 1,2,3,4,5|1):</label>
-                    <textarea id="lotto-observed-numbers" rows="5" placeholder="Example for Powerball:
-3, 17, 25, 36, 55 | 12
-5, 10, 20, 30, 40 | 15"></textarea>
-                    
-                    <label for="lotto-reverse-range">Seed search range:</label>
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Previous head content remains the same -->
+    <style>
+        /* Previous styles remain the same */
+        
+        /* Additional styles for improved Lotto Reverse */
+        .seed-candidate {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .seed-candidate h5 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+        
+        .seed-candidate-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .seed-candidate button {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .verification-draw {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border-left: 4px solid var(--border-color);
+        }
+        
+        .verification-draw.match {
+            border-left-color: var(--success);
+            background-color: rgba(102, 187, 106, 0.1);
+        }
+        
+        .verification-draw.no-match {
+            border-left-color: var(--danger);
+            background-color: rgba(239, 83, 80, 0.1);
+        }
+        
+        .algorithm-options {
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border-radius: 4px;
+        }
+        
+        .algorithm-option {
+            margin-bottom: 0.5rem;
+        }
+        
+        .algorithm-option label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .algorithm-option input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Previous HTML content remains the same until the Lotto Reverse tab -->
+    
+    <!-- Lotto Reverse Engineer Tab (Improved Version) -->
+    <div id="lotto-reverse" class="tab-content">
+        <div class="grid">
+            <div>
+                <label for="lotto-reverse-game-type">Lottery Game:</label>
+                <select id="lotto-reverse-game-type" onchange="updateLottoReverseParams()">
+                    <option value="powerball">Powerball (5/69 + 1/26)</option>
+                    <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
+                    <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
+                    <option value="lotto649">Lotto 6/49</option>
+                    <option value="custom-reverse">Custom Game</option>
+                </select>
+                
+                <div id="lotto-custom-reverse-params" style="display: none;">
                     <div class="grid">
                         <div>
-                            <input type="number" id="lotto-reverse-min" value="0" placeholder="Min seed">
+                            <label for="lotto-reverse-main-numbers">Main Numbers Pool:</label>
+                            <input type="number" id="lotto-reverse-main-numbers" min="1" value="69">
                         </div>
                         <div>
-                            <input type="number" id="lotto-reverse-max" value="100000" placeholder="Max seed">
+                            <label for="lotto-reverse-pick-numbers">Numbers to Pick:</label>
+                            <input type="number" id="lotto-reverse-pick-numbers" min="1" value="5">
                         </div>
                     </div>
-                    
-                    <label for="lotto-predict-count">Number of future draws to predict:</label>
-                    <input type="number" id="lotto-predict-count" min="1" value="5" max="20">
-                    
-                    <div class="status info" id="lotto-reverse-status">
-                        Enter observed numbers to begin reverse engineering. More draws increase accuracy.
-                    </div>
-                    
-                    <div class="progress-container" id="lotto-reverse-progress" style="display: none;">
-                        <div class="progress-bar" id="lotto-progress-bar"></div>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button onclick="reverseEngineerLottoSeed()" class="warning">
-                            <i class="fas fa-search"></i> Reverse Engineer Seed
-                        </button>
-                        <button onclick="stopLottoReverseEngineer()" class="danger" id="lotto-stop-button" style="display: none;">
-                            <i class="fas fa-stop"></i> Stop
-                        </button>
-                        <button onclick="verifyLottoSeed()" class="info">
-                            <i class="fas fa-check"></i> Verify Seed
-                        </button>
-                        <button onclick="clearLottoReverse()" class="secondary">
-                            <i class="fas fa-trash"></i> Clear
-                        </button>
-                        <button onclick="sampleLottoData()" class="info">
-                            <i class="fas fa-file-alt"></i> Load Sample Data
-                        </button>
+                    <div class="grid">
+                        <div>
+                            <label for="lotto-reverse-bonus-numbers">Bonus Numbers Pool:</label>
+                            <input type="number" id="lotto-reverse-bonus-numbers" min="0" value="26">
+                        </div>
+                        <div>
+                            <label for="lotto-reverse-pick-bonus">Bonus Numbers to Pick:</label>
+                            <input type="number" id="lotto-reverse-pick-bonus" min="0" value="1">
+                        </div>
                     </div>
                 </div>
                 
-                <div>
-                    <label>Reverse Engineering Results:</label>
-                    <div class="result" id="lotto-reverse-results">
-                        Results will appear here after analysis.
+                <div class="algorithm-options">
+                    <h4>Reverse Engineering Algorithm</h4>
+                    <div class="algorithm-option">
+                        <label>
+                            <input type="radio" name="reverse-algorithm" value="mulberry32" checked>
+                            Mulberry32 (Default)
+                        </label>
                     </div>
-                    
-                    <label>Verification:</label>
-                    <div id="lotto-verification-results"></div>
-                    
-                    <div id="lotto-predictions">
-                        <h4>Predicted Future Draws</h4>
-                        <div id="lotto-predictions-content"></div>
+                    <div class="algorithm-option">
+                        <label>
+                            <input type="radio" name="reverse-algorithm" value="xorshift32">
+                            Xorshift32
+                        </label>
                     </div>
-                    
-                    <div id="lotto-frequency-analysis">
-                        <h4>Frequency Analysis</h4>
-                        <div id="lotto-frequency-content"></div>
+                    <div class="algorithm-option">
+                        <label>
+                            <input type="radio" name="reverse-algorithm" value="sfc32">
+                            sfc32 (Small Fast Counter)
+                        </label>
                     </div>
-                    
-                    <div id="lotto-statistics">
-                        <h4>Statistical Analysis</h4>
-                        <div id="lotto-statistics-content"></div>
+                    <div class="algorithm-option">
+                        <label>
+                            <input type="radio" name="reverse-algorithm" value="lcg">
+                            Linear Congruential Generator
+                        </label>
                     </div>
+                    <div class="algorithm-option">
+                        <label>
+                            <input type="radio" name="reverse-algorithm" value="mt">
+                            Mersenne Twister (Partial)
+                        </label>
+                    </div>
+                </div>
+                
+                <label for="lotto-observed-numbers">Observed Numbers (one draw per line, format: 1,2,3,4,5|1):</label>
+                <textarea id="lotto-observed-numbers" rows="5" placeholder="Example for Powerball:
+3, 17, 25, 36, 55 | 12
+5, 10, 20, 30, 40 | 15"></textarea>
+                
+                <label for="lotto-reverse-range">Seed search range:</label>
+                <div class="grid">
+                    <div>
+                        <input type="number" id="lotto-reverse-min" value="0" placeholder="Min seed">
+                    </div>
+                    <div>
+                        <input type="number" id="lotto-reverse-max" value="100000" placeholder="Max seed">
+                    </div>
+                </div>
+                
+                <label for="lotto-predict-count">Number of future draws to predict:</label>
+                <input type="number" id="lotto-predict-count" min="1" value="5" max="20">
+                
+                <div class="status info" id="lotto-reverse-status">
+                    Enter observed numbers to begin reverse engineering. More draws increase accuracy.
+                </div>
+                
+                <div class="progress-container" id="lotto-reverse-progress" style="display: none;">
+                    <div class="progress-bar" id="lotto-progress-bar"></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button onclick="reverseEngineerLottoSeed()" class="warning">
+                        <i class="fas fa-search"></i> Reverse Engineer Seed
+                    </button>
+                    <button onclick="stopLottoReverseEngineer()" class="danger" id="lotto-stop-button" style="display: none;">
+                        <i class="fas fa-stop"></i> Stop
+                    </button>
+                    <button onclick="verifyLottoSeed()" class="info">
+                        <i class="fas fa-check"></i> Verify Seed
+                    </button>
+                    <button onclick="clearLottoReverse()" class="secondary">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                    <button onclick="sampleLottoData()" class="info">
+                        <i class="fas fa-file-alt"></i> Load Sample Data
+                    </button>
+                </div>
+            </div>
+            
+            <div>
+                <label>Reverse Engineering Results:</label>
+                <div class="result" id="lotto-reverse-results">
+                    Results will appear here after analysis.
+                </div>
+                
+                <label>Verification:</label>
+                <div id="lotto-verification-results"></div>
+                
+                <div id="lotto-predictions">
+                    <h4>Predicted Future Draws</h4>
+                    <div id="lotto-predictions-content"></div>
+                </div>
+                
+                <div id="lotto-frequency-analysis">
+                    <h4>Frequency Analysis</h4>
+                    <div id="lotto-frequency-content"></div>
+                </div>
+                
+                <div id="lotto-statistics">
+                    <h4>Statistical Analysis</h4>
+                    <div id="lotto-statistics-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rest of the HTML remains the same -->
+
+    <script>
+        // Previous JavaScript remains the same until the Lotto Reverse functions
+
+        // Enhanced Lotto Reverse Engineering Functions
+
+        function reverseEngineerLottoSeed() {
+            const gameType = document.getElementById('lotto-reverse-game-type').value;
+            const algorithm = document.querySelector('input[name="reverse-algorithm"]:checked').value;
+            
+            let mainPool, pickCount, bonusPool, bonusCount;
+            
+            if (gameType === 'custom-reverse') {
+                mainPool = parseInt(document.getElementById('lotto-reverse-main-numbers').value) || 69;
+                pickCount = parseInt(document.getElementById('lotto-reverse-pick-numbers').value) || 5;
+                bonusPool = parseInt(document.getElementById('lotto-reverse-bonus-numbers').value) || 0;
+                bonusCount = parseInt(document.getElementById('lotto-reverse-pick-bonus').value) || 0;
+            } else {
+                switch(gameType) {
+                    case 'powerball':
+                        mainPool = 69;
+                        pickCount = 5;
+                        bonusPool = 26;
+                        bonusCount = 1;
+                        break;
+                    case 'megamillions':
+                        mainPool = 70;
+                        pickCount = 5;
+                        bonusPool = 25;
+                        bonusCount = 1;
+                        break;
+                    case 'euromillions':
+                        mainPool = 50;
+                        pickCount = 5;
+                        bonusPool = 12;
+                        bonusCount = 2;
+                        break;
+                    case 'lotto649':
+                        mainPool = 49;
+                        pickCount = 6;
+                        bonusPool = 0;
+                        bonusCount = 0;
+                        break;
+                    default:
+                        mainPool = 69;
+                        pickCount = 5;
+                        bonusPool = 26;
+                        bonusCount = 1;
+                }
+            }
+            
+            const observedText = document.getElementById('lotto-observed-numbers').value.trim();
+            if (!observedText) {
+                showToast('Please enter observed numbers', 'warning');
+                return;
+            }
+            
+            // Parse observed numbers
+            const observedDraws = observedText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line)
+                .map(line => {
+                    const parts = line.split('|').map(p => p.trim());
+                    const main = parts[0].split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                    const bonus = parts[1] ? parts[1].split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n)) : [];
+                    return { main, bonus };
+                });
+                
+            // Validate draws
+            for (const draw of observedDraws) {
+                if (draw.main.length !== pickCount) {
+                    showToast(`Each draw must have exactly ${pickCount} main numbers`, 'danger');
+                    return;
+                }
+                
+                if (bonusCount > 0 && draw.bonus.length !== bonusCount) {
+                    showToast(`Each draw must have exactly ${bonusCount} bonus numbers`, 'danger');
+                    return;
+                }
+            }
+            
+            if (observedDraws.length < 3) {
+                showToast('At least 3 draws are required for reliable analysis', 'warning');
+                return;
+            }
+            
+            const minSeed = parseInt(document.getElementById('lotto-reverse-min').value) || 0;
+            const maxSeed = parseInt(document.getElementById('lotto-reverse-max').value) || 100000;
+            
+            if (minSeed >= maxSeed) {
+                showToast('Max seed must be greater than min seed', 'danger');
+                return;
+            }
+            
+            // Show progress
+            document.getElementById('lotto-reverse-progress').style.display = 'block';
+            document.getElementById('lotto-stop-button').style.display = 'inline-block';
+            document.getElementById('lotto-reverse-status').className = 'status info';
+            document.getElementById('lotto-reverse-status').textContent = 'Starting reverse engineering...';
+            
+            // Use Web Worker for intensive computation
+            if (lottoReverseWorker) {
+                lottoReverseWorker.terminate();
+            }
+            
+            // Create worker with selected algorithm
+            lottoReverseWorker = new Worker(URL.createObjectURL(new Blob([`
+                // Import the selected algorithm
+                ${algorithm === 'mulberry32' ? mulberry32.toString() : 
+                  algorithm === 'xorshift32' ? xorshift.toString() : 
+                  algorithm === 'sfc32' ? sfc32.toString() : 
+                  algorithm === 'lcg' ? lcg.toString() : 
+                  algorithm === 'mt' ? mersenneTwister.toString() : ''}
+                
+                function generateLottoDraw(seed, mainPool, pickCount, bonusPool, bonusCount, algorithm) {
+                    let gen;
+                    
+                    switch(algorithm) {
+                        case 'mulberry32':
+                            gen = mulberry32(seed);
+                            break;
+                        case 'xorshift32':
+                            gen = xorshift(seed);
+                            break;
+                        case 'sfc32':
+                            // sfc32 requires 4 seeds, so we derive them from the single seed
+                            gen = sfc32(seed, seed + 1, seed + 2, seed + 3);
+                            break;
+                        case 'lcg':
+                            // Using common LCG parameters
+                            gen = lcg(1664525, 1013904223, 4294967296, seed);
+                            break;
+                        case 'mt':
+                            gen = mersenneTwister(seed);
+                            break;
+                        default:
+                            gen = mulberry32(seed);
+                    }
+                    
+                    const mainNumbers = [];
+                    const availableNumbers = Array.from({length: mainPool}, (_, i) => i + 1);
+                    
+                    for (let j = 0; j < pickCount; j++) {
+                        const randomIndex = Math.floor(gen() * availableNumbers.length);
+                        mainNumbers.push(availableNumbers.splice(randomIndex, 1)[0]);
+                    }
+                    
+                    mainNumbers.sort((a, b) => a - b);
+                    
+                    let bonusNumbers = [];
+                    if (bonusPool > 0 && bonusCount > 0) {
+                        const availableBonus = Array.from({length: bonusPool}, (_, i) => i + 1);
+                        
+                        for (let j = 0; j < bonusCount; j++) {
+                            const randomIndex = Math.floor(gen() * availableBonus.length);
+                            bonusNumbers.push(availableBonus.splice(randomIndex, 1)[0]);
+                        }
+                        
+                        bonusNumbers.sort((a, b) => a - b);
+                    }
+                    
+                    return { main: mainNumbers, bonus: bonusNumbers };
+                }
+                
+                onmessage = function(e) {
+                    const { minSeed, maxSeed, observedDraws, mainPool, pickCount, bonusPool, bonusCount, algorithm } = e.data;
+                    const candidates = [];
+                    
+                    // Search for seeds that generate the observed sequence
+                    for (let seed = minSeed; seed <= maxSeed; seed++) {
+                        let match = true;
+                        
+                        // Test this seed against all observed draws
+                        for (let i = 0; i < observedDraws.length; i++) {
+                            const draw = generateLottoDraw(seed + i, mainPool, pickCount, bonusPool, bonusCount, algorithm);
+                            
+                            // Compare main numbers
+                            if (draw.main.join(',') !== observedDraws[i].main.join(',')) {
+                                match = false;
+                                break;
+                            }
+                            
+                            // Compare bonus numbers if applicable
+                            if (bonusCount > 0 && draw.bonus.join(',') !== observedDraws[i].bonus.join(',')) {
+                                match = false;
+                                break;
+                            }
+                        }
+                        
+                        if (match) {
+                            candidates.push(seed);
+                            
+                            // For demo purposes, limit to 5 candidates
+                            if (candidates.length >= 5) {
+                                break;
+                            }
+                        }
+                        
+                        // Report progress every 1000 seeds
+                        if (seed % 1000 === 0) {
+                            postMessage({
+                                type: 'progress',
+                                progress: ((seed - minSeed) / (maxSeed - minSeed)) * 100,
+                                currentSeed: seed
+                            });
+                        }
+                    }
+                    
+                    postMessage({
+                        type: 'result',
+                        candidates,
+                        algorithm
+                    });
+                };
+            `], { type: 'application/javascript' })));
+            
+            lottoReverseWorker.onmessage = function(e) {
+                const data = e.data;
+                
+                if (data.type === 'progress') {
+                    document.getElementById('lotto-progress-bar').style.width = `${data.progress}%`;
+                    document.getElementById('lotto-reverse-status').textContent = 
+                        `Searching... ${Math.floor(data.progress)}% complete (testing seed ${data.currentSeed})`;
+                    return;
+                }
+                
+                // Handle final result
+                document.getElementById('lotto-reverse-progress').style.display = 'none';
+                document.getElementById('lotto-stop-button').style.display = 'none';
+                
+                if (data.candidates.length === 0) {
+                    document.getElementById('lotto-reverse-status').className = 'status warning';
+                    document.getElementById('lotto-reverse-status').textContent = 
+                        'No matching seeds found in the specified range. Try expanding the search range or using a different algorithm.';
+                    return;
+                }
+                
+                // Display seed candidates
+                let resultsHTML = `<h4>Possible Seeds (using ${data.algorithm.toUpperCase()} algorithm)</h4>`;
+                resultsHTML += '<div class="seed-candidates">';
+                
+                data.candidates.forEach(seed => {
+                    resultsHTML += `
+                        <div class="seed-candidate">
+                            <h5>Seed: ${seed}</h5>
+                            <div class="seed-candidate-actions">
+                                <button class="small" onclick="verifyLottoSeed(${seed}, '${data.algorithm}')">Verify</button>
+                                <button class="small" onclick="predictFromLottoSeed(${seed}, '${data.algorithm}')">Predict Next</button>
+                            </div>
+                            
+                            <div class="verification-draws">
+                                <h6>Verification:</h6>
+                                ${observedDraws.map((draw, i) => {
+                                    const verifiedDraw = generateLottoDraw(seed + i, mainPool, pickCount, bonusPool, bonusCount, data.algorithm);
+                                    const mainMatch = verifiedDraw.main.join(',') === draw.main.join(',');
+                                    const bonusMatch = bonusCount === 0 || verifiedDraw.bonus.join(',') === draw.bonus.join(',');
+                                    const match = mainMatch && bonusMatch;
+                                    
+                                    return `
+                                        <div class="verification-draw ${match ? 'match' : 'no-match'}">
+                                            <div>Draw ${i + 1}: ${verifiedDraw.main.join(', ')} ${bonusCount > 0 ? '| ' + verifiedDraw.bonus.join(', ') : ''}</div>
+                                            <div>${match ? '✓ Match' : '✗ No Match'}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsHTML += '</div>';
+                document.getElementById('lotto-reverse-results').innerHTML = resultsHTML;
+                
+                document.getElementById('lotto-reverse-status').className = 'status success';
+                document.getElementById('lotto-reverse-status').textContent = 
+                    `Found ${data.candidates.length} matching seed(s) using ${data.algorithm.toUpperCase()} algorithm`;
+            };
+            
+            lottoReverseWorker.onerror = function(error) {
+                document.getElementById('lotto-reverse-progress').style.display = 'none';
+                document.getElementById('lotto-stop-button').style.display = 'none';
+                document.getElementById('lotto-reverse-status').className = 'status error';
+                document.getElementById('lotto-reverse-status').textContent = 'Error: ' + error.message;
+            };
+            
+            // Start the worker
+            lottoReverseWorker.postMessage({
+                minSeed,
+                maxSeed,
+                observedDraws,
+                mainPool,
+                pickCount,
+                bonusPool,
+                bonusCount,
+                algorithm
+            });
+        }
+
+        function verifyLottoSeed(seed, algorithm) {
+            if (seed === undefined) {
+                seed = parseInt(prompt('Enter seed to verify:'));
+                if (isNaN(seed)) {
+                    showToast('Invalid seed', 'danger');
+                    return;
+                }
+            }
+            
+            if (algorithm === undefined) {
+                algorithm = document.querySelector('input[name="reverse-algorithm"]:checked').value;
+            }
+            
+            const gameType = document.getElementById('lotto-reverse-game-type').value;
+            let mainPool, pickCount, bonusPool, bonusCount;
+            
+            if (gameType === 'custom-reverse') {
+                mainPool = parseInt(document.getElementById('lotto-reverse-main-numbers').value) || 69;
+                pickCount = parseInt(document.getElementById('lotto-reverse-pick-numbers').value) || 5;
+                bonusPool = parseInt(document.getElementById('lotto-reverse-bonus-numbers').value) || 0;
+                bonusCount = parseInt(document.getElementById('lotto-reverse-pick-bonus').value) || 0;
+            } else {
+                switch(gameType) {
+                    case 'powerball':
+                        mainPool = 69;
+                        pickCount = 5;
+                        bonusPool = 26;
+                        bonusCount = 1;
+                        break;
+                    case 'megamillions':
+                        mainPool = 70;
+                        pickCount = 5;
+                        bonusPool = 25;
+                        bonusCount = 1;
+                        break;
+                    case 'euromillions':
+                        mainPool = 50;
+                        pickCount = 5;
+                        bonusPool = 12;
+                        bonusCount = 2;
+                        break;
+                    case 'lotto649':
+                        mainPool = 49;
+                        pickCount = 6;
+                        bonusPool = 0;
+                        bonusCount = 0;
+                        break;
+                    default:
+                        mainPool = 69;
+                        pickCount = 5;
+                        bonusPool = 26;
+                        bonusCount = 1;
+                }
+            }
+            
+            const observedText = document.getElementById('lotto-observed-numbers').value.trim();
+            if (!observedText) {
+                showToast('Please enter observed numbers first', 'warning');
+                return;
+            }
+            
+            // Parse observed numbers
+            const observedDraws = observedText.split('\n')
+                .map(line => line.trim())
+                .filter(line => line)
+                .map(line => {
+                    const parts = line.split('|').map(p => p.trim());
+                    const main = parts[0].split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                    const bonus = parts[1] ? parts[1].split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n)) : [];
+                    return { main, bonus };
+                });
+                
+            // Generate verification draws
+            let verificationHTML = `<h4>Seed Verification (using ${algorithm.toUpperCase()} algorithm)</h4>`;
+            verificationHTML += `<p>Testing seed: ${seed}</p>`;
+            verificationHTML += '<div class="numbers-comparison">';
+            
+            let allMatch = true;
+            
+            for (let i = 0; i < observedDraws.length; i++) {
+                const observed = observedDraws[i];
+                const generated = generateLottoDraw(seed + i, mainPool, pickCount, bonusPool, bonusCount, algorithm);
+                
+                const mainMatch = generated.main.join(',') === observed.main.join(',');
+                const bonusMatch = bonusCount === 0 || generated.bonus.join(',') === observed.bonus.join(',');
+                const match = mainMatch && bonusMatch;
+                
+                if (!match) allMatch = false;
+                
+                verificationHTML += `
+                    <div class="verification-draw ${match ? 'match' : 'no-match'}">
+                        <div><strong>Draw ${i + 1}:</strong></div>
+                        <div>Observed: ${observed.main.join(', ')} ${bonusCount > 0 ? '| ' + observed.bonus.join(', ') : ''}</div>
+                        <div>Generated: ${generated.main.join(', ')} ${bonusCount > 0 ? '| ' + generated.bonus.join(', ') : ''}</div>
+                        <div>${match ? '✓ Match' : '✗ No Match'}</div>
+                    </div>
+                `;
+            }
+            
+            verificationHTML += '</div>';
+            
+            if (allMatch) {
+                verificationHTML += '<p class="status success">All draws match! This seed appears to be correct.</p>';
+            } else {
+                verificationHTML += '<p class="status warning">Some draws do not match. This seed may be incorrect.</p>';
+            }
+            
+            document.getElementById('lotto-verification-results').innerHTML = verificationHTML;
+            showToast(`Seed ${seed} verification completed`, allMatch ? 'success' : 'warning');
+        }
+
+        function predictFromLottoSeed(seed, algorithm) {
+            if (seed === undefined) {
+                seed = parseInt(prompt('Enter seed for prediction:'));
+                if (isNaN(seed)) {
+                    showToast('Invalid seed', 'danger');
+                    return;
+                }
+            }
+            
+            if (algorithm === undefined) {
+                algorithm = document.querySelector('input[name="reverse-algorithm"]:checked').value;
+            }
+            
+            const gameType = document.getElementById('lotto-reverse-game-type').value;
+            const predictCount = parseInt(document.getElementById('lotto-predict-count').value) || 5;
+            let mainPool, pickCount, bonusPool, bonusCount;
+            
+            if (gameType === 'custom-reverse') {
+                mainPool = parseInt(document.getElementById('lotto-reverse-main-numbers').value) || 69;
+                pickCount = parseInt(document.getElementById('lotto-reverse-pick-numbers').value) || 5;
+                bonusPool = parseInt(document.getElementById('lotto-reverse-bonus-numbers').value) || 0;
+                bonusCount = parseInt(document.getElementById('lotto-reverse-pick-bonus').value) || 0;
+            } else {
+                switch(gameType) {
+                    case 'powerball':
+                        mainPool = 69;
+                        pickCount = 5;
+                        bonusPool = 26;
+                        bonusCount = 1;
+                        break;
+                    case 'megamillions':
+                        mainPool = 70;
+                        pickCount = 5;
+                        bonusPool = 25;
+                        bonusCount = 1;
+                        break;
+                    case 'euromillions':
+                        mainPool = 50;
+                        pickCount = 5;
+                        bonusPool = 12;
+                        bonusCount = 2;
+                        break;
+                    case 'lotto649':
+                        mainPool = 49;
+                        pickCount = 6;
+                        bonusPool = 0;
+                        bonusCount = 0;
+                        break;
+                    default:
+                        mainPool = 69;
+                        pickCount = 5;
+                        bonusPool = 26;
+                        bonusCount = 1;
+                }
+            }
+            
+            // Get number of observed draws to determine where to start predictions
+            const observedText = document.getElementById('lotto-observed-numbers').value.trim();
+            const observedCount = observedText ? observedText.split('\n').filter(line => line.trim()).length : 0;
+            
+            // Generate predicted draws
+            let predictionsHTML = `<h4>Predicted Future Draws (using ${algorithm.toUpperCase()} algorithm)</h4>`;
+            predictionsHTML += `<p>Based on seed: ${seed}</p>`;
+            predictionsHTML += '<div class="predicted-draws">';
+            
+            for (let i = 0; i < predictCount; i++) {
+                const draw = generateLottoDraw(seed + observedCount + i, mainPool, pickCount, bonusPool, bonusCount, algorithm);
+                
+                predictionsHTML += `
+                    <div class="predicted-draw">
+                        <h5>Predicted Draw ${i + 1}</h5>
+                        <div class="lotto-balls">
+                            ${draw.main.map(n => `<div class="ball">${n}</div>`).join('')}
+                            ${draw.bonus.map((n, idx) => `
+                                <div class="ball ${gameType === 'powerball' ? 'powerball' : 
+                                    gameType === 'megamillions' ? 'megaball' : 
+                                    gameType === 'euromillions' ? 'eurostar' : ''}">
+                                    ${n}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            predictionsHTML += '</div>';
+            document.getElementById('lotto-predictions-content').innerHTML = predictionsHTML;
+            showToast(`Generated ${predictCount} predicted draws using ${algorithm.toUpperCase()}`, 'success');
+        }
+
+        function generateLottoDraw(seed, mainPool, pickCount, bonusPool, bonusCount, algorithm = 'mulberry32') {
+            let gen;
+            
+            switch(algorithm) {
+                case 'mulberry32':
+                    gen = mulberry32(seed);
+                    break;
+                case 'xorshift32':
+                    gen = xorshift(seed);
+                    break;
+                case 'sfc32':
+                    // sfc32 requires 4 seeds, so we derive them from the single seed
+                    gen = sfc32(seed, seed + 1, seed + 2, seed + 3);
+                    break;
+                case 'lcg':
+                    // Using common LCG parameters
+                    gen = lcg(1664525, 1013904223, 4294967296, seed);
+                    break;
+                case 'mt':
+                    gen = mersenneTwister(seed);
+                    break;
+                default:
+                    gen = mulberry32(seed);
+            }
+            
+            const mainNumbers = [];
+            const availableNumbers = Array.from({length: mainPool}, (_, i) => i + 1);
+            
+            for (let j = 0; j < pickCount; j++) {
+                const randomIndex = Math.floor(gen() * availableNumbers.length);
+                mainNumbers.push(availableNumbers.splice(randomIndex, 1)[0]);
+            }
+            
+            mainNumbers.sort((a, b) => a - b);
+            
+            let bonusNumbers = [];
+            if (bonusPool > 0 && bonusCount > 0) {
+                const availableBonus = Array.from({length: bonusPool}, (_, i) => i + 1);
+                
+                for (let j = 0; j < bonusCount; j++) {
+                    const randomIndex = Math.floor(gen() * availableBonus.length);
+                    bonusNumbers.push(availableBonus.splice(randomIndex, 1)[0]);
+                }
+                
+                bonusNumbers.sort((a, b) => a - b);
+            }
+            
+            return { main: mainNumbers, bonus: bonusNumbers };
+        }
+
+        function sampleLottoData() {
+            const gameType = document.getElementById('lotto-reverse-game-type').value;
+            let sampleData = '';
+            
+            switch(gameType) {
+                case 'powerball':
+                    sampleData = `3, 17, 25, 36, 55 | 12\n5, 10, 20, 30, 40 | 15\n7, 14, 21, 28, 35 | 18`;
+                    break;
+                case 'megamillions':
+                    sampleData = `4, 18, 26, 37, 56 | 13\n6, 11, 21, 31, 41 | 16\n8, 15, 22, 29, 36 | 19`;
+                    break;
+                case 'euromillions':
+                    sampleData = `5, 19, 27, 38, 57 | 3, 8\n7, 12, 22, 32, 42 | 4, 9\n9, 16, 23, 30, 37 | 5, 10`;
+                    break;
+                case 'lotto649':
+                    sampleData = `3, 17, 25, 36, 42, 49\n5, 10, 20, 30, 40, 45\n7, 14, 21, 28, 35, 48`;
+                    break;
+                default:
+                    sampleData = `1, 2, 3, 4, 5 | 1\n6, 7, 8, 9, 10 | 2\n11, 12, 13, 14, 15 | 3`;
+            }
+            
+            document.getElementById('lotto-observed-numbers').value = sampleData;
+            showToast('Sample data loaded', 'info');
+        }
+
+        // Rest of the JavaScript remains the same
+    </script>
+</body>
+</html>                   </div>
                 </div>
             </div>
         </div>
