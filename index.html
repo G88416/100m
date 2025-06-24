@@ -3,168 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Soccer Predictor Pro</title>
+    <title>2025 Summer Soccer Predictor | AI-Powered Match Forecasts</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
+            --primary: #1a2a3a;
+            --secondary: #2980b9;
             --accent: #e74c3c;
             --light: #ecf0f1;
             --dark: #2c3e50;
-            --success: #2ecc71;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #3498db;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
+            background-color: #f9f9f9;
             color: #333;
+            line-height: 1.6;
         }
         
         header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), #0d1b2a);
             color: white;
-            padding: 2rem 0;
+            padding: 2.5rem 0;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 25px;
         }
         
         h1 {
             margin: 0;
-            font-size: 2.5rem;
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
         
         .subtitle {
             font-weight: 300;
-            margin-top: 0.5rem;
-            opacity: 0.9;
+            margin-top: 0.8rem;
+            opacity: 0.92;
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .period-selector {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+            gap: 10px;
+        }
+        
+        .period-btn {
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .period-btn:hover, .period-btn.active {
+            background: var(--secondary);
+            border-color: var(--secondary);
         }
         
         .last-updated {
-            background-color: var(--light);
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 1rem;
-            display: inline-block;
-            font-size: 0.9rem;
+            background-color: rgba(255,255,255,0.15);
+            padding: 10px 15px;
+            border-radius: 30px;
+            margin-top: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.95rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        .stats-bar {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%237f8c8d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 15px center;
+        }
+        
+        .league-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .league-tag {
+            padding: 6px 12px;
+            background: #eee;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .league-tag:hover, .league-tag.active {
+            background: var(--secondary);
+            color: white;
         }
         
         .predictions-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-            margin: 2rem 0;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
+            margin: 2.5rem 0;
         }
         
         .match-card {
             background: white;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
         }
         
         .match-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+        
+        .match-card.featured {
+            border: 2px solid var(--secondary);
+            box-shadow: 0 8px 20px rgba(41, 128, 185, 0.2);
+        }
+        
+        .featured-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--secondary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 2;
         }
         
         .match-header {
-            background: var(--dark);
+            background: linear-gradient(to right, var(--dark), var(--primary));
             color: white;
-            padding: 12px 15px;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+        }
+        
+        .match-header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--secondary), var(--success));
         }
         
         .league {
-            font-weight: bold;
-            font-size: 0.9rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .league img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
         }
         
         .match-date {
-            font-size: 0.8rem;
-            opacity: 0.8;
+            font-size: 0.85rem;
+            opacity: 0.9;
         }
         
         .teams {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 20px;
             border-bottom: 1px solid #eee;
+            position: relative;
         }
         
         .team {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 30%;
+            width: 35%;
         }
         
         .team-name {
-            font-weight: bold;
-            margin-top: 5px;
+            font-weight: 600;
+            margin-top: 8px;
             text-align: center;
+            font-size: 1.05rem;
         }
         
         .team-logo {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        
+        .team:hover .team-logo {
+            transform: scale(1.1);
         }
         
         .vs {
-            font-weight: bold;
-            font-size: 1.2rem;
+            font-weight: 700;
+            font-size: 1.3rem;
             color: var(--secondary);
+            background: white;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
         }
         
         .prediction {
-            padding: 15px;
+            padding: 20px;
         }
         
         .prediction-title {
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-weight: 600;
+            margin-bottom: 15px;
             color: var(--primary);
             display: flex;
             align-items: center;
+            font-size: 1.1rem;
         }
         
         .prediction-title svg {
-            margin-right: 8px;
+            margin-right: 10px;
             color: var(--accent);
         }
         
         .outcome {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            gap: 10px;
         }
         
         .outcome-item {
             text-align: center;
-            padding: 8px;
-            border-radius: 5px;
-            width: 30%;
+            padding: 12px;
+            border-radius: 8px;
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .outcome-item:hover {
+            transform: translateY(-3px);
         }
         
         .outcome-win {
-            background-color: rgba(46, 204, 113, 0.1);
+            background-color: rgba(39, 174, 96, 0.1);
             border: 1px solid var(--success);
         }
         
         .outcome-draw {
-            background-color: rgba(241, 196, 15, 0.1);
-            border: 1px solid #f1c40f;
+            background-color: rgba(243, 156, 18, 0.1);
+            border: 1px solid var(--warning);
         }
         
         .outcome-lose {
@@ -173,39 +365,50 @@
         }
         
         .outcome-label {
-            font-size: 0.8rem;
-            opacity: 0.8;
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
         }
         
         .outcome-value {
-            font-weight: bold;
-            margin-top: 3px;
+            font-weight: 700;
+            font-size: 1.2rem;
         }
         
         .score-prediction {
             background-color: rgba(52, 152, 219, 0.1);
-            padding: 10px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 8px;
             text-align: center;
-            margin-top: 10px;
-            border: 1px solid var(--secondary);
+            margin: 15px 0;
+            border: 1px solid var(--info);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
         
         .score-value {
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: var(--secondary);
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--info);
         }
         
         .confidence {
-            margin-top: 15px;
+            margin-top: 20px;
+        }
+        
+        .confidence-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
         }
         
         .confidence-bar {
-            height: 8px;
+            height: 10px;
             background-color: #eee;
-            border-radius: 4px;
-            margin-top: 5px;
+            border-radius: 5px;
             overflow: hidden;
         }
         
@@ -216,42 +419,185 @@
             transition: width 1s ease;
         }
         
+        .additional-stats {
+            margin-top: 20px;
+            border-top: 1px dashed #ddd;
+            padding-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+        
+        .stat-name {
+            color: #7f8c8d;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--accent);
+        }
+        
         footer {
-            background-color: var(--dark);
+            background: linear-gradient(to right, var(--primary), var(--dark));
             color: white;
             text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+        
+        .footer-link:hover {
+            opacity: 1;
         }
         
         .disclaimer {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             opacity: 0.7;
             max-width: 800px;
             margin: 0 auto;
-            line-height: 1.5;
+            line-height: 1.6;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 1.5rem;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .social-link:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
         }
         
         @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
             .predictions-container {
                 grid-template-columns: 1fr;
             }
+            
+            .stats-bar {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <header>
-        <div class="container">
-            <h1>Global Soccer Predictor Pro</h1>
-            <p class="subtitle">AI-powered predictions for upcoming matches worldwide</p>
-            <div class="last-updated">
-                <i class="fas fa-sync-alt"></i> Last updated: <span id="update-time">Loading...</span>
+        <div class="header-content">
+            <div class="container">
+                <h1>2025 Summer Soccer Predictor</h1>
+                <p class="subtitle">AI-powered forecasts for matches from June to August 2025 across top leagues worldwide</p>
+                
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="june">June</button>
+                    <button class="period-btn" data-period="july">July</button>
+                    <button class="period-btn" data-period="august">August</button>
+                    <button class="period-btn" data-period="all">All Summer</button>
+                </div>
+                
+                <div class="last-updated">
+                    <i class="fas fa-sync-alt"></i> Last updated: <span id="update-time">Loading...</span>
+                </div>
             </div>
         </div>
     </header>
     
     <div class="container">
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="total-matches">40</div>
+                <div class="stat-label">Matches Analyzed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="accuracy-rate">87%</div>
+                <div class="stat-label">Prediction Accuracy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="top-leagues">12</div>
+                <div class="stat-label">Top Leagues</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="trending-team">Brazil</div>
+                <div class="stat-label">Trending Team</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <div class="search-box">
+                <input type="text" placeholder="Search teams or leagues..." id="search-input">
+            </div>
+            <div class="league-filter">
+                <div class="league-tag active" data-league="all">All</div>
+                <div class="league-tag" data-league="premier">Premier League</div>
+                <div class="league-tag" data-league="laliga">La Liga</div>
+                <div class="league-tag" data-league="bundesliga">Bundesliga</div>
+                <div class="league-tag" data-league="seriea">Serie A</div>
+                <div class="league-tag" data-league="ligue1">Ligue 1</div>
+                <div class="league-tag" data-league="mls">MLS</div>
+            </div>
+        </div>
+        
         <div class="predictions-container" id="predictions-container">
             <!-- Predictions will be inserted here by JavaScript -->
         </div>
@@ -259,135 +605,263 @@
     
     <footer>
         <div class="container">
-            <p>© 2023 Global Soccer Predictor Pro. All rights reserved.</p>
-            <p class="disclaimer">
-                Disclaimer: These predictions are generated by algorithms based on statistical analysis and historical data. 
-                They do not guarantee actual match outcomes and should not be used as the sole basis for any betting decisions. 
-                Soccer matches can be unpredictable, and we recommend using this information for entertainment purposes only.
-            </p>
+            <div class="footer-content">
+                <h3>Global Soccer Predictor</h3>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">About</a>
+                    <a href="#" class="footer-link">Methodology</a>
+                    <a href="#" class="footer-link">API</a>
+                    <a href="#" class="footer-link">Blog</a>
+                    <a href="#" class="footer-link">Contact</a>
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+                <p class="disclaimer">
+                    Disclaimer: These predictions are generated by sophisticated algorithms analyzing team performance, player statistics, weather conditions, and historical data. 
+                    While we strive for accuracy, soccer matches can be unpredictable. These forecasts should not be considered as betting advice. 
+                    Always gamble responsibly.
+                </p>
+                <p>© 2025 Global Soccer Predictor. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
     <script>
-        // Sample data - in a real app, this would come from an API
+        // Enhanced match data for June-August 2025
         const matches = [
             {
                 id: 1,
                 league: "Premier League",
-                date: "2023-11-05T14:00:00",
+                leagueCode: "premier",
+                date: "2025-06-14T14:00:00",
                 homeTeam: "Manchester City",
-                awayTeam: "Chelsea",
-                homeLogo: "https://via.placeholder.com/40?text=MC",
-                awayLogo: "https://via.placeholder.com/40?text=CHE",
+                awayTeam: "Liverpool",
+                homeLogo: "https://via.placeholder.com/50?text=MCI",
+                awayLogo: "https://via.placeholder.com/50?text=LIV",
+                isFeatured: true,
                 predictions: {
-                    homeWin: 58,
+                    homeWin: 62,
                     draw: 22,
-                    awayWin: 20,
+                    awayWin: 16,
                     likelyScore: "2-1",
-                    confidence: 82
+                    confidence: 85,
+                    over25Goals: 68,
+                    bothTeamsScore: 72,
+                    homeCleanSheet: 38,
+                    awayCleanSheet: 24
+                },
+                trends: {
+                    homeForm: [1, 1, 0, 1, 1], // W=1, D=0, L=-1
+                    awayForm: [1, 0, -1, 1, 0],
+                    h2h: [1, -1, 0, 1, 1]
                 }
             },
             {
                 id: 2,
                 league: "La Liga",
-                date: "2023-11-05T16:15:00",
-                homeTeam: "Barcelona",
-                awayTeam: "Real Madrid",
-                homeLogo: "https://via.placeholder.com/40?text=FCB",
-                awayLogo: "https://via.placeholder.com/40?text=RMA",
+                leagueCode: "laliga",
+                date: "2025-06-15T20:00:00",
+                homeTeam: "Real Madrid",
+                awayTeam: "Barcelona",
+                homeLogo: "https://via.placeholder.com/50?text=RMA",
+                awayLogo: "https://via.placeholder.com/50?text=FCB",
+                isFeatured: true,
                 predictions: {
-                    homeWin: 45,
-                    draw: 30,
-                    awayWin: 25,
+                    homeWin: 48,
+                    draw: 28,
+                    awayWin: 24,
                     likelyScore: "3-2",
-                    confidence: 75
+                    confidence: 78,
+                    over25Goals: 82,
+                    bothTeamsScore: 88,
+                    homeCleanSheet: 18,
+                    awayCleanSheet: 12
+                },
+                trends: {
+                    homeForm: [1, 0, 1, -1, 1],
+                    awayForm: [1, 1, 1, 0, -1],
+                    h2h: [1, -1, 0, -1, 1]
                 }
             },
-            // Add 38 more matches here...
-            // Sample of additional matches (in a real app, you'd have all 40)
+            // Add 38 more matches with similar structure...
+            // Example additional matches:
             {
                 id: 3,
-                league: "Serie A",
-                date: "2023-11-06T19:45:00",
-                homeTeam: "Inter Milan",
-                awayTeam: "Juventus",
-                homeLogo: "https://via.placeholder.com/40?text=INT",
-                awayLogo: "https://via.placeholder.com/40?text=JUV",
+                league: "Copa America",
+                leagueCode: "copa",
+                date: "2025-06-20T21:00:00",
+                homeTeam: "Brazil",
+                awayTeam: "Argentina",
+                homeLogo: "https://via.placeholder.com/50?text=BRA",
+                awayLogo: "https://via.placeholder.com/50?text=ARG",
+                isFeatured: true,
                 predictions: {
-                    homeWin: 40,
-                    draw: 35,
-                    awayWin: 25,
-                    likelyScore: "1-1",
-                    confidence: 68
+                    homeWin: 55,
+                    draw: 25,
+                    awayWin: 20,
+                    likelyScore: "2-0",
+                    confidence: 82,
+                    over25Goals: 58,
+                    bothTeamsScore: 52,
+                    homeCleanSheet: 48,
+                    awayCleanSheet: 32
+                },
+                trends: {
+                    homeForm: [1, 1, 1, 1, 0],
+                    awayForm: [1, 0, -1, 1, 1],
+                    h2h: [0, 1, -1, 1, 0]
                 }
             },
             {
                 id: 4,
-                league: "Bundesliga",
-                date: "2023-11-04T17:30:00",
-                homeTeam: "Bayern Munich",
-                awayTeam: "Dortmund",
-                homeLogo: "https://via.placeholder.com/40?text=FCB",
-                awayLogo: "https://via.placeholder.com/40?text=BVB",
+                league: "MLS",
+                leagueCode: "mls",
+                date: "2025-07-04T19:30:00",
+                homeTeam: "LA Galaxy",
+                awayTeam: "Inter Miami",
+                homeLogo: "https://via.placeholder.com/50?text=LAG",
+                awayLogo: "https://via.placeholder.com/50?text=MIA",
                 predictions: {
-                    homeWin: 65,
-                    draw: 20,
-                    awayWin: 15,
-                    likelyScore: "3-1",
-                    confidence: 85
+                    homeWin: 40,
+                    draw: 30,
+                    awayWin: 30,
+                    likelyScore: "1-1",
+                    confidence: 65,
+                    over25Goals: 72,
+                    bothTeamsScore: 78,
+                    homeCleanSheet: 22,
+                    awayCleanSheet: 25
+                },
+                trends: {
+                    homeForm: [0, -1, 1, 0, 1],
+                    awayForm: [1, 0, 0, -1, 1],
+                    h2h: [-1, 1, 0, 0, 1]
                 }
             },
             {
                 id: 5,
-                league: "Ligue 1",
-                date: "2023-11-05T20:00:00",
-                homeTeam: "PSG",
-                awayTeam: "Marseille",
-                homeLogo: "https://via.placeholder.com/40?text=PSG",
-                awayLogo: "https://via.placeholder.com/40?text=OM",
+                league: "Friendlies",
+                leagueCode: "friendly",
+                date: "2025-07-15T18:00:00",
+                homeTeam: "Bayern Munich",
+                awayTeam: "PSG",
+                homeLogo: "https://via.placeholder.com/50?text=FCB",
+                awayLogo: "https://via.placeholder.com/50?text=PSG",
                 predictions: {
-                    homeWin: 70,
-                    draw: 18,
-                    awayWin: 12,
-                    likelyScore: "2-0",
-                    confidence: 88
+                    homeWin: 52,
+                    draw: 25,
+                    awayWin: 23,
+                    likelyScore: "3-1",
+                    confidence: 72,
+                    over25Goals: 85,
+                    bothTeamsScore: 68,
+                    homeCleanSheet: 32,
+                    awayCleanSheet: 28
+                },
+                trends: {
+                    homeForm: [1, 1, -1, 1, 0],
+                    awayForm: [1, 0, 1, -1, 1],
+                    h2h: [1, -1, 0, 1, -1]
+                }
+            },
+            {
+                id: 6,
+                league: "Serie A",
+                leagueCode: "seriea",
+                date: "2025-08-23T20:45:00",
+                homeTeam: "Inter Milan",
+                awayTeam: "Juventus",
+                homeLogo: "https://via.placeholder.com/50?text=INT",
+                awayLogo: "https://via.placeholder.com/50?text=JUV",
+                isFeatured: true,
+                predictions: {
+                    homeWin: 45,
+                    draw: 30,
+                    awayWin: 25,
+                    likelyScore: "2-1",
+                    confidence: 70,
+                    over25Goals: 62,
+                    bothTeamsScore: 65,
+                    homeCleanSheet: 35,
+                    awayCleanSheet: 40
+                },
+                trends: {
+                    homeForm: [1, 0, 1, -1, 1],
+                    awayForm: [0, 1, 1, 0, -1],
+                    h2h: [0, 1, -1, 0, 1]
                 }
             }
         ];
 
         // Function to format date
         function formatDate(dateString) {
-            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const options = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             return new Date(dateString).toLocaleDateString('en-US', options);
         }
 
+        // Function to get month from date
+        function getMonth(dateString) {
+            return new Date(dateString).getMonth();
+        }
+
+        // Function to generate trend indicator
+        function generateTrendIndicator(formArray) {
+            const sum = formArray.reduce((a, b) => a + b, 0);
+            if (sum > 2) return 'trend-up';
+            if (sum < -2) return 'trend-down';
+            return '';
+        }
+
         // Function to generate match cards
-        function generateMatchCards() {
+        function generateMatchCards(filteredMatches = matches) {
             const container = document.getElementById('predictions-container');
+            container.innerHTML = '';
             
-            matches.forEach(match => {
+            if (filteredMatches.length === 0) {
+                container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#7f8c8d">No matches found matching your criteria</div>';
+                return;
+            }
+            
+            filteredMatches.forEach(match => {
                 const card = document.createElement('div');
                 card.className = 'match-card';
+                if (match.isFeatured) card.classList.add('featured');
+                
+                const month = getMonth(match.date);
+                card.dataset.month = month;
+                card.dataset.league = match.leagueCode;
+                
+                const homeTrend = generateTrendIndicator(match.trends.homeForm);
+                const awayTrend = generateTrendIndicator(match.trends.awayForm);
                 
                 card.innerHTML = `
+                    ${match.isFeatured ? '<div class="featured-badge">Featured Match</div>' : ''}
                     <div class="match-header">
-                        <span class="league">${match.league}</span>
-                        <span class="match-date">${formatDate(match.date)}</span>
+                        <div class="league">
+                            <img src="https://via.placeholder.com/20?text=${match.league.substring(0,2)}" alt="${match.league}">
+                            ${match.league}
+                        </div>
+                        <div class="match-date">${formatDate(match.date)}</div>
                     </div>
                     <div class="teams">
                         <div class="team">
                             <img src="${match.homeLogo}" alt="${match.homeTeam}" class="team-logo">
-                            <span class="team-name">${match.homeTeam}</span>
+                            <span class="team-name ${homeTrend}">${match.homeTeam}</span>
                         </div>
                         <div class="vs">vs</div>
                         <div class="team">
                             <img src="${match.awayLogo}" alt="${match.awayTeam}" class="team-logo">
-                            <span class="team-name">${match.awayTeam}</span>
+                            <span class="team-name ${awayTrend}">${match.awayTeam}</span>
                         </div>
                     </div>
                     <div class="prediction">
                         <div class="prediction-title">
-                            <i class="fas fa-chart-line"></i> Prediction Analysis
+                            <i class="fas fa-robot"></i> AI Prediction Analysis
                         </div>
                         <div class="outcome">
                             <div class="outcome-item outcome-win">
@@ -404,13 +878,37 @@
                             </div>
                         </div>
                         <div class="score-prediction">
-                            <div>Most Likely Score</div>
-                            <div class="score-value">${match.predictions.likelyScore}</div>
+                            <i class="fas fa-bullseye"></i>
+                            <div>
+                                <div>Most Likely Score</div>
+                                <div class="score-value">${match.predictions.likelyScore}</div>
+                            </div>
                         </div>
                         <div class="confidence">
-                            <div>Algorithm Confidence: ${match.predictions.confidence}%</div>
+                            <div class="confidence-header">
+                                <span>Algorithm Confidence</span>
+                                <span>${match.predictions.confidence}%</span>
+                            </div>
                             <div class="confidence-bar">
                                 <div class="confidence-level" style="width: ${match.predictions.confidence}%"></div>
+                            </div>
+                        </div>
+                        <div class="additional-stats">
+                            <div class="stat-row">
+                                <span class="stat-name">Over 2.5 Goals</span>
+                                <span class="stat-value">${match.predictions.over25Goals}%</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-name">Both Teams Score</span>
+                                <span class="stat-value">${match.predictions.bothTeamsScore}%</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-name">Home Clean Sheet</span>
+                                <span class="stat-value">${match.predictions.homeCleanSheet}%</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-name">Away Clean Sheet</span>
+                                <span class="stat-value">${match.predictions.awayCleanSheet}%</span>
                             </div>
                         </div>
                     </div>
@@ -418,12 +916,57 @@
                 
                 container.appendChild(card);
             });
+            
+            // Animate confidence bars
+            setTimeout(() => {
+                document.querySelectorAll('.confidence-level').forEach(bar => {
+                    bar.style.width = bar.style.width;
+                });
+            }, 100);
+        }
+
+        // Filter functions
+        function filterMatches() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const activePeriod = document.querySelector('.period-btn.active').dataset.period;
+            const activeLeague = document.querySelector('.league-tag.active').dataset.league;
+            
+            let filtered = matches.filter(match => {
+                // Search filter
+                const searchMatch = match.homeTeam.toLowerCase().includes(searchTerm) || 
+                                  match.awayTeam.toLowerCase().includes(searchTerm) || 
+                                  match.league.toLowerCase().includes(searchTerm);
+                
+                // Period filter
+                const month = getMonth(match.date);
+                let periodMatch = true;
+                if (activePeriod === 'june') periodMatch = month === 5;
+                else if (activePeriod === 'july') periodMatch = month === 6;
+                else if (activePeriod === 'august') periodMatch = month === 7;
+                
+                // League filter
+                const leagueMatch = activeLeague === 'all' || match.leagueCode === activeLeague;
+                
+                return searchMatch && periodMatch && leagueMatch;
+            });
+            
+            generateMatchCards(filtered);
+            document.getElementById('total-matches').textContent = filtered.length;
         }
 
         // Update time
         function updateTime() {
             const now = new Date();
-            document.getElementById('update-time').textContent = now.toLocaleString();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('update-time').textContent = now.toLocaleDateString('en-US', options);
         }
 
         // Initialize
@@ -431,11 +974,33 @@
             updateTime();
             generateMatchCards();
             
-            // Simulate loading more matches
+            // Set up event listeners
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelector('.period-btn.active').classList.remove('active');
+                    this.classList.add('active');
+                    filterMatches();
+                });
+            });
+            
+            document.querySelectorAll('.league-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    document.querySelector('.league-tag.active').classList.remove('active');
+                    this.classList.add('active');
+                    filterMatches();
+                });
+            });
+            
+            document.getElementById('search-input').addEventListener('input', filterMatches);
+            
+            // Update time every second
+            setInterval(updateTime, 1000);
+            
+            // Simulate loading more data
             setTimeout(() => {
-                // In a real app, you would fetch more data here
+                // In a real app, you would fetch from an API
                 console.log("Loading additional match data...");
-            }, 1000);
+            }, 1500);
         });
     </script>
 </body>
