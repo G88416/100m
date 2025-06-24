@@ -1,4 +1,4 @@
-complete this code complete the code <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1469,23 +1469,32 @@ complete this code complete the code <!DOCTYPE html>
 
         // Tab functionality
         function setupTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Remove active class from all tabs and contents
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    // Add active class to clicked tab
-                    this.classList.add('active');
-                    
-                    // Show corresponding content
-                    const tabId = this.getAttribute('data-tab');
-                    document.getElementById(tabId).classList.add('active');
-                });
-            });
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Show corresponding content
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+    
+    // Activate the first tab by default if none is active
+    if (document.querySelectorAll('.tab.active').length === 0) {
+        const firstTab = document.querySelector('.tab');
+        if (firstTab) {
+            firstTab.classList.add('active');
+            const firstTabId = firstTab.getAttribute('data-tab');
+            document.getElementById(firstTabId).classList.add('active');
         }
-
+    }
+}
         // Theme functionality
         function initTheme() {
             const themeToggle = document.getElementById('themeToggle');
