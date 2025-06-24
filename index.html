@@ -1438,33 +1438,26 @@
         let cryptoPredictionWorker = null;
 
         // DOM Ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize theme
-            initTheme();
-            
-            // Set up event listeners
-            document.getElementById('prng-algorithm').addEventListener('change', updateAlgorithmParams);
-            document.getElementById('lotto-game-type').addEventListener('change', updateLottoParams);
-            document.getElementById('lotto-reverse-game-type').addEventListener('change', updateLottoReverseParams);
-            document.getElementById('compare-mode').addEventListener('change', updateCompareFields);
-            
-            // Initialize algorithm info
-            updateAlgorithmParams();
-            
-            // Load sample data for visualization
-            sampleVisualizationData();
-            
-            // Set up tab switching
-            setupTabs();
-           
-           function arraysEqual(a, b) {
-         if (a.length !== b.length) return false;
-         for (let i = 0; i < a.length; i++) {
-         if (a[i] !== b[i]) return false;
-        }
-        return true;
-   }
+         document.addEventListener('DOMContentLoaded', function() {
+    // Initialize theme
+    initTheme();
+    
+    // Set up event listeners
+    document.getElementById('prng-algorithm').addEventListener('change', updateAlgorithmParams);
+    document.getElementById('lotto-game-type').addEventListener('change', updateLottoParams);
+    document.getElementById('lotto-reverse-game-type').addEventListener('change', updateLottoReverseParams);
+    document.getElementById('compare-mode').addEventListener('change', updateCompareFields);
+    
+    // Initialize algorithm info
+    updateAlgorithmParams();
+    
+    // Load sample data for visualization
+    sampleVisualizationData();
+    
+    // Set up tab switching
+    setupTabs(); // <-- This is the important line
 
+        
         });
 
         // Tab functionality
