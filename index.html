@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+add 40 international teams <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -632,171 +632,577 @@
     </footer>
 
     <script>
-        // Enhanced match data for June-August 2025
-        const matches = [
-            {
-                id: 1,
-                league: "Premier League",
-                leagueCode: "premier",
-                date: "2025-06-14T14:00:00",
-                homeTeam: "Manchester City",
-                awayTeam: "Liverpool",
-                homeLogo: "https://via.placeholder.com/50?text=MCI",
-                awayLogo: "https://via.placeholder.com/50?text=LIV",
-                isFeatured: true,
-                predictions: {
-                    homeWin: 62,
-                    draw: 22,
-                    awayWin: 16,
-                    likelyScore: "2-1",
-                    confidence: 85,
-                    over25Goals: 68,
-                    bothTeamsScore: 72,
-                    homeCleanSheet: 38,
-                    awayCleanSheet: 24
-                },
-                trends: {
-                    homeForm: [1, 1, 0, 1, 1], // W=1, D=0, L=-1
-                    awayForm: [1, 0, -1, 1, 0],
-                    h2h: [1, -1, 0, 1, 1]
-                }
-            },
-            {
-                id: 2,
-                league: "La Liga",
-                leagueCode: "laliga",
-                date: "2025-06-15T20:00:00",
-                homeTeam: "Real Madrid",
-                awayTeam: "Barcelona",
-                homeLogo: "https://via.placeholder.com/50?text=RMA",
-                awayLogo: "https://via.placeholder.com/50?text=FCB",
-                isFeatured: true,
-                predictions: {
-                    homeWin: 48,
-                    draw: 28,
-                    awayWin: 24,
-                    likelyScore: "3-2",
-                    confidence: 78,
-                    over25Goals: 82,
-                    bothTeamsScore: 88,
-                    homeCleanSheet: 18,
-                    awayCleanSheet: 12
-                },
-                trends: {
-                    homeForm: [1, 0, 1, -1, 1],
-                    awayForm: [1, 1, 1, 0, -1],
-                    h2h: [1, -1, 0, -1, 1]
-                }
-            },
-            // Add 38 more matches with similar structure...
-            // Example additional matches:
-            {
-                id: 3,
-                league: "Copa America",
-                leagueCode: "copa",
-                date: "2025-06-20T21:00:00",
-                homeTeam: "Brazil",
-                awayTeam: "Argentina",
-                homeLogo: "https://via.placeholder.com/50?text=BRA",
-                awayLogo: "https://via.placeholder.com/50?text=ARG",
-                isFeatured: true,
-                predictions: {
-                    homeWin: 55,
-                    draw: 25,
-                    awayWin: 20,
-                    likelyScore: "2-0",
-                    confidence: 82,
-                    over25Goals: 58,
-                    bothTeamsScore: 52,
-                    homeCleanSheet: 48,
-                    awayCleanSheet: 32
-                },
-                trends: {
-                    homeForm: [1, 1, 1, 1, 0],
-                    awayForm: [1, 0, -1, 1, 1],
-                    h2h: [0, 1, -1, 1, 0]
-                }
-            },
-            {
-                id: 4,
-                league: "MLS",
-                leagueCode: "mls",
-                date: "2025-07-04T19:30:00",
-                homeTeam: "LA Galaxy",
-                awayTeam: "Inter Miami",
-                homeLogo: "https://via.placeholder.com/50?text=LAG",
-                awayLogo: "https://via.placeholder.com/50?text=MIA",
-                predictions: {
-                    homeWin: 40,
-                    draw: 30,
-                    awayWin: 30,
-                    likelyScore: "1-1",
-                    confidence: 65,
-                    over25Goals: 72,
-                    bothTeamsScore: 78,
-                    homeCleanSheet: 22,
-                    awayCleanSheet: 25
-                },
-                trends: {
-                    homeForm: [0, -1, 1, 0, 1],
-                    awayForm: [1, 0, 0, -1, 1],
-                    h2h: [-1, 1, 0, 0, 1]
-                }
-            },
-            {
-                id: 5,
-                league: "Friendlies",
-                leagueCode: "friendly",
-                date: "2025-07-15T18:00:00",
-                homeTeam: "Bayern Munich",
-                awayTeam: "PSG",
-                homeLogo: "https://via.placeholder.com/50?text=FCB",
-                awayLogo: "https://via.placeholder.com/50?text=PSG",
-                predictions: {
-                    homeWin: 52,
-                    draw: 25,
-                    awayWin: 23,
-                    likelyScore: "3-1",
-                    confidence: 72,
-                    over25Goals: 85,
-                    bothTeamsScore: 68,
-                    homeCleanSheet: 32,
-                    awayCleanSheet: 28
-                },
-                trends: {
-                    homeForm: [1, 1, -1, 1, 0],
-                    awayForm: [1, 0, 1, -1, 1],
-                    h2h: [1, -1, 0, 1, -1]
-                }
-            },
-            {
-                id: 6,
-                league: "Serie A",
-                leagueCode: "seriea",
-                date: "2025-08-23T20:45:00",
-                homeTeam: "Inter Milan",
-                awayTeam: "Juventus",
-                homeLogo: "https://via.placeholder.com/50?text=INT",
-                awayLogo: "https://via.placeholder.com/50?text=JUV",
-                isFeatured: true,
-                predictions: {
-                    homeWin: 45,
-                    draw: 30,
-                    awayWin: 25,
-                    likelyScore: "2-1",
-                    confidence: 70,
-                    over25Goals: 62,
-                    bothTeamsScore: 65,
-                    homeCleanSheet: 35,
-                    awayCleanSheet: 40
-                },
-                trends: {
-                    homeForm: [1, 0, 1, -1, 1],
-                    awayForm: [0, 1, 1, 0, -1],
-                    h2h: [0, 1, -1, 0, 1]
-                }
-            }
-        ];
+// Enhanced match data for June-August 2025 with international teams
+const matches = [
+    // Existing matches...
+    {
+        id: 1,
+        league: "Premier League",
+        leagueCode: "premier",
+        date: "2025-06-14T14:00:00",
+        homeTeam: "Manchester City",
+        awayTeam: "Liverpool",
+        homeLogo: "https://via.placeholder.com/50?text=MCI",
+        awayLogo: "https://via.placeholder.com/50?text=LIV",
+        isFeatured: true,
+        predictions: {
+            homeWin: 62,
+            draw: 22,
+            awayWin: 16,
+            likelyScore: "2-1",
+            confidence: 85,
+            over25Goals: 68,
+            bothTeamsScore: 72,
+            homeCleanSheet: 38,
+            awayCleanSheet: 24
+        },
+        trends: {
+            homeForm: [1, 1, 0, 1, 1],
+            awayForm: [1, 0, -1, 1, 0],
+            h2h: [1, -1, 0, 1, 1]
+        }
+    },
+    // ... (keep your existing matches)
+
+    // International matches - Copa America
+    {
+        id: 101,
+        league: "Copa America",
+        leagueCode: "copa",
+        date: "2025-06-20T21:00:00",
+        homeTeam: "Brazil",
+        awayTeam: "Argentina",
+        homeLogo: "https://via.placeholder.com/50?text=BRA",
+        awayLogo: "https://via.placeholder.com/50?text=ARG",
+        isFeatured: true,
+        predictions: {
+            homeWin: 55,
+            draw: 25,
+            awayWin: 20,
+            likelyScore: "2-0",
+            confidence: 82,
+            over25Goals: 58,
+            bothTeamsScore: 52,
+            homeCleanSheet: 48,
+            awayCleanSheet: 32
+        },
+        trends: {
+            homeForm: [1, 1, 1, 1, 0],
+            awayForm: [1, 0, -1, 1, 1],
+            h2h: [0, 1, -1, 1, 0]
+        }
+    },
+    {
+        id: 102,
+        league: "Copa America",
+        leagueCode: "copa",
+        date: "2025-06-21T18:00:00",
+        homeTeam: "Uruguay",
+        awayTeam: "Colombia",
+        homeLogo: "https://via.placeholder.com/50?text=URU",
+        awayLogo: "https://via.placeholder.com/50?text=COL",
+        predictions: {
+            homeWin: 45,
+            draw: 30,
+            awayWin: 25,
+            likelyScore: "1-1",
+            confidence: 70,
+            over25Goals: 65,
+            bothTeamsScore: 70,
+            homeCleanSheet: 35,
+            awayCleanSheet: 40
+        },
+        trends: {
+            homeForm: [1, 0, -1, 1, 0],
+            awayForm: [0, 1, 1, -1, 1],
+            h2h: [0, -1, 1, 0, 1]
+        }
+    },
+    {
+        id: 103,
+        league: "Copa America",
+        leagueCode: "copa",
+        date: "2025-06-22T20:00:00",
+        homeTeam: "Chile",
+        awayTeam: "Peru",
+        homeLogo: "https://via.placeholder.com/50?text=CHI",
+        awayLogo: "https://via.placeholder.com/50?text=PER",
+        predictions: {
+            homeWin: 52,
+            draw: 28,
+            awayWin: 20,
+            likelyScore: "2-1",
+            confidence: 75,
+            over25Goals: 68,
+            bothTeamsScore: 72,
+            homeCleanSheet: 38,
+            awayCleanSheet: 28
+        },
+        trends: {
+            homeForm: [1, -1, 1, 0, 1],
+            awayForm: [0, 1, -1, 1, 0],
+            h2h: [1, 0, -1, 1, 0]
+        }
+    },
+
+    // International matches - UEFA Nations League
+    {
+        id: 104,
+        league: "UEFA Nations League",
+        leagueCode: "uefa",
+        date: "2025-06-05T20:45:00",
+        homeTeam: "France",
+        awayTeam: "Germany",
+        homeLogo: "https://via.placeholder.com/50?text=FRA",
+        awayLogo: "https://via.placeholder.com/50?text=GER",
+        isFeatured: true,
+        predictions: {
+            homeWin: 48,
+            draw: 30,
+            awayWin: 22,
+            likelyScore: "2-1",
+            confidence: 78,
+            over25Goals: 75,
+            bothTeamsScore: 78,
+            homeCleanSheet: 32,
+            awayCleanSheet: 25
+        },
+        trends: {
+            homeForm: [1, 0, 1, -1, 1],
+            awayForm: [0, 1, -1, 1, 0],
+            h2h: [1, -1, 0, 1, 0]
+        }
+    },
+    {
+        id: 105,
+        league: "UEFA Nations League",
+        leagueCode: "uefa",
+        date: "2025-06-06T18:00:00",
+        homeTeam: "Spain",
+        awayTeam: "Italy",
+        homeLogo: "https://via.placeholder.com/50?text=ESP",
+        awayLogo: "https://via.placeholder.com/50?text=ITA",
+        isFeatured: true,
+        predictions: {
+            homeWin: 42,
+            draw: 33,
+            awayWin: 25,
+            likelyScore: "1-1",
+            confidence: 72,
+            over25Goals: 62,
+            bothTeamsScore: 68,
+            homeCleanSheet: 35,
+            awayCleanSheet: 38
+        },
+        trends: {
+            homeForm: [0, 1, -1, 1, 0],
+            awayForm: [1, 0, 1, -1, 1],
+            h2h: [0, 1, -1, 0, 1]
+        }
+    },
+    {
+        id: 106,
+        league: "UEFA Nations League",
+        leagueCode: "uefa",
+        date: "2025-06-07T20:45:00",
+        homeTeam: "England",
+        awayTeam: "Netherlands",
+        homeLogo: "https://via.placeholder.com/50?text=ENG",
+        awayLogo: "https://via.placeholder.com/50?text=NED",
+        predictions: {
+            homeWin: 45,
+            draw: 30,
+            awayWin: 25,
+            likelyScore: "2-1",
+            confidence: 70,
+            over25Goals: 72,
+            bothTeamsScore: 75,
+            homeCleanSheet: 32,
+            awayCleanSheet: 28
+        },
+        trends: {
+            homeForm: [1, 0, -1, 1, 1],
+            awayForm: [1, 1, 0, -1, 1],
+            h2h: [0, 1, -1, 1, 0]
+        }
+    },
+    {
+        id: 107,
+        league: "UEFA Nations League",
+        leagueCode: "uefa",
+        date: "2025-06-08T18:00:00",
+        homeTeam: "Portugal",
+        awayTeam: "Belgium",
+        homeLogo: "https://via.placeholder.com/50?text=POR",
+        awayLogo: "https://via.placeholder.com/50?text=BEL",
+        predictions: {
+            homeWin: 40,
+            draw: 35,
+            awayWin: 25,
+            likelyScore: "1-1",
+            confidence: 68,
+            over25Goals: 65,
+            bothTeamsScore: 72,
+            homeCleanSheet: 35,
+            awayCleanSheet: 38
+        },
+        trends: {
+            homeForm: [1, -1, 0, 1, 0],
+            awayForm: [0, 1, -1, 1, 1],
+            h2h: [0, 1, -1, 0, 1]
+        }
+    },
+
+    // International matches - CONCACAF Gold Cup
+    {
+        id: 108,
+        league: "CONCACAF Gold Cup",
+        leagueCode: "concacaf",
+        date: "2025-07-12T20:00:00",
+        homeTeam: "Mexico",
+        awayTeam: "USA",
+        homeLogo: "https://via.placeholder.com/50?text=MEX",
+        awayLogo: "https://via.placeholder.com/50?text=USA",
+        isFeatured: true,
+        predictions: {
+            homeWin: 50,
+            draw: 30,
+            awayWin: 20,
+            likelyScore: "2-1",
+            confidence: 75,
+            over25Goals: 70,
+            bothTeamsScore: 75,
+            homeCleanSheet: 35,
+            awayCleanSheet: 30
+        },
+        trends: {
+            homeForm: [1, 0, 1, -1, 1],
+            awayForm: [1, 1, 0, -1, 1],
+            h2h: [1, -1, 0, 1, 0]
+        }
+    },
+    {
+        id: 109,
+        league: "CONCACAF Gold Cup",
+        leagueCode: "concacaf",
+        date: "2025-07-13T18:00:00",
+        homeTeam: "Canada",
+        awayTeam: "Costa Rica",
+        homeLogo: "https://via.placeholder.com/50?text=CAN",
+        awayLogo: "https://via.placeholder.com/50?text=CRC",
+        predictions: {
+            homeWin: 45,
+            draw: 35,
+            awayWin: 20,
+            likelyScore: "1-0",
+            confidence: 70,
+            over25Goals: 58,
+            bothTeamsScore: 62,
+            homeCleanSheet: 45,
+            awayCleanSheet: 38
+        },
+        trends: {
+            homeForm: [1, 0, -1, 1, 1],
+            awayForm: [0, 1, -1, 1, 0],
+            h2h: [1, 0, -1, 1, 0]
+        }
+    },
+    {
+        id: 110,
+        league: "CONCACAF Gold Cup",
+        leagueCode: "concacaf",
+        date: "2025-07-14T20:00:00",
+        homeTeam: "Jamaica",
+        awayTeam: "Honduras",
+        homeLogo: "https://via.placeholder.com/50?text=JAM",
+        awayLogo: "https://via.placeholder.com/50?text=HON",
+        predictions: {
+            homeWin: 40,
+            draw: 35,
+            awayWin: 25,
+            likelyScore: "1-1",
+            confidence: 65,
+            over25Goals: 62,
+            bothTeamsScore: 68,
+            homeCleanSheet: 32,
+            awayCleanSheet: 35
+        },
+        trends: {
+            homeForm: [0, 1, -1, 1, 0],
+            awayForm: [1, 0, -1, 1, 1],
+            h2h: [0, 1, -1, 0, 1]
+        }
+    },
+
+    // International matches - AFC Asian Cup
+    {
+        id: 111,
+        league: "AFC Asian Cup",
+        leagueCode: "afc",
+        date: "2025-07-20T19:00:00",
+        homeTeam: "Japan",
+        awayTeam: "South Korea",
+        homeLogo: "https://via.placeholder.com/50?text=JPN",
+        awayLogo: "https://via.placeholder.com/50?text=KOR",
+        isFeatured: true,
+        predictions: {
+            homeWin: 48,
+            draw: 30,
+            awayWin: 22,
+            likelyScore: "2-1",
+            confidence: 75,
+            over25Goals: 68,
+            bothTeamsScore: 72,
+            homeCleanSheet: 38,
+            awayCleanSheet: 32
+        },
+        trends: {
+            homeForm: [1, 0, 1, -1, 1],
+            awayForm: [1, 1, 0, -1, 1],
+            h2h: [0, 1, -1, 1, 0]
+        }
+    },
+    {
+        id: 112,
+        league: "AFC Asian Cup",
+        leagueCode: "afc",
+        date: "2025-07-21T17:00:00",
+        homeTeam: "Australia",
+        awayTeam: "Saudi Arabia",
+        homeLogo: "https://via.placeholder.com/50?text=AUS",
+        awayLogo: "https://via.placeholder.com/50?text=KSA",
+        predictions: {
+            homeWin: 52,
+            draw: 28,
+            awayWin: 20,
+            likelyScore: "2-0",
+            confidence: 72,
+            over25Goals: 62,
+            bothTeamsScore: 65,
+            homeCleanSheet: 45,
+            awayCleanSheet: 32
+        },
+        trends: {
+            homeForm: [1, 1, 0, -1, 1],
+            awayForm: [1, 0, -1, 1, 0],
+            h2h: [1, 0, -1, 1, 1]
+        }
+    },
+    {
+        id: 113,
+        league: "AFC Asian Cup",
+        leagueCode: "afc",
+        date: "2025-07-22T20:00:00",
+        homeTeam: "Iran",
+        awayTeam: "Qatar",
+        homeLogo: "https://via.placeholder.com/50?text=IRN",
+        awayLogo: "https://via.placeholder.com/50?text=QAT",
+        predictions: {
+            homeWin: 58,
+            draw: 25,
+            awayWin: 17,
+            likelyScore: "2-0",
+            confidence: 78,
+            over25Goals: 65,
+            bothTeamsScore: 62,
+            homeCleanSheet: 48,
+            awayCleanSheet: 28
+        },
+        trends: {
+            homeForm: [1, 1, -1, 1, 1],
+            awayForm: [0, 1, -1, 1, 0],
+            h2h: [1, 0, -1, 1, 1]
+        }
+    },
+
+    // International matches - Africa Cup of Nations
+    {
+        id: 114,
+        league: "Africa Cup of Nations",
+        leagueCode: "afcon",
+        date: "2025-08-10T18:00:00",
+        homeTeam: "Senegal",
+        awayTeam: "Nigeria",
+        homeLogo: "https://via.placeholder.com/50?text=SEN",
+        awayLogo: "https://via.placeholder.com/50?text=NGA",
+        isFeatured: true,
+        predictions: {
+            homeWin: 45,
+            draw: 30,
+            awayWin: 25,
+            likelyScore: "1-1",
+            confidence: 70,
+            over25Goals: 62,
+            bothTeamsScore: 68,
+            homeCleanSheet: 38,
+            awayCleanSheet: 42
+        },
+        trends: {
+            homeForm: [1, 0, -1, 1, 1],
+            awayForm: [1, 1, 0, -1, 1],
+            h2h: [0, 1, -1, 1, 0]
+        }
+    },
+    {
+        id: 115,
+        league: "Africa Cup of Nations",
+        leagueCode: "afcon",
+        date: "2025-08-11T18:00:00",
+        homeTeam: "Egypt",
+        awayTeam: "Morocco",
+        homeLogo: "https://via.placeholder.com/50?text=EGY",
+        awayLogo: "https://via.placeholder.com/50?text=MAR",
+        isFeatured: true,
+        predictions: {
+            homeWin: 40,
+            draw: 35,
+            awayWin: 25,
+            likelyScore: "1-1",
+            confidence: 68,
+            over25Goals: 65,
+            bothTeamsScore: 72,
+            homeCleanSheet: 35,
+            awayCleanSheet: 38
+        },
+        trends: {
+            homeForm: [0, 1, -1, 1, 0],
+            awayForm: [1, 0, 1, -1, 1],
+            h2h: [0, 1, -1, 0, 1]
+        }
+    },
+    {
+        id: 116,
+        league: "Africa Cup of Nations",
+        leagueCode: "afcon",
+        date: "2025-08-12T20:00:00",
+        homeTeam: "Ivory Coast",
+        awayTeam: "Algeria",
+        homeLogo: "https://via.placeholder.com/50?text=CIV",
+        awayLogo: "https://via.placeholder.com/50?text=ALG",
+        predictions: {
+            homeWin: 42,
+            draw: 33,
+            awayWin: 25,
+            likelyScore: "2-1",
+            confidence: 70,
+            over25Goals: 68,
+            bothTeamsScore: 72,
+            homeCleanSheet: 35,
+            awayCleanSheet: 32
+        },
+        trends: {
+            homeForm: [1, -1, 0, 1, 1],
+            awayForm: [0, 1, -1, 1, 0],
+            h2h: [1, 0, -1, 1, 0]
+        }
+    },
+
+    // International friendlies
+    {
+        id: 117,
+        league: "International Friendly",
+        leagueCode: "friendly",
+        date: "2025-08-15T19:00:00",
+        homeTeam: "Sweden",
+        awayTeam: "Denmark",
+        homeLogo: "https://via.placeholder.com/50?text=SWE",
+        awayLogo: "https://via.placeholder.com/50?text=DEN",
+        predictions: {
+            homeWin: 38,
+            draw: 35,
+            awayWin: 27,
+            likelyScore: "1-1",
+            confidence: 65,
+            over25Goals: 62,
+            bothTeamsScore: 68,
+            homeCleanSheet: 32,
+            awayCleanSheet: 35
+        },
+        trends: {
+            homeForm: [0, 1, -1, 1, 0],
+            awayForm: [1, 0, -1, 1, 1],
+            h2h: [0, 1, -1, 0, 1]
+        }
+    },
+    {
+        id: 118,
+        league: "International Friendly",
+        leagueCode: "friendly",
+        date: "2025-08-16T20:00:00",
+        homeTeam: "Croatia",
+        awayTeam: "Serbia",
+        homeLogo: "https://via.placeholder.com/50?text=CRO",
+        awayLogo: "https://via.placeholder.com/50?text=SRB",
+        predictions: {
+            homeWin: 45,
+            draw: 30,
+            awayWin: 25,
+            likelyScore: "2-1",
+            confidence: 70,
+            over25Goals: 68,
+            bothTeamsScore: 72,
+            homeCleanSheet: 35,
+            awayCleanSheet: 32
+        },
+        trends: {
+            homeForm: [1, 0, -1, 1, 1],
+            awayForm: [1, 1, 0, -1, 1],
+            h2h: [0, 1, -1, 1, 0]
+        }
+    },
+    {
+        id: 119,
+        league: "International Friendly",
+        leagueCode: "friendly",
+        date: "2025-08-17T18:00:00",
+        homeTeam: "Poland",
+        awayTeam: "Czech Republic",
+        homeLogo: "https://via.placeholder.com/50?text=POL",
+        awayLogo: "https://via.placeholder.com/50?text=CZE",
+        predictions: {
+            homeWin: 42,
+            draw: 33,
+            awayWin: 25,
+            likelyScore: "1-1",
+            confidence: 68,
+            over25Goals: 65,
+            bothTeamsScore: 72,
+            homeCleanSheet: 35,
+            awayCleanSheet: 38
+        },
+        trends: {
+            homeForm: [0, 1, -1, 1, 0],
+            awayForm: [1, 0, 1, -1, 1],
+            h2h: [0, 1, -1, 0, 1]
+        }
+    },
+    {
+        id: 120,
+        league: "International Friendly",
+        leagueCode: "friendly",
+        date: "2025-08-18T20:00:00",
+        homeTeam: "Switzerland",
+        awayTeam: "Austria",
+        homeLogo: "https://via.placeholder.com/50?text=SUI",
+        awayLogo: "https://via.placeholder.com/50?text=AUT",
+        predictions: {
+            homeWin: 40,
+            draw: 35,
+            awayWin: 25,
+            likelyScore: "1-1",
+            confidence: 65,
+            over25Goals: 62,
+            bothTeamsScore: 68,
+            homeCleanSheet: 35,
+            awayCleanSheet: 38
+        },
+        trends: {
+            homeForm: [1, -1, 0, 1, 0],
+            awayForm: [0, 1, -1, 1, 1],
+            h2h: [0, 1, -1, 0, 1]
+        }
+    }
+];
 
         // Function to format date
         function formatDate(dateString) {
