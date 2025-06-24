@@ -1456,6 +1456,15 @@ complete this code complete the code <!DOCTYPE html>
             
             // Set up tab switching
             setupTabs();
+           
+           function arraysEqual(a, b) {
+         if (a.length !== b.length) return false;
+         for (let i = 0; i < a.length; i++) {
+         if (a[i] !== b[i]) return false;
+        }
+        return true;
+   }
+
         });
 
         // Tab functionality
@@ -2040,7 +2049,7 @@ complete this code complete the code <!DOCTYPE html>
             };
         }
 
-        function mersenneTwister(seed) {
+         function mersenneTwister(seed) {
             const N = 624;
             const M = 397;
             const MATRIX_A = 0x9908b0df;
@@ -2082,7 +2091,7 @@ complete this code complete the code <!DOCTYPE html>
                     }
                     
                     y = (mt[N-1] & UPPER_MASK) | (mt[0] & LOWER_MASK);
-                    mt[N-1] = mt[M-1] ^ (y >>> 1) ^ mag01[y & 0x1];
+                        mt[N-1] = mt[M-1] ^ (y >>> 1) ^ mag01[y & 0x1];
                     
                     mti = 0;
                 }
@@ -2095,68 +2104,6 @@ complete this code complete the code <!DOCTYPE html>
                 y ^= (y >>> 18);
                 
                 return y / 4294967296;
-            };
-        }
-
-        function xorshift(seed) {
-            let state = seed || 1;
-            
-            return function() {
-                state ^= state << 13;
-                state ^= state >> 17;
-                state ^= state << 5;
-                return (state >>> 0) / 4294967296;
-            };
-        }
-
-        function pcg(seed) {
-            let state = seed || 1;
-            const multiplier = 6364136223846793005n;
-            const increment = 1442695040888963407n;
-            
-            return function() {
-                const oldstate = BigInt(state);
-                state = Number((oldstate * multiplier + increment) & 0xffffffffffffffffn);
-                
-                const xorshifted = Number(((oldstate >> 18n) ^ oldstate) >> 27n) & 0xffffffff;
-                const rot = Number(oldstate >> 59n);
-                
-                return ((xorshifted >> rot) | (xorshifted << ((-rot) & 31))) / 4294967296;
-            };
-        }
-
-        function mulberry32(seed) {
-            return function() {
-                seed += 0x6D2B79F5;
-                let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-                t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-                return ((t ^ t >>> 14) >>> 0) / 4294967296;
-            };
-        }
-
-        function sfc32(a, b, c, d) {
-            return function() {
-                a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; 
-                let t = (a + b) | 0;
-                a = b ^ b >>> 9;
-                b = c + (c << 3) | 0;
-                c = (c << 21 | c >>> 11);
-                d = d + 1 | 0;
-                t = t + d | 0;
-                c = c + t | 0;
-                return (t >>> 0) / 4294967296;
-            };
-        }
-
-        function jsf32(a, b, c, d) {
-            return function() {
-                a |= 0; b |= 0; c |= 0; d |= 0;
-                let t = a - (b << 27 | b >>> 5) | 0;
-                a = b ^ (c << 17 | c >>> 15);
-                b = c + d | 0;
-                c = d + t | 0;
-                d = a + t | 0;
-                return ((d >>> 0) / 4294967296);
             };
         }
 
