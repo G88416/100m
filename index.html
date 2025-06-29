@@ -869,116 +869,101 @@
         </div>
         
         <!-- Lotto Generator Tab -->
-         <div id="lotto-generate" class="tab-content">
-    <div class="config-buttons">
-        <button onclick="saveLottoConfig()" class="info">
-            <i class="fas fa-save"></i> Save Config
-        </button>
-        <button onclick="loadLottoConfig()" class="info">
-            <i class="fas fa-folder-open"></i> Load Config
-        </button>
-    </div>
-    
-    <div class="grid">
-        <div>
-            <label for="lotto-game-type">Lottery Game:</label>
-            <select id="lotto-game-type">
-                <option value="powerball">Powerball (5/69 + 1/26)</option>
-                <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
-                <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
-                <option value="lotto649">Lotto 6/49</option>
-                <option value="custom">Custom Game</option>
-            </select>
-            
-            <div id="lotto-custom-params" style="display: none;">
-                <div class="grid">
-                    <div>
-                        <label for="lotto-main-numbers">Main Numbers Pool:</label>
-                        <input type="number" id="lotto-main-numbers" min="1" value="69">
-                    </div>
-                    <div>
-                        <label for="lotto-pick-numbers">Numbers to Pick:</label>
-                        <input type="number" id="lotto-pick-numbers" min="1" value="5">
-                    </div>
-                </div>
-                <div class="grid">
-                    <div>
-                        <label for="lotto-bonus-numbers">Bonus Numbers Pool:</label>
-                        <input type="number" id="lotto-bonus-numbers" min="0" value="26">
-                    </div>
-                    <div>
-                        <label for="lotto-pick-bonus">Bonus Numbers to Pick:</label>
-                        <input type="number" id="lotto-pick-bonus" min="0" value="1">
-                    </div>
-                </div>
+        <div id="lotto-generate" class="tab-content">
+            <div class="config-buttons">
+                <button onclick="saveLottoConfig()" class="info">
+                    <i class="fas fa-save"></i> Save Config
+                </button>
+                <button onclick="loadLottoConfig()" class="info">
+                    <i class="fas fa-folder-open"></i> Load Config
+                </button>
             </div>
             
-            <label for="lotto-algorithm">Generation Algorithm:</label>
-            <select id="lotto-algorithm">
-                <option value="standard">Standard Random</option>
-                <option value="shuffle">Fisher-Yates Shuffle</option>
-                <option value="low-high">Low-High Balanced</option>
-                <option value="odd-even">Odd-Even Balanced</option>
-                <option value="prime">Prime Number Weighted</option>
-                <option value="frequency">Frequency Based</option>
-                <option value="delta">Delta System</option>
-                <option value="wheeling">Wheeling System</option>
-            </select>
-            
-            <div id="lotto-algorithm-params" style="display: none;">
-                <!-- Parameters will be shown here based on selected algorithm -->
-            </div>
-            
-            <label for="lotto-seed">Seed (leave empty for random):</label>
-            <input type="number" id="lotto-seed">
-            
-            <label for="lotto-draw-count">Number of draws:</label>
-            <input type="number" id="lotto-draw-count" min="1" value="5" max="1000">
-            
-            <div class="action-buttons">
-                <button onclick="generateLottoNumbers()" class="success">
-                    <i class="fas fa-play"></i> Generate
-                </button>
-                <button onclick="clearLottoGeneration()" class="secondary">
-                    <i class="fas fa-trash"></i> Clear
-                </button>
-                <button onclick="randomizeLottoSeed()" class="info">
-                    <i class="fas fa-dice"></i> Random Seed
-                </button>
+            <div class="grid">
+                <div>
+                    <label for="lotto-game-type">Lottery Game:</label>
+                    <select id="lotto-game-type">
+                        <option value="powerball">Powerball (5/69 + 1/26)</option>
+                        <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
+                        <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
+                        <option value="lotto649">Lotto 6/49</option>
+                        <option value="custom">Custom Game</option>
+                    </select>
+                    
+                    <div id="lotto-custom-params" style="display: none;">
+                        <div class="grid">
+                            <div>
+                                <label for="lotto-main-numbers">Main Numbers Pool:</label>
+                                <input type="number" id="lotto-main-numbers" min="1" value="69">
+                            </div>
+                            <div>
+                                <label for="lotto-pick-numbers">Numbers to Pick:</label>
+                                <input type="number" id="lotto-pick-numbers" min="1" value="5">
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <div>
+                                <label for="lotto-bonus-numbers">Bonus Numbers Pool:</label>
+                                <input type="number" id="lotto-bonus-numbers" min="0" value="26">
+                            </div>
+                            <div>
+                                <label for="lotto-pick-bonus">Bonus Numbers to Pick:</label>
+                                <input type="number" id="lotto-pick-bonus" min="0" value="1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <label for="lotto-seed">Seed (leave empty for random):</label>
+                    <input type="number" id="lotto-seed">
+                    
+                    <label for="lotto-draw-count">Number of draws:</label>
+                    <input type="number" id="lotto-draw-count" min="1" value="5" max="1000">
+                    
+                    <div class="action-buttons">
+                        <button onclick="generateLottoNumbers()" class="success">
+                            <i class="fas fa-play"></i> Generate
+                        </button>
+                        <button onclick="clearLottoGeneration()" class="secondary">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                        <button onclick="randomizeLottoSeed()" class="info">
+                            <i class="fas fa-dice"></i> Random Seed
+                        </button>
+                    </div>
+                </div>
+                
+                <div>
+                    <label>Generated Numbers:</label>
+                    <div id="lotto-generated-results"></div>
+                    
+                    <div class="export-buttons">
+                        <button onclick="exportLottoNumbers('txt')" class="secondary">
+                            <i class="fas fa-file-alt"></i> Export as TXT
+                        </button>
+                        <button onclick="exportLottoNumbers('csv')" class="secondary">
+                            <i class="fas fa-file-csv"></i> Export as CSV
+                        </button>
+                        <button onclick="exportLottoNumbers('json')" class="secondary">
+                            <i class="fas fa-file-code"></i> Export as JSON
+                        </button>
+                        <button onclick="copyLottoNumbers()" class="secondary">
+                            <i class="fas fa-copy"></i> Copy to Clipboard
+                        </button>
+                    </div>
+                    
+                    <div class="result">
+                        <strong>Generation Details:</strong>
+                        <div id="lotto-gen-details"></div>
+                    </div>
+                    
+                    <div id="lotto-frequency-analysis">
+                        <h4>Frequency Analysis</h4>
+                        <div id="lotto-frequency-content"></div>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div>
-            <label>Generated Numbers:</label>
-            <div id="lotto-generated-results"></div>
-            
-            <div class="export-buttons">
-                <button onclick="exportLottoNumbers('txt')" class="secondary">
-                    <i class="fas fa-file-alt"></i> Export as TXT
-                </button>
-                <button onclick="exportLottoNumbers('csv')" class="secondary">
-                    <i class="fas fa-file-csv"></i> Export as CSV
-                </button>
-                <button onclick="exportLottoNumbers('json')" class="secondary">
-                    <i class="fas fa-file-code"></i> Export as JSON
-                </button>
-                <button onclick="copyLottoNumbers()" class="secondary">
-                    <i class="fas fa-copy"></i> Copy to Clipboard
-                </button>
-            </div>
-            
-            <div class="result">
-                <strong>Generation Details:</strong>
-                <div id="lotto-gen-details"></div>
-            </div>
-            
-            <div id="lotto-frequency-analysis">
-                <h4>Frequency Analysis</h4>
-                <div id="lotto-frequency-content"></div>
-            </div>
-        </div>
-    </div>
-</div>       
         <!-- Lotto Reverse Engineer Tab -->
         <div id="lotto-reverse" class="tab-content">
             <div class="grid">
@@ -1311,8 +1296,6 @@
             document.getElementById('lotto-game-type').addEventListener('change', updateLottoParams);
             document.getElementById('lotto-reverse-game-type').addEventListener('change', updateLottoReverseParams);
             document.getElementById('compare-mode').addEventListener('change', updateCompareFields);
-             document.getElementById('lotto-game-type').addEventListener('change', updateLottoParams);
-    document.getElementById('lotto-algorithm').addEventListener('change', updateLottoAlgorithmParams);
             
             // Initialize algorithm info
             updateAlgorithmParams();
@@ -2271,541 +2254,564 @@
             };
         }
 
+        
         // Lotto Generator Functions
-       function updateLottoParams() {
-    const gameType = document.getElementById('lotto-game-type').value;
-    const customParams = document.getElementById('lotto-custom-params');
-    
-    if (gameType === 'custom') {
-        customParams.style.display = 'block';
-    } else {
-        customParams.style.display = 'none';
-        
-        // Set default values for known games
-        switch(gameType) {
-            case 'powerball':
-                document.getElementById('lotto-main-numbers').value = 69;
-                document.getElementById('lotto-pick-numbers').value = 5;
-                document.getElementById('lotto-bonus-numbers').value = 26;
-                document.getElementById('lotto-pick-bonus').value = 1;
-                break;
-            case 'megamillions':
-                document.getElementById('lotto-main-numbers').value = 70;
-                document.getElementById('lotto-pick-numbers').value = 5;
-                document.getElementById('lotto-bonus-numbers').value = 25;
-                document.getElementById('lotto-pick-bonus').value = 1;
-                break;
-            case 'euromillions':
-                document.getElementById('lotto-main-numbers').value = 50;
-                document.getElementById('lotto-pick-numbers').value = 5;
-                document.getElementById('lotto-bonus-numbers').value = 12;
-                document.getElementById('lotto-pick-bonus').value = 2;
-                break;
-            case 'lotto649':
-                document.getElementById('lotto-main-numbers').value = 49;
-                document.getElementById('lotto-pick-numbers').value = 6;
-                document.getElementById('lotto-bonus-numbers').value = 0;
-                document.getElementById('lotto-pick-bonus').value = 0;
-                break;
-        }
-    }
-    
-    updateLottoAlgorithmParams();
-}
-
-// Update algorithm parameters function
-function updateLottoAlgorithmParams() {
-    const algorithm = document.getElementById('lotto-algorithm').value;
-    const paramsDiv = document.getElementById('lotto-algorithm-params');
-    
-    let paramsHTML = '';
-    
-    switch(algorithm) {
-        case 'low-high':
-            paramsHTML = `
-                <label for="low-high-ratio">Low/High Ratio:</label>
-                <select id="low-high-ratio">
-                    <option value="balanced">Balanced (50/50)</option>
-                    <option value="low">More Low Numbers</option>
-                    <option value="high">More High Numbers</option>
-                </select>
-            `;
-            break;
+        function updateLottoParams() {
+            const gameType = document.getElementById('lotto-game-type').value;
+            const customParams = document.getElementById('lotto-custom-params');
             
-        case 'odd-even':
-            paramsHTML = `
-                <label for="odd-even-ratio">Odd/Even Ratio:</label>
-                <select id="odd-even-ratio">
-                    <option value="balanced">Balanced (50/50)</option>
-                    <option value="odd">More Odd Numbers</option>
-                    <option value="even">More Even Numbers</option>
-                </select>
-            `;
-            break;
+            if (gameType === 'custom') {
+                customParams.style.display = 'block';
+            } else {
+                customParams.style.display = 'none';
+                
+                // Set default values for known games
+                switch(gameType) {
+                    case 'powerball':
+                        document.getElementById('lotto-main-numbers').value = 69;
+                        document.getElementById('lotto-pick-numbers').value = 5;
+                        document.getElementById('lotto-bonus-numbers').value = 26;
+                        document.getElementById('lotto-pick-bonus').value = 1;
+                        break;
+                    case 'megamillions':
+                        document.getElementById('lotto-main-numbers').value = 70;
+                        document.getElementById('lotto-pick-numbers').value = 5;
+                        document.getElementById('lotto-bonus-numbers').value = 25;
+                        document.getElementById('lotto-pick-bonus').value = 1;
+                        break;
+                    case 'euromillions':
+                        document.getElementById('lotto-main-numbers').value = 50;
+                        document.getElementById('lotto-pick-numbers').value = 5;
+                        document.getElementById('lotto-bonus-numbers').value = 12;
+                        document.getElementById('lotto-pick-bonus').value = 2;
+                        break;
+                    case 'lotto649':
+                        document.getElementById('lotto-main-numbers').value = 49;
+                        document.getElementById('lotto-pick-numbers').value = 6;
+                        document.getElementById('lotto-bonus-numbers').value = 0;
+                        document.getElementById('lotto-pick-bonus').value = 0;
+                        break;
+                }
+            }
             
-        case 'prime':
-            paramsHTML = `
-                <label for="prime-weight">Prime Number Weight:</label>
-                <select id="prime-weight">
-                    <option value="normal">Normal</option>
-                    <option value="slight">Slight Preference</option>
-                    <option value="strong">Strong Preference</option>
-                </select>
-            `;
-            break;
+            updateLottoAlgorithmParams();
+        }
+
+        function updateLottoAlgorithmParams() {
+            const algorithm = document.getElementById('lotto-algorithm').value;
+            const paramsDiv = document.getElementById('lotto-algorithm-params');
             
-        case 'frequency':
-            paramsHTML = `
-                <label for="frequency-source">Frequency Data Source:</label>
-                <select id="frequency-source">
-                    <option value="random">Random Sample</option>
-                    <option value="historical">Historical Data</option>
-                </select>
-                <div id="frequency-historical-params" style="margin-top: 10px; display: none;">
-                    <label for="historical-data">Paste Historical Data:</label>
-                    <textarea id="historical-data" rows="3" placeholder="Enter past draws, one per line"></textarea>
-                </div>
-            `;
-            break;
+            let paramsHTML = '';
             
-        case 'delta':
-            paramsHTML = `
-                <label for="delta-range">Delta Range:</label>
-                <select id="delta-range">
-                    <option value="small">Small (1-5)</option>
-                    <option value="medium">Medium (3-8)</option>
-                    <option value="large">Large (5-15)</option>
-                </select>
-            `;
-            break;
+            switch(algorithm) {
+                case 'low-high':
+                    paramsHTML = `
+                        <label for="low-high-ratio">Low/High Ratio:</label>
+                        <select id="low-high-ratio">
+                            <option value="balanced">Balanced (50/50)</option>
+                            <option value="low">More Low Numbers</option>
+                            <option value="high">More High Numbers</option>
+                        </select>
+                    `;
+                    break;
+                    
+                case 'odd-even':
+                    paramsHTML = `
+                        <label for="odd-even-ratio">Odd/Even Ratio:</label>
+                        <select id="odd-even-ratio">
+                            <option value="balanced">Balanced (50/50)</option>
+                            <option value="odd">More Odd Numbers</option>
+                            <option value="even">More Even Numbers</option>
+                        </select>
+                    `;
+                    break;
+                    
+                case 'prime':
+                    paramsHTML = `
+                        <label for="prime-weight">Prime Number Weight:</label>
+                        <select id="prime-weight">
+                            <option value="normal">Normal</option>
+                            <option value="slight">Slight Preference</option>
+                            <option value="strong">Strong Preference</option>
+                        </select>
+                    `;
+                    break;
+                    
+                case 'frequency':
+                    paramsHTML = `
+                        <label for="frequency-source">Frequency Data Source:</label>
+                        <select id="frequency-source">
+                            <option value="random">Random Sample</option>
+                            <option value="historical">Historical Data</option>
+                        </select>
+                        <div id="frequency-historical-params" style="margin-top: 10px; display: none;">
+                            <label for="historical-data">Paste Historical Data:</label>
+                            <textarea id="historical-data" rows="3" placeholder="Enter past draws, one per line"></textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'delta':
+                    paramsHTML = `
+                        <label for="delta-range">Delta Range:</label>
+                        <select id="delta-range">
+                            <option value="small">Small (1-5)</option>
+                            <option value="medium">Medium (3-8)</option>
+                            <option value="large">Large (5-15)</option>
+                        </select>
+                    `;
+                    break;
+                    
+                case 'wheeling':
+                    paramsHTML = `
+                        <label for="wheeling-system">Wheeling System:</label>
+                        <select id="wheeling-system">
+                            <option value="abbreviated">Abbreviated (3 if 5)</option>
+                            <option value="full">Full Coverage</option>
+                        </select>
+                    `;
+                    break;
+                    
+                default:
+                    paramsHTML = '<p>No parameters needed for this algorithm</p>';
+            }
             
-        case 'wheeling':
-            paramsHTML = `
-                <label for="wheeling-system">Wheeling System:</label>
-                <select id="wheeling-system">
-                    <option value="abbreviated">Abbreviated (3 if 5)</option>
-                    <option value="full">Full Coverage</option>
-                </select>
-            `;
-            break;
+            paramsDiv.innerHTML = paramsHTML;
+            paramsDiv.style.display = paramsHTML ? 'block' : 'none';
             
-        default:
-            paramsHTML = '<p>No parameters needed for this algorithm</p>';
-    }
-    
-    paramsDiv.innerHTML = paramsHTML;
-    paramsDiv.style.display = paramsHTML ? 'block' : 'none';
-    
-    // Add event listener for frequency source change
-    if (algorithm === 'frequency') {
-        document.getElementById('frequency-source').addEventListener('change', function() {
-            document.getElementById('frequency-historical-params').style.display = 
-                this.value === 'historical' ? 'block' : 'none';
-        });
-    }
-}
-
-// Main generation function (modify your existing one)
-function generateLottoNumbers() {
-    const gameType = document.getElementById('lotto-game-type').value;
-    let mainPool, pickCount, bonusPool, bonusCount;
-    
-    if (gameType === 'custom') {
-        mainPool = parseInt(document.getElementById('lotto-main-numbers').value) || 69;
-        pickCount = parseInt(document.getElementById('lotto-pick-numbers').value) || 5;
-        bonusPool = parseInt(document.getElementById('lotto-bonus-numbers').value) || 26;
-        bonusCount = parseInt(document.getElementById('lotto-pick-bonus').value) || 1;
-    } else {
-        switch(gameType) {
-            case 'powerball':
-                mainPool = 69;
-                pickCount = 5;
-                bonusPool = 26;
-                bonusCount = 1;
-                break;
-            case 'megamillions':
-                mainPool = 70;
-                pickCount = 5;
-                bonusPool = 25;
-                bonusCount = 1;
-                break;
-            case 'euromillions':
-                mainPool = 50;
-                pickCount = 5;
-                bonusPool = 12;
-                bonusCount = 2;
-                break;
-            case 'lotto649':
-                mainPool = 49;
-                pickCount = 6;
-                bonusPool = 0;
-                bonusCount = 0;
-                break;
-            default:
-                mainPool = 69;
-                pickCount = 5;
-                bonusPool = 26;
-                bonusCount = 1;
-        }
-    }
-    
-    const algorithm = document.getElementById('lotto-algorithm').value;
-    const drawCount = parseInt(document.getElementById('lotto-draw-count').value) || 5;
-    const seed = document.getElementById('lotto-seed').value || Math.floor(Math.random() * 1000000);
-    
-    // Generate numbers based on selected algorithm
-    const results = [];
-    const generator = mulberry32(parseInt(seed));
-    
-    for (let i = 0; i < drawCount; i++) {
-        let mainNumbers, bonusNumbers;
-        
-        switch(algorithm) {
-            case 'standard':
-                mainNumbers = generateStandardNumbers(generator, mainPool, pickCount);
-                break;
-            case 'shuffle':
-                mainNumbers = generateShuffledNumbers(generator, mainPool, pickCount);
-                break;
-            case 'low-high':
-                mainNumbers = generateLowHighNumbers(generator, mainPool, pickCount);
-                break;
-            case 'odd-even':
-                mainNumbers = generateOddEvenNumbers(generator, mainPool, pickCount);
-                break;
-            case 'prime':
-                mainNumbers = generatePrimeWeightedNumbers(generator, mainPool, pickCount);
-                break;
-            case 'frequency':
-                mainNumbers = generateFrequencyBasedNumbers(generator, mainPool, pickCount);
-                break;
-            case 'delta':
-                mainNumbers = generateDeltaSystemNumbers(generator, mainPool, pickCount);
-                break;
-            case 'wheeling':
-                mainNumbers = generateWheelingSystemNumbers(generator, mainPool, pickCount);
-                break;
-            default:
-                mainNumbers = generateStandardNumbers(generator, mainPool, pickCount);
-        }
-        
-        bonusNumbers = bonusCount > 0 ? generateStandardNumbers(generator, bonusPool, bonusCount) : [];
-        
-        results.push({
-            main: mainNumbers,
-            bonus: bonusNumbers
-        });
-    }
-    
-    // Display results
-    displayLottoResults(results, gameType);
-    
-    // Update generation details
-    document.getElementById('lotto-gen-details').innerHTML = `
-        <p><strong>Game Type:</strong> ${gameType}</p>
-        <p><strong>Algorithm:</strong> ${document.getElementById('lotto-algorithm').options[document.getElementById('lotto-algorithm').selectedIndex].text}</p>
-        <p><strong>Main Numbers:</strong> Pick ${pickCount} from ${mainPool}</p>
-        ${bonusCount > 0 ? `<p><strong>Bonus Numbers:</strong> Pick ${bonusCount} from ${bonusPool}</p>` : ''}
-        <p><strong>Seed:</strong> ${seed}</p>
-    `;
-    
-    // Perform frequency analysis
-    performFrequencyAnalysis(results, mainPool, bonusPool);
-    
-    showToast('Lotto numbers generated successfully', 'success');
-}
-
-// Algorithm implementations
-function generateStandardNumbers(generator, poolSize, count) {
-    const numbers = [];
-    while (numbers.length < count) {
-        const num = Math.floor(generator() * poolSize) + 1;
-        if (!numbers.includes(num)) {
-            numbers.push(num);
-        }
-    }
-    return numbers.sort((a, b) => a - b);
-}
-
-function generateShuffledNumbers(generator, poolSize, count) {
-    const allNumbers = Array.from({length: poolSize}, (_, i) => i + 1);
-    
-    // Fisher-Yates shuffle
-    for (let i = allNumbers.length - 1; i > 0; i--) {
-        const j = Math.floor(generator() * (i + 1));
-        [allNumbers[i], allNumbers[j]] = [allNumbers[j], allNumbers[i]];
-    }
-    
-    return allNumbers.slice(0, count).sort((a, b) => a - b);
-}
-
-function generateLowHighNumbers(generator, poolSize, count) {
-    const ratio = document.getElementById('low-high-ratio').value;
-    const splitPoint = Math.ceil(poolSize / 2);
-    
-    let lowTarget, highTarget;
-    
-    switch(ratio) {
-        case 'balanced':
-            lowTarget = Math.ceil(count / 2);
-            highTarget = Math.floor(count / 2);
-            break;
-        case 'low':
-            lowTarget = Math.ceil(count * 0.7);
-            highTarget = Math.floor(count * 0.3);
-            break;
-        case 'high':
-            lowTarget = Math.ceil(count * 0.3);
-            highTarget = Math.floor(count * 0.7);
-            break;
-        default:
-            lowTarget = Math.ceil(count / 2);
-            highTarget = Math.floor(count / 2);
-    }
-    
-    const numbers = [];
-    
-    // Generate low numbers (1 to splitPoint)
-    while (numbers.length < lowTarget && numbers.length < count) {
-        const num = Math.floor(generator() * splitPoint) + 1;
-        if (!numbers.includes(num)) {
-            numbers.push(num);
-        }
-    }
-    
-    // Generate high numbers (splitPoint+1 to poolSize)
-    while (numbers.length < count) {
-        const num = Math.floor(generator() * (poolSize - splitPoint)) + splitPoint + 1;
-        if (!numbers.includes(num)) {
-            numbers.push(num);
-        }
-    }
-    
-    return numbers.sort((a, b) => a - b);
-}
-
-function generateOddEvenNumbers(generator, poolSize, count) {
-    const ratio = document.getElementById('odd-even-ratio').value;
-    
-    let oddTarget, evenTarget;
-    
-    switch(ratio) {
-        case 'balanced':
-            oddTarget = Math.ceil(count / 2);
-            evenTarget = Math.floor(count / 2);
-            break;
-        case 'odd':
-            oddTarget = Math.ceil(count * 0.7);
-            evenTarget = Math.floor(count * 0.3);
-            break;
-        case 'even':
-            oddTarget = Math.ceil(count * 0.3);
-            evenTarget = Math.floor(count * 0.7);
-            break;
-        default:
-            oddTarget = Math.ceil(count / 2);
-            evenTarget = Math.floor(count / 2);
-    }
-    
-    const numbers = [];
-    
-    // Generate odd numbers
-    while (numbers.length < oddTarget && numbers.length < count) {
-        const num = Math.floor(generator() * poolSize) + 1;
-        if (num % 2 === 1 && !numbers.includes(num)) {
-            numbers.push(num);
-        }
-    }
-    
-    // Generate even numbers
-    while (numbers.length < count) {
-        const num = Math.floor(generator() * poolSize) + 1;
-        if (num % 2 === 0 && !numbers.includes(num)) {
-            numbers.push(num);
-        }
-    }
-    
-    return numbers.sort((a, b) => a - b);
-}
-
-function generatePrimeWeightedNumbers(generator, poolSize, count) {
-    const weight = document.getElementById('prime-weight').value;
-    
-    // First identify all prime numbers in the pool
-    const primes = [];
-    for (let i = 2; i <= poolSize; i++) {
-        if (isPrime(i)) primes.push(i);
-    }
-    
-    // Create weighted array based on preference
-    let allNumbers = Array.from({length: poolSize}, (_, i) => i + 1);
-    let weightedNumbers = [];
-    
-    // Assign weights based on selection
-    allNumbers.forEach(num => {
-        const isPrimeNum = primes.includes(num);
-        let weightMultiplier = 1;
-        
-        if (isPrimeNum) {
-            switch(weight) {
-                case 'slight': weightMultiplier = 2; break;
-                case 'strong': weightMultiplier = 3; break;
+            // Add event listener for frequency source change
+            if (algorithm === 'frequency') {
+                document.getElementById('frequency-source').addEventListener('change', function() {
+                    document.getElementById('frequency-historical-params').style.display = 
+                        this.value === 'historical' ? 'block' : 'none';
+                });
             }
         }
-        
-        for (let i = 0; i < weightMultiplier; i++) {
-            weightedNumbers.push(num);
-        }
-    });
-    
-    // Select numbers from weighted array
-    const numbers = [];
-    while (numbers.length < count) {
-        const index = Math.floor(generator() * weightedNumbers.length);
-        const num = weightedNumbers[index];
-        if (!numbers.includes(num)) {
-            numbers.push(num);
-        }
-    }
-    
-    return numbers.sort((a, b) => a - b);
-}
 
-function isPrime(num) {
-    if (num <= 1) return false;
-    if (num <= 3) return true;
-    if (num % 2 === 0 || num % 3 === 0) return false;
-    
-    for (let i = 5; i * i <= num; i += 6) {
-        if (num % i === 0 || num % (i + 2) === 0) return false;
-    }
-    
-    return true;
-}
-
-function generateFrequencyBasedNumbers(generator, poolSize, count) {
-    const source = document.getElementById('frequency-source').value;
-    let frequencyMap = {};
-    
-    if (source === 'historical') {
-        const historicalData = document.getElementById('historical-data').value.trim();
-        if (historicalData) {
-            // Parse historical data and count frequencies
-            const draws = historicalData.split('\n');
-            draws.forEach(draw => {
-                const numbers = draw.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num) && num >= 1 && num <= poolSize);
-                numbers.forEach(num => {
-                    frequencyMap[num] = (frequencyMap[num] || 0) + 1;
+        function generateLottoNumbers() {
+            const gameType = document.getElementById('lotto-game-type').value;
+            let mainPool, pickCount, bonusPool, bonusCount;
+            
+            if (gameType === 'custom') {
+                mainPool = parseInt(document.getElementById('lotto-main-numbers').value) || 69;
+                pickCount = parseInt(document.getElementById('lotto-pick-numbers').value) || 5;
+                bonusPool = parseInt(document.getElementById('lotto-bonus-numbers').value) || 26;
+                bonusCount = parseInt(document.getElementById('lotto-pick-bonus').value) || 1;
+            } else {
+                switch(gameType) {
+                    case 'powerball':
+                        mainPool = 69;
+                        pickCount = 5;
+                        bonusPool = 26;
+                        bonusCount = 1;
+                        break;
+                    case 'megamillions':
+                        mainPool = 70;
+                        pickCount = 5;
+                        bonusPool = 25;
+                        bonusCount = 1;
+                        break;
+                    case 'euromillions':
+                        mainPool = 50;
+                        pickCount = 5;
+                        bonusPool = 12;
+                        bonusCount = 2;
+                        break;
+                    case 'lotto649':
+                        mainPool = 49;
+                        pickCount = 6;
+                        bonusPool = 0;
+                        bonusCount = 0;
+                        break;
+                    default:
+                        mainPool = 69;
+                        pickCount = 5;
+                        bonusPool = 26;
+                        bonusCount = 1;
+                }
+            }
+            
+            const algorithm = document.getElementById('lotto-algorithm').value;
+            const drawCount = parseInt(document.getElementById('lotto-draw-count').value) || 5;
+            const seed = document.getElementById('lotto-seed').value || Math.floor(Math.random() * 1000000);
+            
+            // Generate numbers based on selected algorithm
+            const results = [];
+            const generator = mulberry32(parseInt(seed));
+            
+            for (let i = 0; i < drawCount; i++) {
+                let mainNumbers, bonusNumbers;
+                
+                switch(algorithm) {
+                    case 'standard':
+                        mainNumbers = generateStandardNumbers(generator, mainPool, pickCount);
+                        break;
+                    case 'shuffle':
+                        mainNumbers = generateShuffledNumbers(generator, mainPool, pickCount);
+                        break;
+                    case 'low-high':
+                        mainNumbers = generateLowHighNumbers(generator, mainPool, pickCount);
+                        break;
+                    case 'odd-even':
+                        mainNumbers = generateOddEvenNumbers(generator, mainPool, pickCount);
+                        break;
+                    case 'prime':
+                        mainNumbers = generatePrimeWeightedNumbers(generator, mainPool, pickCount);
+                        break;
+                    case 'frequency':
+                        mainNumbers = generateFrequencyBasedNumbers(generator, mainPool, pickCount);
+                        break;
+                    case 'delta':
+                        mainNumbers = generateDeltaSystemNumbers(generator, mainPool, pickCount);
+                        break;
+                    case 'wheeling':
+                        mainNumbers = generateWheelingSystemNumbers(generator, mainPool, pickCount);
+                        break;
+                    default:
+                        mainNumbers = generateStandardNumbers(generator, mainPool, pickCount);
+                }
+                
+                bonusNumbers = bonusCount > 0 ? generateStandardNumbers(generator, bonusPool, bonusCount) : [];
+                
+                results.push({
+                    main: mainNumbers,
+                    bonus: bonusNumbers
                 });
+            }
+            
+            // Display results
+            displayLottoResults(results, gameType);
+            
+            // Update generation details
+            document.getElementById('lotto-gen-details').innerHTML = `
+                <p><strong>Game Type:</strong> ${gameType}</p>
+                <p><strong>Algorithm:</strong> ${document.getElementById('lotto-algorithm').options[document.getElementById('lotto-algorithm').selectedIndex].text}</p>
+                <p><strong>Main Numbers:</strong> Pick ${pickCount} from ${mainPool}</p>
+                ${bonusCount > 0 ? `<p><strong>Bonus Numbers:</strong> Pick ${bonusCount} from ${bonusPool}</p>` : ''}
+                <p><strong>Seed:</strong> ${seed}</p>
+            `;
+            
+            // Perform frequency analysis
+            performFrequencyAnalysis(results, mainPool, bonusPool);
+            
+            showToast('Lotto numbers generated successfully', 'success');
+        }
+
+        // Standard random number generation
+        function generateStandardNumbers(generator, poolSize, count) {
+            const numbers = [];
+            while (numbers.length < count) {
+                const num = Math.floor(generator() * poolSize) + 1;
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            return numbers.sort((a, b) => a - b);
+        }
+
+        // Fisher-Yates shuffle algorithm
+        function generateShuffledNumbers(generator, poolSize, count) {
+            // Create an array of all possible numbers
+            const allNumbers = Array.from({length: poolSize}, (_, i) => i + 1);
+            
+            // Fisher-Yates shuffle
+            for (let i = allNumbers.length - 1; i > 0; i--) {
+                const j = Math.floor(generator() * (i + 1));
+                [allNumbers[i], allNumbers[j]] = [allNumbers[j], allNumbers[i]];
+            }
+            
+            // Return the first 'count' numbers
+            return allNumbers.slice(0, count).sort((a, b) => a - b);
+        }
+
+        // Low-high balanced numbers
+        function generateLowHighNumbers(generator, poolSize, count) {
+            const ratio = document.getElementById('low-high-ratio').value;
+            const splitPoint = Math.ceil(poolSize / 2);
+            
+            let lowTarget, highTarget;
+            
+            switch(ratio) {
+                case 'balanced':
+                    lowTarget = Math.ceil(count / 2);
+                    highTarget = Math.floor(count / 2);
+                    break;
+                case 'low':
+                    lowTarget = Math.ceil(count * 0.7);
+                    highTarget = Math.floor(count * 0.3);
+                    break;
+                case 'high':
+                    lowTarget = Math.ceil(count * 0.3);
+                    highTarget = Math.floor(count * 0.7);
+                    break;
+                default:
+                    lowTarget = Math.ceil(count / 2);
+                    highTarget = Math.floor(count / 2);
+            }
+            
+            const numbers = [];
+            
+            // Generate low numbers (1 to splitPoint)
+            while (numbers.length < lowTarget && numbers.length < count) {
+                const num = Math.floor(generator() * splitPoint) + 1;
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            
+            // Generate high numbers (splitPoint+1 to poolSize)
+            while (numbers.length < count) {
+                const num = Math.floor(generator() * (poolSize - splitPoint)) + splitPoint + 1;
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            
+            return numbers.sort((a, b) => a - b);
+        }
+
+        // Odd-even balanced numbers
+        function generateOddEvenNumbers(generator, poolSize, count) {
+            const ratio = document.getElementById('odd-even-ratio').value;
+            
+            let oddTarget, evenTarget;
+            
+            switch(ratio) {
+                case 'balanced':
+                    oddTarget = Math.ceil(count / 2);
+                    evenTarget = Math.floor(count / 2);
+                    break;
+                case 'odd':
+                    oddTarget = Math.ceil(count * 0.7);
+                    evenTarget = Math.floor(count * 0.3);
+                    break;
+                case 'even':
+                    oddTarget = Math.ceil(count * 0.3);
+                    evenTarget = Math.floor(count * 0.7);
+                    break;
+                default:
+                    oddTarget = Math.ceil(count / 2);
+                    evenTarget = Math.floor(count / 2);
+            }
+            
+            const numbers = [];
+            
+            // Generate odd numbers
+            while (numbers.length < oddTarget && numbers.length < count) {
+                const num = Math.floor(generator() * poolSize) + 1;
+                if (num % 2 === 1 && !numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            
+            // Generate even numbers
+            while (numbers.length < count) {
+                const num = Math.floor(generator() * poolSize) + 1;
+                if (num % 2 === 0 && !numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            
+            return numbers.sort((a, b) => a - b);
+        }
+
+        // Prime number weighted selection
+        function generatePrimeWeightedNumbers(generator, poolSize, count) {
+            const weight = document.getElementById('prime-weight').value;
+            
+            // First identify all prime numbers in the pool
+            const primes = [];
+            for (let i = 2; i <= poolSize; i++) {
+                if (isPrime(i)) primes.push(i);
+            }
+            
+            // Create weighted array based on preference
+            let allNumbers = Array.from({length: poolSize}, (_, i) => i + 1);
+            let weightedNumbers = [];
+            
+            // Assign weights based on selection
+            allNumbers.forEach(num => {
+                const isPrimeNum = primes.includes(num);
+                let weightMultiplier = 1;
+                
+                if (isPrimeNum) {
+                    switch(weight) {
+                        case 'slight': weightMultiplier = 2; break;
+                        case 'strong': weightMultiplier = 3; break;
+                    }
+                }
+                
+                for (let i = 0; i < weightMultiplier; i++) {
+                    weightedNumbers.push(num);
+                }
+            });
+            
+            // Select numbers from weighted array
+            const numbers = [];
+            while (numbers.length < count) {
+                const index = Math.floor(generator() * weightedNumbers.length);
+                const num = weightedNumbers[index];
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            
+            return numbers.sort((a, b) => a - b);
+        }
+
+        function isPrime(num) {
+            if (num <= 1) return false;
+            if (num <= 3) return true;
+            if (num % 2 === 0 || num % 3 === 0) return false;
+            
+            for (let i = 5; i * i <= num; i += 6) {
+                if (num % i === 0 || num % (i + 2) === 0) return false;
+            }
+            
+            return true;
+        }
+
+        // Frequency-based number selection
+        function generateFrequencyBasedNumbers(generator, poolSize, count) {
+            const source = document.getElementById('frequency-source').value;
+            let frequencyMap = {};
+            
+            if (source === 'historical') {
+                const historicalData = document.getElementById('historical-data').value.trim();
+                if (historicalData) {
+                    // Parse historical data and count frequencies
+                    const draws = historicalData.split('\n');
+                    draws.forEach(draw => {
+                        const numbers = draw.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num) && num >= 1 && num <= poolSize);
+                        numbers.forEach(num => {
+                            frequencyMap[num] = (frequencyMap[num] || 0) + 1;
+                        });
+                    });
+                }
+            }
+            
+            // If no historical data or random source, create equal frequencies
+            if (Object.keys(frequencyMap).length === 0) {
+                for (let i = 1; i <= poolSize; i++) {
+                    frequencyMap[i] = 1; // Default frequency
+                }
+            }
+            
+            // Create weighted array
+            let weightedNumbers = [];
+            for (const num in frequencyMap) {
+                for (let i = 0; i < frequencyMap[num]; i++) {
+                    weightedNumbers.push(parseInt(num));
+                }
+            }
+            
+            // Select numbers from weighted array
+            const numbers = [];
+            while (numbers.length < count) {
+                const index = Math.floor(generator() * weightedNumbers.length);
+                const num = weightedNumbers[index];
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            
+            return numbers.sort((a, b) => a - b);
+        }
+
+        // Delta system (numbers with specific differences)
+        function generateDeltaSystemNumbers(generator, poolSize, count) {
+            const range = document.getElementById('delta-range').value;
+            let minDelta, maxDelta;
+            
+            switch(range) {
+                case 'small':
+                    minDelta = 1;
+                    maxDelta = 5;
+                    break;
+                case 'medium':
+                    minDelta = 3;
+                    maxDelta = 8;
+                    break;
+                case 'large':
+                    minDelta = 5;
+                    maxDelta = 15;
+                    break;
+                default:
+                    minDelta = 1;
+                    maxDelta = 5;
+            }
+            
+            const numbers = [];
+            
+            // Start with a random number
+            numbers.push(Math.floor(generator() * poolSize) + 1);
+            
+            while (numbers.length < count) {
+                const lastNum = numbers[numbers.length - 1];
+                const delta = minDelta + Math.floor(generator() * (maxDelta - minDelta + 1));
+                const direction = generator() > 0.5 ? 1 : -1;
+                const newNum = lastNum + (delta * direction);
+                
+                if (newNum >= 1 && newNum <= poolSize && !numbers.includes(newNum)) {
+                    numbers.push(newNum);
+                }
+                
+                // If stuck, try a different approach
+                if (numbers.length === 1 && numbers.length < count) {
+                    numbers.push(Math.floor(generator() * poolSize) + 1);
+                }
+            }
+            
+            return numbers.sort((a, b) => a - b);
+        }
+
+        // Wheeling system (covering more combinations)
+        function generateWheelingSystemNumbers(generator, poolSize, count) {
+            const system = document.getElementById('wheeling-system').value;
+            
+            if (system === 'abbreviated') {
+                // Simple abbreviated system - pick 3 numbers from first half, 2 from second
+                const splitPoint = Math.ceil(poolSize / 2);
+                const numbers = [];
+                
+                // Pick from first half
+                while (numbers.length < Math.min(3, count)) {
+                    const num = Math.floor(generator() * splitPoint) + 1;
+                    if (!numbers.includes(num)) {
+                        numbers.push(num);
+                    }
+                }
+                
+                // Pick from second half
+                while (numbers.length < count) {
+                    const num = Math.floor(generator() * (poolSize - splitPoint)) + splitPoint + 1;
+                    if (!numbers.includes(num)) {
+                        numbers.push(num);
+                    }
+                }
+                
+                return numbers.sort((a, b) => a - b);
+            } else {
+                // Full coverage system - more complex implementation would be needed
+                // For simplicity, we'll just do a standard random here
+                return generateStandardNumbers(generator, poolSize, count);
+            }           
+        }
+
+        function copyLottoNumbers() {
+            const results = document.getElementById('lotto-generated-results').innerText;
+            if (!results.trim()) {
+                showToast('No numbers to copy', 'warning');
+                return;
+            }
+            
+            navigator.clipboard.writeText(results).then(() => {
+                showToast('Lotto numbers copied to clipboard', 'success');
+            }).catch(err => {
+                showToast('Failed to copy: ' + err, 'danger');
             });
         }
-    }
-    
-    // If no historical data or random source, create equal frequencies
-    if (Object.keys(frequencyMap).length === 0) {
-        for (let i = 1; i <= poolSize; i++) {
-            frequencyMap[i] = 1; // Default frequency
-        }
-    }
-    
-    // Create weighted array
-    let weightedNumbers = [];
-    for (const num in frequencyMap) {
-        for (let i = 0; i < frequencyMap[num]; i++) {
-            weightedNumbers.push(parseInt(num));
-        }
-    }
-    
-    // Select numbers from weighted array
-    const numbers = [];
-    while (numbers.length < count) {
-        const index = Math.floor(generator() * weightedNumbers.length);
-        const num = weightedNumbers[index];
-        if (!numbers.includes(num)) {
-            numbers.push(num);
-        }
-    }
-    
-    return numbers.sort((a, b) => a - b);
-}
 
-function generateDeltaSystemNumbers(generator, poolSize, count) {
-    const range = document.getElementById('delta-range').value;
-    let minDelta, maxDelta;
-    
-    switch(range) {
-        case 'small':
-            minDelta = 1;
-            maxDelta = 5;
-            break;
-        case 'medium':
-            minDelta = 3;
-            maxDelta = 8;
-            break;
-        case 'large':
-            minDelta = 5;
-            maxDelta = 15;
-            break;
-        default:
-            minDelta = 1;
-            maxDelta = 5;
-    }
-    
-    const numbers = [];
-    
-    // Start with a random number
-    numbers.push(Math.floor(generator() * poolSize) + 1);
-    
-    while (numbers.length < count) {
-        const lastNum = numbers[numbers.length - 1];
-        const delta = minDelta + Math.floor(generator() * (maxDelta - minDelta + 1));
-        const direction = generator() > 0.5 ? 1 : -1;
-        const newNum = lastNum + (delta * direction);
-        
-        if (newNum >= 1 && newNum <= poolSize && !numbers.includes(newNum)) {
-            numbers.push(newNum);
-        }
-        
-        // If stuck, try a different approach
-        if (numbers.length === 1 && numbers.length < count) {
-            numbers.push(Math.floor(generator() * poolSize) + 1);
-        }
-    }
-    
-    return numbers.sort((a, b) => a - b);
-}
-
-function generateWheelingSystemNumbers(generator, poolSize, count) {
-    const system = document.getElementById('wheeling-system').value;
-    
-    if (system === 'abbreviated') {
-        // Simple abbreviated system - pick 3 numbers from first half, 2 from second
-        const splitPoint = Math.ceil(poolSize / 2);
-        const numbers = [];
-        
-        // Pick from first half
-        while (numbers.length < Math.min(3, count)) {
-            const num = Math.floor(generator() * splitPoint) + 1;
-            if (!numbers.includes(num)) {
-                numbers.push(num);
-            }
-        }
-        
-        // Pick from second half
-        while (numbers.length < count) {
-            const num = Math.floor(generator() * (poolSize - splitPoint)) + splitPoint + 1;
-            if (!numbers.includes(num)) {
-                numbers.push(num);
-            }
-        }
-        
-        return numbers.sort((a, b) => a - b);
-    } else {
-        // Full coverage system - more complex implementation would be needed
-        // For simplicity, we'll just do a standard random here
-        return generateStandardNumbers(generator, poolSize, count);
-    }
-}
         // PRNG Reverse Engineering Functions
         function reverseEngineerPRNG() {
             const algorithm = document.getElementById('reverse-prng-algorithm').value;
