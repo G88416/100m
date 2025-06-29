@@ -868,101 +868,117 @@
             </div>
         </div>
         
-        <!-- Lotto Generator Tab -->
-        <div id="lotto-generate" class="tab-content">
-            <div class="config-buttons">
-                <button onclick="saveLottoConfig()" class="info">
-                    <i class="fas fa-save"></i> Save Config
-                </button>
-                <button onclick="loadLottoConfig()" class="info">
-                    <i class="fas fa-folder-open"></i> Load Config
-                </button>
-            </div>
-            
-            <div class="grid">
-                <div>
-                    <label for="lotto-game-type">Lottery Game:</label>
-                    <select id="lotto-game-type">
-                        <option value="powerball">Powerball (5/69 + 1/26)</option>
-                        <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
-                        <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
-                        <option value="lotto649">Lotto 6/49</option>
-                        <option value="custom">Custom Game</option>
-                    </select>
-                    
-                    <div id="lotto-custom-params" style="display: none;">
-                        <div class="grid">
-                            <div>
-                                <label for="lotto-main-numbers">Main Numbers Pool:</label>
-                                <input type="number" id="lotto-main-numbers" min="1" value="69">
-                            </div>
-                            <div>
-                                <label for="lotto-pick-numbers">Numbers to Pick:</label>
-                                <input type="number" id="lotto-pick-numbers" min="1" value="5">
-                            </div>
+         <!-- Lotto Generator Tab -->
+    <div id="lotto-generate" class="tab-content">
+        <div class="config-buttons">
+            <button onclick="saveLottoConfig()" class="info">
+                <i class="fas fa-save"></i> Save Config
+            </button>
+            <button onclick="loadLottoConfig()" class="info">
+                <i class="fas fa-folder-open"></i> Load Config
+            </button>
+        </div>
+        
+        <div class="grid">
+            <div>
+                <label for="lotto-game-type">Lottery Game:</label>
+                <select id="lotto-game-type">
+                    <option value="powerball">Powerball (5/69 + 1/26)</option>
+                    <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
+                    <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
+                    <option value="lotto649">Lotto 6/49</option>
+                    <option value="custom">Custom Game</option>
+                </select>
+                
+                <div id="lotto-custom-params" style="display: none;">
+                    <div class="grid">
+                        <div>
+                            <label for="lotto-main-numbers">Main Numbers Pool:</label>
+                            <input type="number" id="lotto-main-numbers" min="1" value="69">
                         </div>
-                        <div class="grid">
-                            <div>
-                                <label for="lotto-bonus-numbers">Bonus Numbers Pool:</label>
-                                <input type="number" id="lotto-bonus-numbers" min="0" value="26">
-                            </div>
-                            <div>
-                                <label for="lotto-pick-bonus">Bonus Numbers to Pick:</label>
-                                <input type="number" id="lotto-pick-bonus" min="0" value="1">
-                            </div>
+                        <div>
+                            <label for="lotto-pick-numbers">Numbers to Pick:</label>
+                            <input type="number" id="lotto-pick-numbers" min="1" value="5">
                         </div>
                     </div>
-                    
-                    <label for="lotto-seed">Seed (leave empty for random):</label>
-                    <input type="number" id="lotto-seed">
-                    
-                    <label for="lotto-draw-count">Number of draws:</label>
-                    <input type="number" id="lotto-draw-count" min="1" value="5" max="1000">
-                    
-                    <div class="action-buttons">
-                        <button onclick="generateLottoNumbers()" class="success">
-                            <i class="fas fa-play"></i> Generate
-                        </button>
-                        <button onclick="clearLottoGeneration()" class="secondary">
-                            <i class="fas fa-trash"></i> Clear
-                        </button>
-                        <button onclick="randomizeLottoSeed()" class="info">
-                            <i class="fas fa-dice"></i> Random Seed
-                        </button>
+                    <div class="grid">
+                        <div>
+                            <label for="lotto-bonus-numbers">Bonus Numbers Pool:</label>
+                            <input type="number" id="lotto-bonus-numbers" min="0" value="26">
+                        </div>
+                        <div>
+                            <label for="lotto-pick-bonus">Bonus Numbers to Pick:</label>
+                            <input type="number" id="lotto-pick-bonus" min="0" value="1">
+                        </div>
                     </div>
                 </div>
                 
-                <div>
-                    <label>Generated Numbers:</label>
-                    <div id="lotto-generated-results"></div>
-                    
-                    <div class="export-buttons">
-                        <button onclick="exportLottoNumbers('txt')" class="secondary">
-                            <i class="fas fa-file-alt"></i> Export as TXT
-                        </button>
-                        <button onclick="exportLottoNumbers('csv')" class="secondary">
-                            <i class="fas fa-file-csv"></i> Export as CSV
-                        </button>
-                        <button onclick="exportLottoNumbers('json')" class="secondary">
-                            <i class="fas fa-file-code"></i> Export as JSON
-                        </button>
-                        <button onclick="copyLottoNumbers()" class="secondary">
-                            <i class="fas fa-copy"></i> Copy to Clipboard
-                        </button>
-                    </div>
-                    
-                    <div class="result">
-                        <strong>Generation Details:</strong>
-                        <div id="lotto-gen-details"></div>
-                    </div>
-                    
-                    <div id="lotto-frequency-analysis">
-                        <h4>Frequency Analysis</h4>
-                        <div id="lotto-frequency-content"></div>
-                    </div>
+                <label for="lotto-algorithm">Generation Algorithm:</label>
+                <select id="lotto-algorithm">
+                    <option value="standard">Standard Random</option>
+                    <option value="shuffle">Fisher-Yates Shuffle</option>
+                    <option value="low-high">Low-High Balanced</option>
+                    <option value="odd-even">Odd-Even Balanced</option>
+                    <option value="prime">Prime Number Weighted</option>
+                    <option value="frequency">Frequency Based</option>
+                    <option value="delta">Delta System</option>
+                    <option value="wheeling">Wheeling System</option>
+                </select>
+                
+                <div id="lotto-algorithm-params" style="display: none;">
+                    <!-- Parameters for specific algorithms will be shown here -->
+                </div>
+                
+                <label for="lotto-seed">Seed (leave empty for random):</label>
+                <input type="number" id="lotto-seed">
+                
+                <label for="lotto-draw-count">Number of draws:</label>
+                <input type="number" id="lotto-draw-count" min="1" value="5" max="1000">
+                
+                <div class="action-buttons">
+                    <button onclick="generateLottoNumbers()" class="success">
+                        <i class="fas fa-play"></i> Generate
+                    </button>
+                    <button onclick="clearLottoGeneration()" class="secondary">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                    <button onclick="randomizeLottoSeed()" class="info">
+                        <i class="fas fa-dice"></i> Random Seed
+                    </button>
+                </div>
+            </div>
+            
+            <div>
+                <label>Generated Numbers:</label>
+                <div id="lotto-generated-results"></div>
+                
+                <div class="export-buttons">
+                    <button onclick="exportLottoNumbers('txt')" class="secondary">
+                        <i class="fas fa-file-alt"></i> Export as TXT
+                    </button>
+                    <button onclick="exportLottoNumbers('csv')" class="secondary">
+                        <i class="fas fa-file-csv"></i> Export as CSV
+                    </button>
+                    <button onclick="exportLottoNumbers('json')" class="secondary">
+                        <i class="fas fa-file-code"></i> Export as JSON
+                    </button>
+                    <button onclick="copyLottoNumbers()" class="secondary">
+                        <i class="fas fa-copy"></i> Copy to Clipboard
+                    </button>
+                </div>
+                
+                <div class="result">
+                    <strong>Generation Details:</strong>
+                    <div id="lotto-gen-details"></div>
+                </div>
+                
+                <div id="lotto-frequency-analysis">
+                    <h4>Frequency Analysis</h4>
+                    <div id="lotto-frequency-content"></div>
                 </div>
             </div>
         </div>
+    </div>
         
         <!-- Lotto Reverse Engineer Tab -->
         <div id="lotto-reverse" class="tab-content">
@@ -2795,7 +2811,180 @@
                 // Full coverage system - more complex implementation would be needed
                 // For simplicity, we'll just do a standard random here
                 return generateStandardNumbers(generator, poolSize, count);
-            }           
+            
+            // Display results
+            displayLottoResults(results, gameType);
+            
+            // Update generation details
+            document.getElementById('lotto-gen-details').innerHTML = `
+                <p><strong>Game Type:</strong> ${gameType}</p>
+                <p><strong>Main Numbers:</strong> Pick ${pickCount} from ${mainPool}</p>
+                ${bonusCount > 0 ? `<p><strong>Bonus Numbers:</strong> Pick ${bonusCount} from ${bonusPool}</p>` : ''}
+                <p><strong>Seed:</strong> ${seed}</p>
+            `;
+            
+            // Perform frequency analysis
+            performFrequencyAnalysis(results, mainPool, bonusPool);
+            
+            showToast('Lotto numbers generated successfully', 'success');
+        }
+
+        function generateUniqueNumbers(generator, poolSize, count) {
+            const numbers = [];
+            while (numbers.length < count) {
+                const num = Math.floor(generator() * poolSize) + 1;
+                if (!numbers.includes(num)) {
+                    numbers.push(num);
+                }
+            }
+            return numbers.sort((a, b) => a - b);
+        }
+
+        function displayLottoResults(results, gameType) {
+            const container = document.getElementById('lotto-generated-results');
+            container.innerHTML = '';
+            
+            results.forEach((draw, index) => {
+                const drawElement = document.createElement('div');
+                drawElement.className = 'lotto-draw';
+                drawElement.style.marginBottom = '15px';
+                
+                const drawTitle = document.createElement('h4');
+                drawTitle.textContent = `Draw ${index + 1}:`;
+                drawElement.appendChild(drawTitle);
+                
+                const ballsContainer = document.createElement('div');
+                ballsContainer.className = 'lotto-balls';
+                
+                // Main numbers
+                draw.main.forEach(num => {
+                    const ball = document.createElement('div');
+                    ball.className = 'ball';
+                    ball.textContent = num;
+                    ballsContainer.appendChild(ball);
+                });
+                
+                // Bonus numbers
+                if (draw.bonus.length > 0) {
+                    const separator = document.createElement('span');
+                    separator.textContent = ' + ';
+                    separator.style.margin = '0 5px';
+                    ballsContainer.appendChild(separator);
+                    
+                    draw.bonus.forEach(num => {
+                        const ball = document.createElement('div');
+                        ball.className = 'ball ' + 
+                            (gameType === 'powerball' ? 'powerball' : 
+                             gameType === 'megamillions' ? 'megaball' : 
+                             gameType === 'euromillions' ? 'eurostar' : 'ball');
+                        ball.textContent = num;
+                        ballsContainer.appendChild(ball);
+                    });
+                }
+                
+                drawElement.appendChild(ballsContainer);
+                container.appendChild(drawElement);
+            });
+        }
+
+        function performFrequencyAnalysis(results, mainPool, bonusPool) {
+            // Count frequency of main numbers
+            const mainFreq = {};
+            for (let i = 1; i <= mainPool; i++) {
+                mainFreq[i] = 0;
+            }
+            
+            // Count frequency of bonus numbers
+            const bonusFreq = {};
+            if (bonusPool > 0) {
+                for (let i = 1; i <= bonusPool; i++) {
+                    bonusFreq[i] = 0;
+                }
+            }
+            
+            // Count occurrences
+            results.forEach(draw => {
+                draw.main.forEach(num => {
+                    mainFreq[num]++;
+                });
+                
+                draw.bonus.forEach(num => {
+                    bonusFreq[num]++;
+                });
+            });
+            
+            // Display frequency analysis
+            let frequencyHTML = '<h4>Main Numbers Frequency</h4>';
+            frequencyHTML += '<div class="histogram">';
+            
+            // Create histogram for main numbers
+            const mainNumbers = Object.keys(mainFreq);
+            const maxMainFreq = Math.max(...Object.values(mainFreq));
+            
+            mainNumbers.forEach(num => {
+                const freq = mainFreq[num];
+                const height = maxMainFreq > 0 ? (freq / maxMainFreq * 100) : 0;
+                
+                frequencyHTML += `
+                    <div class="histogram-bar" style="height: ${height}%">
+                        <div class="histogram-bar-label">${num}</div>
+                    </div>
+                `;
+            });
+            
+            frequencyHTML += '</div>';
+            
+            // Add bonus numbers frequency if applicable
+            if (bonusPool > 0) {
+                frequencyHTML += '<h4>Bonus Numbers Frequency</h4>';
+                frequencyHTML += '<div class="histogram">';
+                
+                const bonusNumbers = Object.keys(bonusFreq);
+                const maxBonusFreq = Math.max(...Object.values(bonusFreq));
+                
+                bonusNumbers.forEach(num => {
+                    const freq = bonusFreq[num];
+                    const height = maxBonusFreq > 0 ? (freq / maxBonusFreq * 100) : 0;
+                    
+                    frequencyHTML += `
+                        <div class="histogram-bar" style="height: ${height}%">
+                            <div class="histogram-bar-label">${num}</div>
+                        </div>
+                    `;
+                });
+                
+                frequencyHTML += '</div>';
+            }
+            
+            document.getElementById('lotto-frequency-content').innerHTML = frequencyHTML;
+        }
+
+        function clearLottoGeneration() {
+            document.getElementById('lotto-generated-results').innerHTML = '';
+            document.getElementById('lotto-gen-details').innerHTML = '';
+            document.getElementById('lotto-frequency-content').innerHTML = '';
+            document.getElementById('lotto-seed').value = '';
+        }
+
+        function randomizeLottoSeed() {
+            document.getElementById('lotto-seed').value = Math.floor(Math.random() * 1000000);
+            showToast('Random seed generated', 'info');
+        }
+
+        function exportLottoNumbers(format) {
+            const results = document.getElementById('lotto-generated-results').innerText;
+            if (!results.trim()) {
+                showToast('No numbers to export', 'warning');
+                return;
+            }
+            
+            if (format === 'csv') {
+                exportToCSV(results, 'lotto_numbers.csv');
+            } else if (format === 'json') {
+                exportToJSON(results, 'lotto_numbers.json');
+            } else {
+                exportToFile(results, 'lotto_numbers.txt');
+            }
         }
 
         function copyLottoNumbers() {
