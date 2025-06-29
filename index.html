@@ -2276,6 +2276,7 @@ enhance the lotto generator to have multiple algorithm <!DOCTYPE html>
         }
 
 
+        
         // Lotto Generator Functions
         function updateLottoParams() {
             const gameType = document.getElementById('lotto-game-type').value;
@@ -2817,22 +2818,7 @@ enhance the lotto generator to have multiple algorithm <!DOCTYPE html>
                 // For simplicity, we'll just do a standard random here
                 return generateStandardNumbers(generator, poolSize, count);
             }
-        }
-
-        function copyLottoNumbers() {
-            const results = document.getElementById('lotto-generated-results').innerText;
-            if (!results.trim()) {
-                showToast('No numbers to copy', 'warning');
-                return;
-            }
-            
-            navigator.clipboard.writeText(results).then(() => {
-                showToast('Lotto numbers copied to clipboard', 'success');
-            }).catch(err => {
-                showToast('Failed to copy: ' + err, 'danger');
-            });
-        }
-
+       
         // PRNG Reverse Engineering Functions
         function reverseEngineerPRNG() {
             const algorithm = document.getElementById('reverse-prng-algorithm').value;
