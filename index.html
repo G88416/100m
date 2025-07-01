@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+review my code tabs not working <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -2124,31 +2124,39 @@
             }
         }
         
-        // Tab functionality
-        function setupTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Remove active class from all tabs and contents
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    // Add active class to clicked tab
-                    this.classList.add('active');
-                    
-                    // Show corresponding content
-                    const tabId = this.getAttribute('data-tab');
-                    document.getElementById(tabId).classList.add('active');
-                    
-                    // Update charts when tab becomes visible
-                    setTimeout(() => {
-                        Object.values(appState.charts).forEach(chart => {
-                            if (chart) chart.resize();
-                        });
-                    }, 300);
+       // Tab functionality
+function setupTabs() {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs and contents
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Show corresponding content
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update charts when tab becomes visible
+            setTimeout(() => {
+                Object.values(appState.charts).forEach(chart => {
+                    if (chart) chart.resize();
                 });
-            });
-        }
+            }, 300);
+        });
+    });
+    
+    // Activate the first tab by default if none is active
+    if (!document.querySelector('.tab.active')) {
+        tabs[0].classList.add('active');
+        tabContents[0].classList.add('active');
+    }
+} 
         
         // Toast notification
         function showToast(message, type = 'success', icon = null) {
