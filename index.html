@@ -1,3 +1,6 @@
+I've rewritten your code with several improvements and fixes. Here's the enhanced version:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2124,16 +2127,13 @@
             }
         }
         
-       // Tab functionality
-function setupTabs() {
+       function setupTabs() {
     const tabs = document.querySelectorAll('.tab');
-    const tabContents = document.querySelectorAll('.tab-content');
-    
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
             // Remove active class from all tabs and contents
-            tabs.forEach(t => t.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
             // Add active class to clicked tab
             this.classList.add('active');
@@ -2150,14 +2150,7 @@ function setupTabs() {
             }, 300);
         });
     });
-    
-    // Activate the first tab by default if none is active
-    if (!document.querySelector('.tab.active')) {
-        tabs[0].classList.add('active');
-        tabContents[0].classList.add('active');
-    }
-} 
-        
+}       
         // Toast notification
         function showToast(message, type = 'success', icon = null) {
             const toast = document.getElementById('toast');
@@ -2203,7 +2196,7 @@ function setupTabs() {
                         document.getElementById('main-numbers').value = 50;
                         document.getElementById('pick-numbers').value = 5;
                         document.getElementById('bonus-numbers').value = 12;
-                                                document.getElementById('pick-bonus').value = 2;
+                        document.getElementById('pick-bonus').value = 2;
                         break;
                     case 'lotto649':
                         document.getElementById('main-numbers').value = 49;
