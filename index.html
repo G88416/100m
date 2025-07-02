@@ -8,6 +8,7 @@
     <style>
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .error { color: red; font-size: 0.875rem; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -17,257 +18,173 @@
     </header>
 
     <nav class="bg-gray-800 text-white p-4">
-        <ul class="flex flex-wrap gap-4 justify-center">
-            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('smart-generator')">Smart Generator</button></li>
-            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('advanced-analyzer')">Advanced Analyzer</button></li>
-            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('historical-data')">Historical Data</button></li>
-            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('ai-strategies')">AI Strategies</button></li>
-            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('probability-lab')">Probability Lab</button></li>
-            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('prediction-engine')">Prediction Engine</button></li>
-            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('seed-reverse-engineer')">Seed Reverse Engineer</button></li>
-            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('settings')">Settings</button></li>
-            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('about')">About</button></li>
+        <ul class="flex flex-wrap gap-4 justify-center" role="tablist">
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('smart-generator')" role="tab" aria-selected="true">Smart Generator</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('advanced-analyzer')" role="tab" aria-selected="false">Advanced Analyzer</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('historical-data')" role="tab" aria-selected="false">Historical Data</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('ai-strategies')" role="tab" aria-selected="false">AI Strategies</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('probability-lab')" role="tab" aria-selected="false">Probability Lab</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('prediction-engine')" role="tab" aria-selected="false">Prediction Engine</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('seed-reverse-engineer')" role="tab" aria-selected="false">Seed Reverse Engineer</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('settings')" role="tab" aria-selected="false">Settings</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('about')" role="tab" aria-selected="false">About</button></li>
         </ul>
     </nav>
 
     <main class="container mx-auto p-4">
         <!-- Smart Generator Tab -->
-        <section id="smart-generator" class="tab-content active">
+        <section id="smart-generator" class="tab-content active" role="tabpanel">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-white p-4 rounded shadow">
                     <h2 class="text-xl font-bold mb-4">Lottery Selection</h2>
                     <label class="block mb-2">Lottery Game:</label>
-                    <select class="w-full p-2 border rounded">
-                        <option>Powerball (5/69 + 1/26)</option>
-                        <option>Mega Millions (5/70 + 1/25)</option>
-                        <option>EuroMillions (5/50 + 2/12)</option>
-                        <option>Lotto 6/49</option>
-                        <option>Custom Game</option>
+                    <select id="lottery-game" class="w-full p-2 border rounded" onchange="updateLotteryConfig()">
+                        <option value="powerball">Powerball (5/69 + 1/26)</option>
+                        <option value="mega-millions">Mega Millions (5/70 + 1/25)</option>
+                        <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
+                        <option value="lotto-649">Lotto 6/49</option>
+                        <option value="custom">Custom Game</option>
                     </select>
                     <div class="mt-4">
                         <label>Main Numbers Pool:</label>
-                        <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 69">
+                        <input type="number" id="main-pool" class="w-full p-2 border rounded" min="1" value="69">
                         <label>Numbers to Pick:</label>
-                        <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 5">
+                        <input type="number" id="main-pick" class="w-full p-2 border rounded" min="1" value="5">
                     </div>
                     <div class="mt-4">
                         <label>Bonus Numbers Pool:</label>
-                        <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 26">
+                        <input type="number" id="bonus-pool" class="w-full p-2 border rounded" min "¿0" value="26">
                         <label>Bonus Numbers to Pick:</label>
-                        <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 1">
+                        <input type="number" id="bonus-pick" class="w-full p-2 border rounded" min="0" value="1">
                     </div>
+                    <p id="lottery-error" class="error hidden"></p>
                 </div>
                 <div class="bg-white p-4 rounded shadow">
                     <h2 class="text-xl font-bold mb-4">Generation Options</h2>
                     <label>Random Seed:</label>
                     <input type="text" id="random-seed" class="w-full p-2 border rounded" placeholder="Enter seed or leave blank">
                     <label class="block mt-4">Generation Method:</label>
-                    <select class="w-full p-2 border rounded">
-                        <option>Standard Random</option>
-                        <option>Fisher-Yates Shuffle</option>
-                        <option>Cryptographically Secure</option>
-                        <option>Low-High Balance</option>
-                        <option>Odd-Even Balance</option>
-                        <option>Prime Numbers</option>
-                        <option>Fibonacci Numbers</option>
-                        <option>Lucky Numbers</option>
-                        <option>Hot & Cold Numbers</option>
-                        <option>Wheel System</option>
-                        <option>AI-Powered Prediction</option>
+                    <select id="generation-method" class="w-full p-2 border rounded">
+                        <option value="standard">Standard Random</option>
+                        <option value="fisher-yates">Fisher-Yates Shuffle</option>
+                        <option value="crypto">Cryptographically Secure</option>
+                        <option value="low-high">Low-High Balance</option>
+                        <option value="odd-even">Odd-Even Balance</option>
                     </select>
-                    <label class="block mt-4">Number of tickets:</label>
-                    <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 5">
+                    <label class="block mt-4">Number of Tickets:</label>
+                    <input type="number" id="num-tickets" class="w-full p-2 border rounded" min="1" value="1">
                     <div class="mt-4 flex gap-2">
                         <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="generateTickets()">Generate</button>
-                        <button class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Quick Pick</button>
-                        <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
+                        <button class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700" onclick="quickPick()">Quick Pick</button>
+                        <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" onclick="clearTickets()">Clear</button>
                     </div>
+                    <p id="generator-error" class="error hidden"></p>
                 </div>
             </div>
             <div class="bg-white p-4 rounded shadow mt-4">
-                <h2 class="text-xl font-bold mb-4">AI Recommendations</h2>
-                <p class="mb-2">Tip: Combine multiple strategies for better coverage. Try using Hot/Cold numbers with Low/High balance for optimal results.</p>
-                <p>Analysis: Based on historical data, numbers between 1-31 appear more frequently due to birthday selections. Consider including some higher numbers.</p>
-            </div>
-            <div class="bg-white p-4 rounded shadow mt-4">
                 <h2 class="text-xl font-bold mb-4">Generated Tickets</h2>
-                <p id="generated-tickets">Generate some numbers to see results</p>
+                <pre id="generated-tickets" class="bg-gray-100 p-2 rounded">Generate some numbers to see results</pre>
                 <div class="mt-4 flex gap-2">
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export as TXT</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export as CSV</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export as JSON</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Copy to Clipboard</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Print</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Tickets</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="exportTickets('txt')">Export as TXT</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="exportTickets('csv')">Export as CSV</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="copyToClipboard()">Copy to Clipboard</button>
                 </div>
             </div>
         </section>
 
         <!-- Advanced Analyzer Tab -->
-        <section id="advanced-analyzer" class="tab-content">
+        <section id="advanced-analyzer" class="tab-content" role="tabpanel">
             <div class="bg-white p-4 rounded shadow">
                 <h2 class="text-xl font-bold mb-4">Number Analysis</h2>
                 <label>Lottery Game:</label>
-                <select class="w-full p-2 border rounded">
-                    <option>Powerball (5/69 + 1/26)</option>
-                    <option>Mega Millions (5/70 + 1/25)</option>
-                    <option>EuroMillions (5/50 + 2/12)</option>
-                    <option>Lotto 6/49</option>
+                <select id="analyzer-game" class="w-full p-2 border rounded">
+                    <option value="powerball">Powerball (5/69 + 1/26)</option>
+                    <option value="mega-millions">Mega Millions (5/70 + 1/25)</option>
+                    <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
+                    <option value="lotto-649">Lotto 6/49</option>
                 </select>
                 <label class="block mt-4">Numbers to Analyze (comma separated):</label>
-                <input type="text" class="w-full p-2 border rounded" placeholder="e.g., 5, 12, 23, 34, 45, 6">
+                <input type="text" id="numbers-to-analyze" class="w-full p-2 border rounded" placeholder="e.g., 5, 12, 23, 34, 45, 6">
                 <div class="mt-4 flex gap-2">
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Analyze</button>
-                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Load Saved</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="analyzeNumbers()">Analyze</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" onclick="clearAnalysis()">Clear</button>
                 </div>
+                <p id="analyzer-error" class="error hidden"></p>
             </div>
-            <!-- Add other analyzer sections similarly -->
+            <div class="bg-white p-4 rounded shadow mt-4">
+                <h2 class="text-xl font-bold mb-4">Analysis Results</h2>
+                <pre id="analysis-results" class="bg-gray-100 p-2 rounded">Enter numbers to analyze them</pre>
+            </div>
         </section>
 
         <!-- Historical Data Tab -->
-        <section id="historical-data" class="tab-content">
+        <section id="historical-data" class="tab-content" role="tabpanel">
             <div class="bg-white p-4 rounded shadow">
                 <h2 class="text-xl font-bold mb-4">Historical Data</h2>
                 <label>Lottery Game:</label>
-                <select class="w-full p-2 border rounded">
-                    <option>Powerball (5/69 + 1/26)</option>
-                    <option>Mega Millions (5/70 + 1/25)</option>
-                    <option>EuroMillions (5/50 + 2/12)</option>
-                    <option>Lotto 6/49</option>
+                <select id="history-game" class="w-full p-2 border rounded">
+                    <option value="powerball">Powerball (5/69 + 1/26)</option>
+                    <option value="mega-millions">Mega Millions (5/70 + 1/25)</option>
+                    <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
+                    <option value="lotto-649">Lotto 6/49</option>
                 </select>
-                <label class="block mt-4">Number of past draws to load:</label>
-                <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 100">
+                <label class="block mt-4">Number of Past Draws to Load:</label>
+                <input type="number" id="num-draws" class="w-full p-2 border rounded" min="1" value="10">
                 <div class="mt-4 flex gap-2">
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Load History</button>
-                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Download Data</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="loadHistory()">Load History</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" onclick="clearHistory()">Clear</button>
                 </div>
+                <p id="history-error" class="error hidden"></p>
             </div>
-            <!-- Add other historical data sections -->
-        </section>
-
-        <!-- AI Strategies Tab -->
-        <section id="ai-strategies" class="tab-content">
-            <div class="bg-white p-4 rounded shadow">
-                <h2 class="text-xl font-bold mb-4">AI-Powered Strategies</h2>
-                <label>Select a strategy:</label>
-                <select class="w-full p-2 border rounded">
-                    <option>Random</option>
-                    <option>Low-High</option>
-                    <option>Odd-Even</option>
-                    <option>Prime</option>
-                    <option>Fibonacci</option>
-                    <option>Lucky</option>
-                    <option>Hot/Cold</option>
-                    <option>Birthday</option>
-                    <option>AI Prediction</option>
-                </select>
-                <div class="mt-4 flex gap-2">
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Generate with Strategy</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Test Strategy</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Strategy</button>
-                </div>
+            <div class="bg-white p-4 rounded shadow mt-4">
+                <h2 class="text-xl font-bold mb-4">Past Draws</h2>
+                <pre id="past-draws" class="bg-gray-100 p-2 rounded">Load historical data to see results</pre>
             </div>
-            <!-- Add other AI strategies sections -->
-        </section>
-
-        <!-- Probability Lab Tab -->
-        <section id="probability-lab" class="tab-content">
-            <div class="bg-white p-4 rounded shadow">
-                <h2 class="text-xl font-bold mb-4">Probability Lab</h2>
-                <label>Lottery Game:</label>
-                <select class="w-full p-2 border rounded">
-                    <option>Powerball (5/69 + 1/26)</option>
-                    <option>Mega Millions (5/70 + 1/25)</option>
-                    <option>EuroMillions (5/50 + 2/12)</option>
-                    <option>Lotto 6/49</option>
-                </select>
-                <label class="block mt-4">Your Tickets (one per line):</label>
-                <textarea class="w-full p-2 border rounded" rows="4"></textarea>
-                <label class="block mt-4">Number of simulations:</label>
-                <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 1000">
-                <div class="mt-4 flex gap-2">
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Run Simulation</button>
-                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Stop</button>
-                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
-                </div>
-            </div>
-            <!-- Add other probability lab sections -->
-        </section>
-
-        <!-- Prediction Engine Tab -->
-        <section id="prediction-engine" class="tab-content">
-            <div class="bg-white p-4 rounded shadow">
-                <h2 class="text-xl font-bold mb-4">Prediction Engine</h2>
-                <label>Lottery Game:</label>
-                <select class="w-full p-2 border rounded">
-                    <option>Powerball (5/69 + 1/26)</option>
-                    <option>Mega Millions (5/70 + 1/25)</option>
-                    <option>EuroMillions (5/50 + 2/12)</option>
-                    <option>Lotto 6/49</option>
-                </select>
-                <label class="block mt-4">Prediction Method:</label>
-                <select class="w-full p-2 border rounded">
-                    <option>Markov Chain Model</option>
-                    <option>Neural Network</option>
-                    <option>Regression Analysis</option>
-                    <option>Frequency Analysis</option>
-                    <option>Combined AI Model</option>
-                </select>
-                <label class="block mt-4">Number of predictions:</label>
-                <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 5">
-                <div class="mt-4 flex gap-2">
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Generate Predictions</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Analyze Results</button>
-                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
-                </div>
-            </div>
-            <!-- Add other prediction engine sections -->
         </section>
 
         <!-- Seed Reverse Engineer Tab -->
-        <section id="seed-reverse-engineer" class="tab-content">
+        <section id="seed-reverse-engineer" class="tab-content" role="tabpanel">
             <div class="bg-white p-4 rounded shadow">
                 <h2 class="text-xl font-bold mb-4">Lotto Seed Reverse Engineer</h2>
                 <p class="mb-4">Enter generated lottery numbers to attempt to reverse-engineer the seed used.</p>
                 <label>Lottery Game:</label>
-                <select class="w-full p-2 border rounded">
-                    <option>Powerball (5/69 + 1/26)</option>
-                    <option>Mega Millions (5/70 + 1/25)</option>
-                    <option>EuroMillions (5/50 + 2/12)</option>
-                    <option>Lotto 6/49</option>
+                <select id="reverse-game" class="w-full p-2 border rounded" onchange="updateReverseConfig()">
+                    <option value="powerball">Powerball (5/69 + 1/26)</option>
+                    <option value="mega-millions">Mega Millions (5/70 + 1/25)</option>
+                    <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
+                    <option value="lotto-649">Lotto 6/49</option>
                 </select>
                 <label class="block mt-4">Generated Numbers (comma separated):</label>
                 <input type="text" id="generated-numbers" class="w-full p-2 border rounded" placeholder="e.g., 5, 12, 23, 34, 45, 6">
                 <label class="block mt-4">Generation Method Used:</label>
-                <select class="w-full p-2 border rounded">
-                    <option>Standard Random</option>
-                    <option>Fisher-Yates Shuffle</option>
-                    <option>Cryptographically Secure</option报警
-
+                <select id="reverse-method" class="w-full p-2 border rounded">
+                    <option value="standard">Standard Random</option>
+                    <option value="fisher-yates">Fisher-Yates Shuffle</option>
+                    <option value="crypto">Cryptographically Secure</option>
+                </select>
                 <div class="mt-4 flex gap-2">
                     <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="reverseEngineerSeed()">Reverse Engineer Seed</button>
-                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" onclick="clearReverse()">Clear</button>
                 </div>
+                <p id="reverse-error" class="error hidden"></p>
             </div>
             <div class="bg-white p-4 rounded shadow mt-4">
                 <h2 class="text-xl font-bold mb-4">Seed Analysis Results</h2>
-                <p id="seed-results">Enter numbers to see potential seed results</p>
+                <pre id="seed-results" class="bg-gray-100 p-2 rounded">Enter numbers to see potential seed results</pre>
             </div>
         </section>
 
         <!-- Settings Tab -->
-        <section id="settings" class="tab-content">
+        <section id="settings" class="tab-content" role="tabpanel">
             <div class="bg-white p-4 rounded shadow">
                 <h2 class="text-xl font-bold mb-4">Settings</h2>
                 <div>
                     <h3 class="text-lg font-bold mb-2">User Preferences</h3>
                     <label>Theme:</label>
-                    <select class="w-full p-2 border rounded">
-                        <option>Light</option>
-                        <option>Dark</option>
-                        <option>System Default</option>
+                    <select id="theme" class="w-full p-2 border rounded" onchange="applyTheme()">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="system">System Default</option>
                     </select>
                     <label class="block mt-4">Language:</label>
                     <select class="w-full p-2 border rounded">
@@ -275,24 +192,17 @@
                         <option>Spanish</option>
                         <option>French</option>
                     </select>
-                    <label class="block mt-4">Currency:</label>
-                    <select class="w-full p-2 border rounded">
-                        <option>USD ($)</option>
-                        <option>EUR (€)</option>
-                        <option>GBP (£)</option>
-                    </select>
                 </div>
-                <!-- Add other settings sections -->
             </div>
         </section>
 
         <!-- About Tab -->
-        <section id="about" class="tab-content">
+        <section id="about" class="tab-content" role="tabpanel">
             <div class="bg-white p-4 rounded shadow">
                 <h2 class="text-xl font-bold mb-4">About Lotto Pro</h2>
                 <div>
                     <h3 class="text-lg font-bold mb-2">How It Works</h3>
-                    <p>Lotto Pro uses advanced artificial intelligence and statistical analysis to help you generate and analyze lottery numbers. Our system combines multiple predictive models to identify patterns and trends in lottery draws.</p>
+                    <p>Lotto Pro uses advanced artificial intelligence and statistical analysis to help you generate and analyze lottery numbers.</p>
                 </div>
                 <div class="mt-4">
                     <h3 class="text-lg font-bold mb-2">Odds Information</h3>
@@ -303,7 +213,6 @@
                                 <th>Main Numbers</th>
                                 <th>Bonus Numbers</th>
                                 <th>Odds of Jackpot</th>
-                                <th>Expected Value</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -312,28 +221,24 @@
                                 <td>5/69</td>
                                 <td>1/26</td>
                                 <td>1 in 292,201,338</td>
-                                <td>-$0.80</td>
                             </tr>
                             <tr>
                                 <td class="p-2">Mega Millions</td>
                                 <td>5/70</td>
                                 <td>1/25</td>
                                 <td>1 in 302,575,350</td>
-                                <td>-$0.85</td>
                             </tr>
                             <tr>
                                 <td class="p-2">EuroMillions</td>
                                 <td>5/50</td>
                                 <td>2/12</td>
                                 <td>1 in 139,838,160</td>
-                                <td>-$0.50</td>
                             </tr>
                             <tr>
                                 <td class="p-2">Lotto 6/49</td>
                                 <td>6/49</td>
                                 <td>None</td>
                                 <td>1 in 13,983,816</td>
-                                <td>-$0.55</td>
                             </tr>
                         </tbody>
                     </table>
@@ -343,20 +248,68 @@
     </main>
 
     <script>
+        // Lottery configurations
+        const lotteryConfigs = {
+            powerball: { mainPool: 69, mainPick: 5, bonusPool: 26, bonusPick: 1 },
+            'mega-millions': { mainPool: 70, mainPick: 5, bonusPool: 25, bonusPick: 1 },
+            euromillions: { mainPool: 50, mainPick: 5, bonusPool: 12, bonusPick: 2 },
+            'lotto-649': { mainPool: 49, mainPick: 6, bonusPool: 0, bonusPick: 0 },
+            custom: { mainPool: 69, mainPick: 5, bonusPool: 26, bonusPick: 1 }
+        };
+
+        function updateLotteryConfig() {
+            const game = document.getElementById('lottery-game').value;
+            const config = lotteryConfigs[game];
+            document.getElementById('main-pool').value = config.mainPool;
+            document.getElementById('main-pick').value = config.mainPick;
+            document.getElementById('bonus-pool').value = config.bonusPool;
+            document.getElementById('bonus-pick').value = config.bonusPick;
+            document.getElementById('main-pool').disabled = game !== 'custom';
+            document.getElementById('main-pick').disabled = game !== 'custom';
+            document.getElementById('bonus-pool').disabled = game !== 'custom';
+            document.getElementById('bonus-pick').disabled = game !== 'custom';
+        }
+
+        function updateReverseConfig() {
+            const game = document.getElementById('reverse-game').value;
+            const config = lotteryConfigs[game];
+            // Update placeholder or other UI elements if needed
+        }
+
         function openTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.setAttribute('aria-selected', 'false'));
             document.getElementById(tabId).classList.add('active');
+            document.querySelector(`button[onclick="openTab('${tabId}')"]`).setAttribute('aria-selected', 'true');
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.innerText = message;
+            errorElement.classList.remove('hidden');
+            setTimeout(() => errorElement.classList.add('hidden'), 5000);
         }
 
         function generateTickets() {
+            const game = document.getElementById('lottery-game').value;
+            const config = lotteryConfigs[game];
+            const mainPool = parseInt(document.getElementById('main-pool').value) || config.mainPool;
+            const mainPick = parseInt(document.getElementById('main-pick').value) || config.mainPick;
+            const bonusPool = parseInt(document.getElementById('bonus-pool').value) || config.bonusPool;
+            const bonusPick = parseInt(document.getElementById('bonus-pick').value) || config.bonusPick;
+            const numTickets = parseInt(document.getElementById('num-tickets').value) || 1;
             const seed = document.getElementById('random-seed').value || Date.now();
-            const mainPool = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 69"]').value) || 69;
-            const mainPick = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 5"]').value) || 5;
-            const bonusPool = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 26"]').value) || 26;
-            const bonusPick = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 1"]').value) || 1;
-            const numTickets = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 5"]').value) || 1;
+            const method = document.getElementById('generation-method').value;
 
-            // Simple random number generator with seed
+            if (mainPick > mainPool || bonusPick > bonusPool) {
+                showError('generator-error', 'Cannot pick more numbers than available in pool.');
+                return;
+            }
+            if (numTickets < 1) {
+                showError('generator-error', 'Number of tickets must be at least 1.');
+                return;
+            }
+
             let seedValue = parseInt(seed);
             function seededRandom() {
                 seedValue = (seedValue * 9301 + 49297) % 233280;
@@ -367,61 +320,217 @@
             for (let i = 0; i < numTickets; i++) {
                 let mainNumbers = [];
                 let numbers = Array.from({ length: mainPool }, (_, i) => i + 1);
-                for (let j = 0; j < mainPick; j++) {
-                    const index = Math.floor(seededRandom() * numbers.length);
-                    mainNumbers.push(numbers.splice(index, 1)[0]);
+                if (method === 'fisher-yates') {
+                    for (let j = numbers.length - 1; j > 0; j--) {
+                        const k = Math.floor(seededRandom() * (j + 1));
+                        [numbers[j], numbers[k]] = [numbers[k], numbers[j]];
+                    }
+                    mainNumbers = numbers.slice(0, mainPick).sort((a, b) => a - b);
+                } else if (method === 'low-high') {
+                    const low = numbers.slice(0, Math.floor(mainPool / 2));
+                    const high = numbers.slice(Math.floor(mainPool / 2));
+                    for (let j = 0; j < Math.ceil(mainPick / 2); j++) {
+                        const idx = Math.floor(seededRandom() * low.length);
+                        mainNumbers.push(low.splice(idx, 1)[0]);
+                    }
+                    for (let j = 0; j < Math.floor(mainPick / 2); j++) {
+                        const idx = Math.floor(seededRandom() * high.length);
+                        mainNumbers.push(high.splice(idx, 1)[0]);
+                    }
+                    mainNumbers.sort((a, b) => a - b);
+                } else {
+                    for (let j = 0; j < mainPick; j++) {
+                        const index = Math.floor(seededRandom() * numbers.length);
+                        mainNumbers.push(numbers.splice(index, 1)[0]);
+                    }
+                    mainNumbers.sort((a, b) => a - b);
                 }
-                mainNumbers.sort((a, b) => a - b);
                 let bonusNumbers = [];
-                numbers = Array.from({ length: bonusPool }, (_, i) => i + 1);
-                for (let j = 0; j < bonusPick; j++) {
-                    const index = Math.floor(seededRandom() * numbers.length);
-                    bonusNumbers.push(numbers.splice(index, 1)[0]);
+                if (bonusPick > 0) {
+                    numbers = Array.from({ length: bonusPool }, (_, i) => i + 1);
+                    for (let j = 0; j < bonusPick; j++) {
+                        const index = Math.floor(seededRandom() * numbers.length);
+                        bonusNumbers.push(numbers.splice(index, 1)[0]);
+                    }
+                    bonusNumbers.sort((a, b) => a - b);
                 }
-                tickets.push(`Ticket ${i + 1}: ${mainNumbers.join(', ')} + Bonus: ${bonusNumbers.join(', ')}`);
+                tickets.push(`Ticket ${i + 1}: ${mainNumbers.join(', ')}${bonusNumbers.length ? ` + Bonus: ${bonusNumbers.join(', ')}` : ''}`);
             }
 
             document.getElementById('generated-tickets').innerText = tickets.join('\n');
+            window.generatedTickets = tickets; // Store for export
+        }
+
+        function quickPick() {
+            document.getElementById('random-seed').value = '';
+            generateTickets();
+        }
+
+        function clearTickets() {
+            document.getElementById('generated-tickets').innerText = 'Generate some numbers to see results';
+            window.generatedTickets = null;
+        }
+
+        function exportTickets(format) {
+            if (!window.generatedTickets) {
+                showError('generator-error', 'No tickets to export.');
+                return;
+            }
+            let content = window.generatedTickets.join('\n');
+            let mimeType = 'text/plain';
+            let extension = 'txt';
+            if (format === 'csv') {
+                content = 'Ticket,Numbers\n' + window.generatedTickets.map((t, i) => `${i + 1},"${t.split(': ')[1]}"`).join('\n');
+                mimeType = 'text/csv';
+                extension = 'csv';
+            }
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lotto-tickets.${extension}`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function copyToClipboard() {
+            if (!window.generatedTickets) {
+                showError('generator-error', 'No tickets to copy.');
+                return;
+            }
+            navigator.clipboard.writeText(window.generatedTickets.join('\n'))
+                .then(() => alert('Tickets copied to clipboard!'))
+                .catch(() => showError('generator-error', 'Failed to copy to clipboard.'));
+        }
+
+        function analyzeNumbers() {
+            const numbersInput = document.getElementById('numbers-to-analyze').value;
+            const numbers = numbersInput.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+            const game = document.getElementById('analyzer-game').value;
+            const config = lotteryConfigs[game];
+            const expectedCount = config.mainPick + config.bonusPick;
+
+            if (numbers.length !== expectedCount) {
+                showError('analyzer-error', `Please enter exactly ${expectedCount} numbers.`);
+                return;
+            }
+            if (numbers.some(n => n < 1 || n > (config.mainPick ? config.mainPool : config.bonusPool))) {
+                showError('analyzer-error', `Numbers must be between 1 and ${config.mainPool} for main, ${config.bonusPool} for bonus.`);
+                return;
+            }
+
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const isEven = numbers.map(n => n % 2 === 0);
+            const evenCount = isEven.filter(x => x).length;
+            const oddCount = numbers.length - evenCount;
+            const gaps = numbers.slice(0, -1).map((n, i) => numbers[i + 1] - n - 1).filter(g => g >= 0);
+
+            document.getElementById('analysis-results').innerText = `
+Sum: ${sum}
+Odd Numbers: ${oddCount}
+Even Numbers: ${evenCount}
+Average Gap: ${gaps.length ? (gaps.reduce((a, b) => a + b, 0) / gaps.length).toFixed(2) : 'N/A'}
+            `.trim();
+        }
+
+        function clearAnalysis() {
+            document.getElementById('numbers-to-analyze').value = '';
+            document.getElementById('analysis-results').innerText = 'Enter numbers to analyze them';
+        }
+
+        function loadHistory() {
+            const numDraws = parseInt(document.getElementById('num-draws').value) || 10;
+            if (numDraws < 1) {
+                showError('history-error', 'Number of draws must be at least 1.');
+                return;
+            }
+            // Mock historical data
+            let draws = [];
+            for (let i = 0; i < numDraws; i++) {
+                draws.push(`Draw ${i + 1}: 5, 12, 23, 34, 45${i % 2 ? ', Bonus: 6' : ''}`);
+            }
+            document.getElementById('past-draws').innerText = draws.join('\n');
+        }
+
+        function clearHistory() {
+            document.getElementById('past-draws').innerText = 'Load historical data to see results';
         }
 
         function reverseEngineerSeed() {
             const numbersInput = document.getElementById('generated-numbers').value;
             const numbers = numbersInput.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-            if (numbers.length < 5) {
-                document.getElementById('seed-results').innerText = 'Please enter at least 5 numbers.';
+            const game = document.getElementById('reverse-game').value;
+            const config = lotteryConfigs[game];
+            const method = document.getElementById('reverse-method').value;
+            const expectedCount = config.mainPick + config.bonusPick;
+
+            if (numbers.length !== expectedCount) {
+                showError('reverse-error', `Please enter exactly ${expectedCount} numbers.`);
+                return;
+            }
+            if (numbers.some(n => n < 1 || n > (config.mainPick ? config.mainPool : config.bonusPool))) {
+                showError('reverse-error', `Numbers must be between 1 and ${config.mainPool} for main, ${config.bonusPool} for bonus.`);
                 return;
             }
 
-            // Simplified reverse-engineering (for demo purposes)
-            // Attempts to find a seed that generates the first few numbers
-            const mainPool = parseInt(document.querySelector('#seed-reverse-engineer select').value.match(/(\d+)\/(\d+)/)[2]) || 69;
-            const mainPick = parseInt(document.querySelector('#seed-reverse-engineer select').value.match(/(\d+)\/(\d+)/)[1]) || 5;
             let possibleSeeds = [];
-            for (let seed = 1; seed <= 10000; seed++) {
+            const maxAttempts = 10000; // Limit for performance
+            for (let seed = 1; seed <= maxAttempts; seed++) {
                 let seedValue = seed;
                 function seededRandom() {
                     seedValue = (seedValue * 9301 + 49297) % 233280;
                     return seedValue / 233280;
                 }
                 let generated = [];
-                let numbers = Array.from({ length: mainPool }, (_, i) => i + 1);
-                for (let i = 0; i < mainPick; i++) {
-                    const index = Math.floor(seededRandom() * numbers.length);
-                    generated.push(numbers.splice(index, 1)[0]);
+                let pool = Array.from({ length: config.mainPool }, (_, i) => i + 1);
+                if (method === 'fisher-yates') {
+                    for (let j = pool.length - 1; j > 0; j--) {
+                        const k = Math.floor(seededRandom() * (j + 1));
+                        [pool[j], pool[k]] = [pool[k], pool[j]];
+                    }
+                    generated = pool.slice(0, config.mainPick).sort((a, b) => a - b);
+                } else {
+                    for (let j = 0; j < config.mainPick; j++) {
+                        const index = Math.floor(seededRandom() * pool.length);
+                        generated.push(pool.splice(index, 1)[0]);
+                    }
+                    generated.sort((a, b) => a - b);
                 }
-                generated.sort((a, b) => a - b);
+                if (config.bonusPick > 0) {
+                    pool = Array.from({ length: config.bonusPool }, (_, i) => i + 1);
+                    for (let j = 0; j < config.bonusPick; j++) {
+                        const index = Math.floor(seededRandom() * pool.length);
+                        generated.push(pool.splice(index, 1)[0]);
+                    }
+                }
                 if (generated.every((n, i) => n === numbers[i])) {
                     possibleSeeds.push(seed);
                     if (possibleSeeds.length >= 5) break;
                 }
             }
 
-            if (possibleSeeds.length > 0) {
-                document.getElementById('seed-results').innerText = `Possible seeds: ${possibleSeeds.join(', ')}`;
+            document.getElementById('seed-results').innerText = possibleSeeds.length
+                ? `Possible seeds: ${possibleSeeds.join(', ')}`
+                : `No matching seeds found in ${maxAttempts} attempts.`;
+        }
+
+        function clearReverse() {
+            document.getElementById('generated-numbers').value = '';
+            document.getElementById('seed-results').innerText = 'Enter numbers to see potential seed results';
+        }
+
+        function applyTheme() {
+            const theme = document.getElementById('theme').value;
+            if (theme === 'dark') {
+                document.body.classList.add('dark', 'bg-gray-900', 'text-white');
             } else {
-                document.getElementById('seed-results').innerText = 'No matching seeds found in range.';
+                document.body.classList.remove('dark', 'bg-gray-900', 'text-white');
+                document.body.classList.add('bg-gray-100');
             }
         }
+
+        // Initialize
+        updateLotteryConfig();
     </script>
 </body>
 </html>
