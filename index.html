@@ -3,2837 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Advanced lottery prediction and analysis system">
-    <title>Lotto Pro - Advanced Lottery System</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <title>Lotto Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-        }
-        .lotto-balls {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .ball {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 50%;
-            background-color: #4a6bff;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        .powerball { background-color: #ef4444; }
-        .megaball { background-color: #eab308; }
-        .eurostar { background-color: #8b5cf6; }
-        .number-cell {
-            width: 2.5rem;
-            height: 2.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .number-cell:hover {
-            background-color: #e5e7eb;
-        }
-        .number-cell.selected {
-            background-color: #4a6bff;
-            color: white;
-            border-color: #4a6bff;
-        }
-        .toast {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            z-index: 1000;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .chart-container {
-            height: 300px;
-            margin: 1rem 0;
-        }
-        [aria-hidden="true"] {
-            display: none;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
-<body class="min-h-screen">
-    <div class="container mx-auto p-4">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-800">Lotto Pro</h1>
-            <p class="text-xl text-gray-600">Advanced Lottery Prediction & Analysis System</p>
-        </header>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white p-4 text-center">
+        <h1 class="text-3xl font-bold">Lotto Pro</h1>
+        <p class="text-lg">Advanced Lottery Prediction & Analysis System</p>
+    </header>
 
-        <nav class="mb-6">
-            <ul class="flex flex-wrap justify-center gap-4">
-                <li><button class="tab-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-tab="generator">Smart Generator</button></li>
-                <li><button class="tab-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-tab="analyzer">Advanced Analyzer</button></li>
-                <li><button class="tab-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-tab="history">Historical Data</button></li>
-                <li><button class="tab-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-tab="strategies">AI Strategies</button></li>
-                <li><button class="tab-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-tab="probability">Probability Lab</button></li>
-                <li><button class="tab-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-tab="predictor">Prediction Engine</button></li>
-                <li><button class="tab-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-tab="settings">Settings</button></li>
-            </ul>
-        </nav>
+    <nav class="bg-gray-800 text-white p-4">
+        <ul class="flex flex-wrap gap-4 justify-center">
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('smart-generator')">Smart Generator</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('advanced-analyzer')">Advanced Analyzer</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('historical-data')">Historical Data</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('ai-strategies')">AI Strategies</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('probability-lab')">Probability Lab</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('prediction-engine')">Prediction Engine</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('seed-reverse-engineer')">Seed Reverse Engineer</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('settings')">Settings</button></li>
+            <li><button class="tab-button px-4 py-2 hover:bg-gray-700 rounded" onclick="openTab('about')">About</button></li>
+        </ul>
+    </nav>
 
-        <main>
-            <!-- Smart Generator -->
-            <section id="generator" class="tab-content active">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Lottery Selection</h2>
-                        <label for="game-type" class="block mb-2 font-medium">Lottery Game:</label>
-                        <select id="game-type" class="w-full p-2 border rounded" aria-label="Select lottery game">
-                            <option value="powerball">Powerball (5/69 + 1/26)</option>
-                            <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
-                            <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
-                            <option value="lotto649">Lotto 6/49</option>
-                            <option value="custom">Custom Game</option>
-                        </select>
-
-                        <div id="custom-game-options" class="mt-4 hidden">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="main-numbers" class="block mb-1">Main Numbers Pool:</label>
-                                    <input type="number" id="main-numbers" class="w-full p-2 border rounded" min="1" max="100" value="69" aria-label="Main numbers pool size">
-                                </div>
-                                <div>
-                                    <label for="pick-numbers" class="block mb-1">Numbers to Pick:</label>
-                                    <input type="number" id="pick-numbers" class="w-full p-2 border rounded" min="1" max="20" value="5" aria-label="Numbers to pick">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4 mt-4">
-                                <div>
-                                    <label for="bonus-numbers" class="block mb-1">Bonus Numbers Pool:</label>
-                                    <input type="number" id="bonus-numbers" class="w-full p-2 border rounded" min="0" max="100" value="26" aria-label="Bonus numbers pool size">
-                                </div>
-                                <div>
-                                    <label for="pick-bonus" class="block mb-1">Bonus Numbers to Pick:</label>
-                                    <input type="number" id="pick-bonus" class="w-full p-2 border rounded" min="0" max="10" value="1" aria-label="Bonus numbers to pick">
-                                </div>
-                            </div>
-                        </div>
+    <main class="container mx-auto p-4">
+        <!-- Smart Generator Tab -->
+        <section id="smart-generator" class="tab-content active">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded shadow">
+                    <h2 class="text-xl font-bold mb-4">Lottery Selection</h2>
+                    <label class="block mb-2">Lottery Game:</label>
+                    <select class="w-full p-2 border rounded">
+                        <option>Powerball (5/69 + 1/26)</option>
+                        <option>Mega Millions (5/70 + 1/25)</option>
+                        <option>EuroMillions (5/50 + 2/12)</option>
+                        <option>Lotto 6/49</option>
+                        <option>Custom Game</option>
+                    </select>
+                    <div class="mt-4">
+                        <label>Main Numbers Pool:</label>
+                        <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 69">
+                        <label>Numbers to Pick:</label>
+                        <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 5">
                     </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Generation Options</h2>
-                        <div class="mb-4">
-                            <label for="random-seed" class="block mb-1">Random Seed</label>
-                            <input type="text" id="random-seed" class="w-full p-2 border rounded" aria-label="Random seed for generation">
-                        </div>
-                        <label for="generation-method" class="block mb-1 font-medium">Generation Method:</label>
-                        <select id="generation-method" class="w-full p-2 border rounded" aria-label="Select generation method">
-                            <option value="random">Standard Random</option>
-                            <option value="fisher-yates">Fisher-Yates Shuffle</option>
-                            <option value="crypto">Cryptographically Secure</option>
-                            <option value="low-high">Low-High Balance</option>
-                            <option value="odd-even">Odd-Even Balance</option>
-                            <option value="prime">Prime Numbers</option>
-                            <option value="fibonacci">Fibonacci Numbers</option>
-                            <option value="lucky">Lucky Numbers</option>
-                            <option value="hot-cold">Hot & Cold Numbers</option>
-                            <option value="wheel">Wheel System</option>
-                            <option value="ai">AI-Powered Prediction</option>
-                        </select>
-                        <div id="generator-params" class="mt-4"></div>
-                        <div class="mt-4">
-                            <label for="ticket-count" class="block mb-1">Number of tickets:</label>
-                            <input type="number" id="ticket-count" class="w-full p-2 border rounded" min="1" max="100" value="1" aria-label="Number of tickets to generate">
-                        </div>
-                        <div class="mt-4 flex gap-2">
-                            <button id="generate-button" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Generate lottery tickets">Generate</button>
-                            <button id="quick-pick" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" aria-label="Quick pick random numbers">Quick Pick</button>
-                            <button id="clear-generator" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" aria-label="Clear generated tickets">Clear</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">AI Recommendations</h2>
-                        <div class="space-y-4">
-                            <div class="p-4 bg-blue-50 rounded">
-                                <p class="text-blue-800"><i class="fas fa-lightbulb mr-2"></i>Tip: Combine multiple strategies for better coverage. Try using Hot/Cold numbers with Low/High balance for optimal results.</p>
-                            </div>
-                            <div class="p-4 bg-blue-50 rounded">
-                                <p class="text-blue-800"><i class="fas fa-chart-line mr-2"></i>Analysis: Based on historical data, numbers between 1-31 appear more frequently due to birthday selections. Consider including some higher numbers.</p>
-                            </div>
-                        </div>
+                    <div class="mt-4">
+                        <label>Bonus Numbers Pool:</label>
+                        <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 26">
+                        <label>Bonus Numbers to Pick:</label>
+                        <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 1">
                     </div>
                 </div>
-
-                <div class="bg-white p-6 rounded-lg shadow mt-6">
-                    <h2 class="text-2xl font-semibold mb-4">Generated Tickets</h2>
-                    <div id="generated-results" class="lotto-balls mb-4">Generate some numbers to see results</div>
-                    <div class="flex flex-wrap gap-2">
-                        <button id="export-txt" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Export tickets as TXT">Export as TXT</button>
-                        <button id="export-csv" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Export tickets as CSV">Export as CSV</button>
-                        <button id="export-json" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Export tickets as JSON">Export as JSON</button>
-                        <button id="copy-clipboard" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Copy tickets to clipboard">Copy to Clipboard</button>
-                        <button id="print-tickets" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Print tickets">Print</button>
-                        <button id="save-tickets" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" aria-label="Save tickets">Save Tickets</button>
+                <div class="bg-white p-4 rounded shadow">
+                    <h2 class="text-xl font-bold mb-4">Generation Options</h2>
+                    <label>Random Seed:</label>
+                    <input type="text" id="random-seed" class="w-full p-2 border rounded" placeholder="Enter seed or leave blank">
+                    <label class="block mt-4">Generation Method:</label>
+                    <select class="w-full p-2 border rounded">
+                        <option>Standard Random</option>
+                        <option>Fisher-Yates Shuffle</option>
+                        <option>Cryptographically Secure</option>
+                        <option>Low-High Balance</option>
+                        <option>Odd-Even Balance</option>
+                        <option>Prime Numbers</option>
+                        <option>Fibonacci Numbers</option>
+                        <option>Lucky Numbers</option>
+                        <option>Hot & Cold Numbers</option>
+                        <option>Wheel System</option>
+                        <option>AI-Powered Prediction</option>
+                    </select>
+                    <label class="block mt-4">Number of tickets:</label>
+                    <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 5">
+                    <div class="mt-4 flex gap-2">
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="generateTickets()">Generate</button>
+                        <button class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Quick Pick</button>
+                        <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
                     </div>
                 </div>
-
-                <div class="bg-white p-6 rounded-lg shadow mt-6">
-                    <h2 class="text-2xl font-semibold mb-4">Number Coverage</h2>
-                    <div id="number-matrix" class="grid grid-cols-10 gap-1 mb-4"></div>
-                    <p id="coverage-stats" class="text-gray-600">0% of numbers covered</p>
-                    <div class="chart-container">
-                        <canvas id="coverage-chart"></canvas>
-                    </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow mt-4">
+                <h2 class="text-xl font-bold mb-4">AI Recommendations</h2>
+                <p class="mb-2">Tip: Combine multiple strategies for better coverage. Try using Hot/Cold numbers with Low/High balance for optimal results.</p>
+                <p>Analysis: Based on historical data, numbers between 1-31 appear more frequently due to birthday selections. Consider including some higher numbers.</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow mt-4">
+                <h2 class="text-xl font-bold mb-4">Generated Tickets</h2>
+                <p id="generated-tickets">Generate some numbers to see results</p>
+                <div class="mt-4 flex gap-2">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export as TXT</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export as CSV</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Export as JSON</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Copy to Clipboard</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Print</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Tickets</button>
                 </div>
+            </div>
+        </section>
 
-                <div class="bg-white p-6 rounded-lg shadow mt-6">
-                    <h2 class="text-2xl font-semibold mb-4">Frequency Analysis</h2>
-                    <div id="frequency-analysis" class="mb-4">Generate some numbers to see frequency analysis</div>
-                    <div class="chart-container">
-                        <canvas id="frequency-chart"></canvas>
-                    </div>
+        <!-- Advanced Analyzer Tab -->
+        <section id="advanced-analyzer" class="tab-content">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold mb-4">Number Analysis</h2>
+                <label>Lottery Game:</label>
+                <select class="w-full p-2 border rounded">
+                    <option>Powerball (5/69 + 1/26)</option>
+                    <option>Mega Millions (5/70 + 1/25)</option>
+                    <option>EuroMillions (5/50 + 2/12)</option>
+                    <option>Lotto 6/49</option>
+                </select>
+                <label class="block mt-4">Numbers to Analyze (comma separated):</label>
+                <input type="text" class="w-full p-2 border rounded" placeholder="e.g., 5, 12, 23, 34, 45, 6">
+                <div class="mt-4 flex gap-2">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Analyze</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Load Saved</button>
                 </div>
-            </section>
+            </div>
+            <!-- Add other analyzer sections similarly -->
+        </section>
 
-            <!-- Advanced Analyzer -->
-            <section id="analyzer" class="tab-content">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Number Analysis</h2>
-                        <label for="analyzer-game-type" class="block mb-2 font-medium">Lottery Game:</label>
-                        <select id="analyzer-game-type" class="w-full p-2 border rounded" aria-label="Select lottery game for analysis">
-                            <option value="powerball">Powerball (5/69 + 1/26)</option>
-                            <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
-                            <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
-                            <option value="lotto649">Lotto 6/49</option>
-                        </select>
-                        <div class="mt-4">
-                            <label for="analyzer-numbers" class="block mb-1">Numbers to Analyze (comma separated):</label>
-                            <input type="text" id="analyzer-numbers" class="w-full p-2 border rounded" aria-label="Enter numbers to analyze">
-                        </div>
-                        <div id="analyzer-number-matrix" class="grid grid-cols-10 gap-1 mt-4"></div>
-                        <div class="mt-4 flex gap-2">
-                            <button id="analyze-button" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Analyze numbers">Analyze</button>
-                            <button id="clear-analyzer" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" aria-label="Clear analysis">Clear</button>
-                            <button id="load-saved" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" aria-label="Load saved tickets">Load Saved</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Advanced Analysis</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <h3 class="text-xl font-semibold mb-2">Number Sum Analysis</h3>
-                                <div id="sum-analysis" class="p-4 bg-gray-50 rounded">Analyze numbers to see sum statistics</div>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-semibold mb-2">Number Gap Analysis</h3>
-                                <div id="gap-analysis" class="p-4 bg-gray-50 rounded">Analyze numbers to see gap statistics</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Analysis Results</h2>
-                        <div id="analyzer-results" class="lotto-balls mb-4">Enter numbers to analyze them</div>
-                        <div class="chart-container">
-                            <canvas id="analyzer-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Pattern Recognition</h2>
-                        <div id="pattern-recognition" class="p-4 bg-gray-50 rounded">Analyze numbers to detect patterns</div>
-                    </div>
+        <!-- Historical Data Tab -->
+        <section id="historical-data" class="tab-content">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold mb-4">Historical Data</h2>
+                <label>Lottery Game:</label>
+                <select class="w-full p-2 border rounded">
+                    <option>Powerball (5/69 + 1/26)</option>
+                    <option>Mega Millions (5/70 + 1/25)</option>
+                    <option>EuroMillions (5/50 + 2/12)</option>
+                    <option>Lotto 6/49</option>
+                </select>
+                <label class="block mt-4">Number of past draws to load:</label>
+                <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 100">
+                <div class="mt-4 flex gap-2">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Load History</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Download Data</button>
                 </div>
-            </section>
+            </div>
+            <!-- Add other historical data sections -->
+        </section>
 
-            <!-- Historical Data -->
-            <section id="history" class="tab-content">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Historical Data</h2>
-                        <label for="history-game-type" class="block mb-2 font-medium">Lottery Game:</label>
-                        <select id="history-game-type" class="w-full p-2 border rounded" aria-label="Select lottery game for historical data">
-                            <option value="powerball">Powerball (5/69 + 1/26)</option>
-                            <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
-                            <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
-                            <option value="lotto649">Lotto 6/49</option>
-                        </select>
-                        <div class="mt-4">
-                            <label for="history-draw-count" class="block mb-1">Number of past draws to load:</label>
-                            <input type="number" id="history-draw-count" class="w-full p-2 border rounded" min="1" max="1000" value="100" aria-label="Number of past draws">
-                        </div>
-                        <div class="mt-4 flex gap-2">
-                            <button id="load-history" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Load historical data">Load History</button>
-                            <button id="clear-history" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" aria-label="Clear historical data">Clear</button>
-                            <button id="download-history" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" aria-label="Download historical data">Download Data</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Historical Trends</h2>
-                        <div class="chart-container">
-                            <canvas id="history-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Past Draws</h2>
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-100">
-                                    <th class="p-2">Draw Date</th>
-                                    <th class="p-2">Numbers</th>
-                                    <th class="p-2">Bonus</th>
-                                    <th class="p-2">Jackpot</th>
-                                </tr>
-                            </thead>
-                            <tbody id="history-table-body"></tbody>
-                        </table>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Hot & Cold Numbers</h2>
-                        <div id="hot-cold-numbers" class="mb-4">Load historical data to see hot and cold numbers</div>
-                        <div class="chart-container">
-                            <canvas id="hot-cold-chart"></canvas>
-                        </div>
-                    </div>
+        <!-- AI Strategies Tab -->
+        <section id="ai-strategies" class="tab-content">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold mb-4">AI-Powered Strategies</h2>
+                <label>Select a strategy:</label>
+                <select class="w-full p-2 border rounded">
+                    <option>Random</option>
+                    <option>Low-High</option>
+                    <option>Odd-Even</option>
+                    <option>Prime</option>
+                    <option>Fibonacci</option>
+                    <option>Lucky</option>
+                    <option>Hot/Cold</option>
+                    <option>Birthday</option>
+                    <option>AI Prediction</option>
+                </select>
+                <div class="mt-4 flex gap-2">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Generate with Strategy</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Test Strategy</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Strategy</button>
                 </div>
-            </section>
+            </div>
+            <!-- Add other AI strategies sections -->
+        </section>
 
-            <!-- AI Strategies -->
-            <section id="strategies" class="tab-content">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">AI-Powered Strategies</h2>
-                        <p class="mb-4">Select a strategy to generate numbers based on different approaches:</p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button class="strategy-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-strategy="random" aria-label="Random strategy">Random</button>
-                            <button class="strategy-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-strategy="low-high" aria-label="Low-High strategy">Low-High</button>
-                            <button class="strategy-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-strategy="odd-even" aria-label="Odd-Even strategy">Odd-Even</button>
-                            <button class="strategy-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-strategy="prime" aria-label="Prime strategy">Prime</button>
-                            <button class="strategy-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-strategy="fibonacci" aria-label="Fibonacci strategy">Fibonacci</button>
-                            <button class="strategy-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-strategy="lucky" aria-label="Lucky strategy">Lucky</button>
-                            <button class="strategy-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-strategy="hot-cold" aria-label="Hot/Cold strategy">Hot/Cold</button>
-                            <button class="strategy-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-strategy="birthday" aria-label="Birthday strategy">Birthday</button>
-                            <button class="strategy-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" data-strategy="ai" aria-label="AI Prediction strategy">AI Prediction</button>
-                        </div>
-                        <div id="strategy-params" class="mt-4"></div>
-                        <div class="mt-4 flex gap-2">
-                            <button id="generate-strategy" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Generate with strategy">Generate with Strategy</button>
-                            <button id="test-strategy" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Test strategy">Test Strategy</button>
-                            <button id="save-strategy" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" aria-label="Save strategy">Save Strategy</button>
-                            <button id="export-strategy" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600" aria-label="Export strategy">Export Strategy</button>
-                            <button id="import-strategy" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600" aria-label="Import strategy">Import Strategy</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Strategy Explanation</h2>
-                        <div id="strategy-explanation" class="p-4 bg-gray-50 rounded">The Random strategy generates numbers completely at random with no particular pattern or strategy. This mimics how lottery numbers are actually drawn.</div>
-                        <div class="p-4 bg-blue-50 rounded mt-4">
-                            <p class="text-blue-800"><i class="fas fa-robot mr-2"></i>AI Suggestion: For best results, combine multiple strategies and analyze historical trends before generating your numbers.</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Generated Numbers</h2>
-                        <div id="strategy-results" class="lotto-balls mb-4">Generate numbers to see results</div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Strategy Statistics</h2>
-                        <div id="strategy-stats" class="mb-4">Generate numbers to see statistics</div>
-                        <div class="chart-container">
-                            <canvas id="strategy-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow" id="strategy-performance" style="display: none;">
-                        <h2 class="text-2xl font-semibold mb-4">Strategy Performance</h2>
-                        <div id="performance-results"></div>
-                    </div>
+        <!-- Probability Lab Tab -->
+        <section id="probability-lab" class="tab-content">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold mb-4">Probability Lab</h2>
+                <label>Lottery Game:</label>
+                <select class="w-full p-2 border rounded">
+                    <option>Powerball (5/69 + 1/26)</option>
+                    <option>Mega Millions (5/70 + 1/25)</option>
+                    <option>EuroMillions (5/50 + 2/12)</option>
+                    <option>Lotto 6/49</option>
+                </select>
+                <label class="block mt-4">Your Tickets (one per line):</label>
+                <textarea class="w-full p-2 border rounded" rows="4"></textarea>
+                <label class="block mt-4">Number of simulations:</label>
+                <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 1000">
+                <div class="mt-4 flex gap-2">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Run Simulation</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Stop</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
                 </div>
-            </section>
+            </div>
+            <!-- Add other probability lab sections -->
+        </section>
 
-            <!-- Probability Lab -->
-            <section id="probability" class="tab-content">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Probability Lab</h2>
-                        <label for="simulator-game-type" class="block mb-2 font-medium">Lottery Game:</label>
-                        <select id="simulator-game-type" class="w-full p-2 border rounded" aria-label="Select lottery game for simulation">
-                            <option value="powerball">Powerball (5/69 + 1/26)</option>
-                            <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
-                            <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
-                            <option value="lotto649">Lotto 6/49</option>
-                        </select>
-                        <div class="mt-4">
-                            <label for="simulator-tickets" class="block mb-1">Your Tickets (one per line):</label>
-                            <textarea id="simulator-tickets" class="w-full p-2 border rounded" rows="5" aria-label="Enter tickets for simulation"></textarea>
-                        </div>
-                        <div id="simulator-number-matrix" class="grid grid-cols-10 gap-1 mt-4"></div>
-                        <div class="mt-4">
-                            <label for="simulation-count" class="block mb-1">Number of simulations:</label>
-                            <input type="number" id="simulation-count" class="w-full p-2 border rounded" min="1" max="1000000" value="1000" aria-label="Number of simulations to run">
-                        </div>
-                        <div class="mt-4 flex gap-2">
-                            <button id="run-simulation" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Run simulation">Run Simulation</button>
-                            <button id="stop-simulation" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" aria-label="Stop simulation">Stop</button>
-                            <button id="clear-simulation" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" aria-label="Clear simulation">Clear</button>
-                            <button id="load-sample" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" aria-label="Load sample tickets">Load Sample</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Probability Calculator</h2>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
-                                <h3 class="font-semibold mb-2">Jackpot Odds</h3>
-                                <p id="jackpot-odds" class="p-4 bg-gray-50 rounded">1 in 292M</p>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold mb-2">Break-even Point</h3>
-                                <p id="break-even" class="p-4 bg-gray-50 rounded">$584M</p>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold mb-2">Expected Value</h3>
-                                <p id="expected-value" class="p-4 bg-gray-50 rounded">-$0.80</p>
-                            </div>
-                        </div>
-                        <p class="mt-4 text-gray-600">Note: These calculations assume a $2 ticket price and standard prize structure. Actual values may vary.</p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Simulation Results</h2>
-                        <div id="simulation-results" class="mb-4">Run a simulation to see results</div>
-                        <div class="chart-container">
-                            <canvas id="simulation-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Winning Numbers</h2>
-                        <div id="winning-numbers" class="lotto-balls mb-4">Run a simulation to see winning numbers</div>
-                    </div>
+        <!-- Prediction Engine Tab -->
+        <section id="prediction-engine" class="tab-content">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold mb-4">Prediction Engine</h2>
+                <label>Lottery Game:</label>
+                <select class="w-full p-2 border rounded">
+                    <option>Powerball (5/69 + 1/26)</option>
+                    <option>Mega Millions (5/70 + 1/25)</option>
+                    <option>EuroMillions (5/50 + 2/12)</option>
+                    <option>Lotto 6/49</option>
+                </select>
+                <label class="block mt-4">Prediction Method:</label>
+                <select class="w-full p-2 border rounded">
+                    <option>Markov Chain Model</option>
+                    <option>Neural Network</option>
+                    <option>Regression Analysis</option>
+                    <option>Frequency Analysis</option>
+                    <option>Combined AI Model</option>
+                </select>
+                <label class="block mt-4">Number of predictions:</label>
+                <input type="number" class="w-full p-2 border rounded" placeholder="e.g., 5">
+                <div class="mt-4 flex gap-2">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Generate Predictions</button>
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Analyze Results</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
                 </div>
-            </section>
+            </div>
+            <!-- Add other prediction engine sections -->
+        </section>
 
-            <!-- Prediction Engine -->
-            <section id="predictor" class="tab-content">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Prediction Engine</h2>
-                        <label for="predictor-game-type" class="block mb-2 font-medium">Lottery Game:</label>
-                        <select id="predictor-game-type" class="w-full p-2 border rounded" aria-label="Select lottery game for predictions">
-                            <option value="powerball">Powerball (5/69 + 1/26)</option>
-                            <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
-                            <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
-                            <option value="lotto649">Lotto 6/49</option>
-                        </select>
-                        <label for="predictor-method" class="block mt-4 mb-2 font-medium">Prediction Method:</label>
-                        <select id="predictor-method" class="w-full p-2 border rounded" aria-label="Select prediction method">
-                            <option value="markov">Markov Chain Model</option>
-                            <option value="neural">Neural Network</option>
-                            <option value="regression">Regression Analysis</option>
-                            <option value="frequency">Frequency Analysis</option>
-                            <option value="combined">Combined AI Model</option>
-                        </select>
-                        <div class="mt-4">
-                            <label for="prediction-count" class="block mb-1">Number of predictions:</label>
-                            <input type="number" id="prediction-count" class="w-full p-2 border rounded" min="1" max="100" value="5" aria-label="Number of predictions to generate">
-                        </div>
-                        <div class="mt-4 flex gap-2">
-                            <button id="generate-predictions" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Generate predictions">Generate Predictions</button>
-                            <button id="analyze-predictions" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Analyze predictions">Analyze Results</button>
-                            <button id="clear-predictions" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" aria-label="Clear predictions">Clear</button>
-                        </div>
-                    </div>
+        <!-- Seed Reverse Engineer Tab -->
+        <section id="seed-reverse-engineer" class="tab-content">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold mb-4">Lotto Seed Reverse Engineer</h2>
+                <p class="mb-4">Enter generated lottery numbers to attempt to reverse-engineer the seed used.</p>
+                <label>Lottery Game:</label>
+                <select class="w-full p-2 border rounded">
+                    <option>Powerball (5/69 + 1/26)</option>
+                    <option>Mega Millions (5/70 + 1/25)</option>
+                    <option>EuroMillions (5/50 + 2/12)</option>
+                    <option>Lotto 6/49</option>
+                </select>
+                <label class="block mt-4">Generated Numbers (comma separated):</label>
+                <input type="text" id="generated-numbers" class="w-full p-2 border rounded" placeholder="e.g., 5, 12, 23, 34, 45, 6">
+                <label class="block mt-4">Generation Method Used:</label>
+                <select class="w-full p-2 border rounded">
+                    <option>Standard Random</option>
+                    <option>Fisher-Yates Shuffle</option>
+                    <option>Cryptographically Secure</option报警
 
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Prediction Model Details</h2>
-                        <div id="model-details" class="p-4 bg-gray-50 rounded">Select a prediction method to see details</div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Predicted Numbers</h2>
-                        <div id="prediction-results" class="lotto-balls mb-4">Generate predictions to see results</div>
-                        <div class="chart-container">
-                            <canvas id="prediction-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow">
-                        <h2 class="text-2xl font-semibold mb-4">Prediction Analysis</h2>
-                        <div id="prediction-analysis" class="mb-4">Generate predictions to see analysis</div>
-                    </div>
+                <div class="mt-4 flex gap-2">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="reverseEngineerSeed()">Reverse Engineer Seed</button>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Clear</button>
                 </div>
-            </section>
+            </div>
+            <div class="bg-white p-4 rounded shadow mt-4">
+                <h2 class="text-xl font-bold mb-4">Seed Analysis Results</h2>
+                <p id="seed-results">Enter numbers to see potential seed results</p>
+            </div>
+        </section>
 
-            <!-- Settings -->
-            <section id="settings" class="tab-content">
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h2 class="text-2xl font-semibold mb-4">Settings</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">User Preferences</h3>
-                            <div class="space-y-2">
-                                <div>
-                                    <label for="theme" class="block mb-1">Theme:</label>
-                                    <select id="theme" class="w-full p-2 border rounded" aria-label="Select theme">
-                                        <option value="light">Light</option>
-                                        <option value="dark">Dark</option>
-                                        <option value="system">System Default</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="language" class="block mb-1">Language:</label>
-                                    <select id="language" class="w-full p-2 border rounded" aria-label="Select language">
-                                        <option value="en">English</option>
-                                        <option value="es">Spanish</option>
-                                        <option value="fr">French</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="currency" class="block mb-1">Currency:</label>
-                                    <select id="currency" class="w-full p-2 border rounded" aria-label="Select currency">
-                                        <option value="USD">USD ($)</option>
-                                        <option value="EUR">EUR (€)</option>
-                                        <option value="GBP">GBP (£)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Account</h3>
-                            <div class="space-y-2">
-                                <button id="login-button" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" aria-label="Login to account">Login</button>
-                                <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 hidden" aria-label="Logout from account">Logout</button>
-                                <div id="user-info" class="p-4 bg-gray-50 rounded hidden">
-                                    <p id="user-email"></p>
-                                    <p id="user-since"></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Notifications</h3>
-                            <div class="space-y-2">
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="notify-draws" class="mr-2" aria-label="Receive draw notifications">
-                                    Receive draw notifications
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="notify-wins" class="mr-2" aria-label="Receive win notifications">
-                                    Receive win notifications
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" id="notify-updates" class="mr-2" aria-label="Receive app updates">
-                                    Receive app updates
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Settings Tab -->
+        <section id="settings" class="tab-content">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold mb-4">Settings</h2>
+                <div>
+                    <h3 class="text-lg font-bold mb-2">User Preferences</h3>
+                    <label>Theme:</label>
+                    <select class="w-full p-2 border rounded">
+                        <option>Light</option>
+                        <option>Dark</option>
+                        <option>System Default</option>
+                    </select>
+                    <label class="block mt-4">Language:</label>
+                    <select class="w-full p-2 border rounded">
+                        <option>English</option>
+                        <option>Spanish</option>
+                        <option>French</option>
+                    </select>
+                    <label class="block mt-4">Currency:</label>
+                    <select class="w-full p-2 border rounded">
+                        <option>USD ($)</option>
+                        <option>EUR (€)</option>
+                        <option>GBP (£)</option>
+                    </select>
                 </div>
-            </section>
+                <!-- Add other settings sections -->
+            </div>
+        </section>
 
-            <!-- About -->
-            <section class="mt-8">
-                <div class="bg-white p-6 rounded-lg shadow">
-                    <h2 class="text-2xl font-semibold mb-4">About Lotto Pro</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">How It Works</h3>
-                            <p>Lotto Pro uses advanced artificial intelligence and statistical analysis to help you generate and analyze lottery numbers. Our system combines multiple predictive models to identify patterns and trends in lottery draws.</p>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Odds Information</h3>
-                            <table class="w-full">
-                                <thead>
-                                    <tr class="bg-gray-100">
-                                        <th class="p-2">Game</th>
-                                        <th class="p-2">Main Numbers</th>
-                                        <th class="p-2">Bonus Numbers</th>
-                                        <th class="p-2">Odds of Jackpot</th>
-                                        <th class="p-2">Expected Value</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="p-2">Powerball</td>
-                                        <td class="p-2">5/69</td>
-                                        <td class="p-2">1/26</td>
-                                        <td class="p-2">1 in 292,201,338</td>
-                                        <td class="p-2">-$0.80</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-2">Mega Millions</td>
-                                        <td class="p-2">5/70</td>
-                                        <td class="p-2">1/25</td>
-                                        <td class="p-2">1 in 302,575,350</td>
-                                        <td class="p-2">-$0.85</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-2">EuroMillions</td>
-                                        <td class="p-2">5/50</td>
-                                        <td class="p-2">2/12</td>
-                                        <td class="p-2">1 in 139,838,160</td>
-                                        <td class="p-2">-$0.50</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-2">Lotto 6/49</td>
-                                        <td class="p-2">6/49</td>
-                                        <td class="p-2">None</td>
-                                        <td class="p-2">1 in 13,983,816</td>
-                                        <td class="p-2">-$0.55</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">AI-Powered Strategies</h3>
-                            <ul class="list-disc pl-5 space-y-2">
-                                <li><strong>Markov Chain Model:</strong> Predicts future numbers based on transition probabilities from historical data</li>
-                                <li><strong>Neural Network:</strong> Deep learning model trained on past draws to identify complex patterns</li>
-                                <li><strong>Regression Analysis:</strong> Statistical model that identifies relationships between numbers</li>
-                                <li><strong>Frequency Analysis:</strong> Prioritizes numbers based on their historical appearance rates</li>
-                                <li><strong>Combined AI Model:</strong> Ensemble approach that weights predictions from multiple models</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Remember</h3>
-                            <p>Lotteries are games of chance. While our system can identify patterns and improve your number selection strategy, no system can guarantee a win. Always play responsibly and never spend more than you can afford to lose.</p>
-                        </div>
-                    </div>
+        <!-- About Tab -->
+        <section id="about" class="tab-content">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold mb-4">About Lotto Pro</h2>
+                <div>
+                    <h3 class="text-lg font-bold mb-2">How It Works</h3>
+                    <p>Lotto Pro uses advanced artificial intelligence and statistical analysis to help you generate and analyze lottery numbers. Our system combines multiple predictive models to identify patterns and trends in lottery draws.</p>
                 </div>
-            </section>
-        </main>
-    </div>
-
-    <div id="toast-container" class="toast"></div>
-    <input type="file" id="strategy-file-input" class="hidden" accept=".json" aria-label="Import strategy file">
+                <div class="mt-4">
+                    <h3 class="text-lg font-bold mb-2">Odds Information</h3>
+                    <table class="w-full border">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="p-2">Game</th>
+                                <th>Main Numbers</th>
+                                <th>Bonus Numbers</th>
+                                <th>Odds of Jackpot</th>
+                                <th>Expected Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="p-2">Powerball</td>
+                                <td>5/69</td>
+                                <td>1/26</td>
+                                <td>1 in 292,201,338</td>
+                                <td>-$0.80</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">Mega Millions</td>
+                                <td>5/70</td>
+                                <td>1/25</td>
+                                <td>1 in 302,575,350</td>
+                                <td>-$0.85</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">EuroMillions</td>
+                                <td>5/50</td>
+                                <td>2/12</td>
+                                <td>1 in 139,838,160</td>
+                                <td>-$0.50</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2">Lotto 6/49</td>
+                                <td>6/49</td>
+                                <td>None</td>
+                                <td>1 in 13,983,816</td>
+                                <td>-$0.55</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <script>
-        // Application state
-        const appState = {
-            currentTab: 'generator',
-            currentStrategy: 'random',
-            historicalData: {},
-            hotColdData: {},
-            savedTickets: JSON.parse(localStorage.getItem('savedTickets')) || {},
-            savedStrategies: JSON.parse(localStorage.getItem('savedStrategies')) || {},
-            charts: {},
-            simulationRunning: false,
-            simulationWorker: null,
-            predictionModels: {
-                markov: {
-                    name: 'Markov Chain Model',
-                    description: 'Predicts numbers based on historical transition probabilities',
-                    accuracy: '65%'
-                },
-                neural: {
-                    name: 'Neural Network',
-                    description: 'Deep learning model for complex pattern recognition',
-                    accuracy: '72%'
-                },
-                regression: {
-                    name: 'Regression Analysis',
-                    description: 'Statistical model for number relationships',
-                    accuracy: '68%'
-                },
-                frequency: {
-                    name: 'Frequency Analysis',
-                    description: 'Based on historical number frequencies',
-                    accuracy: '62%'
-                },
-                combined: {
-                    name: 'Combined AI Model',
-                    description: 'Ensemble of multiple predictive models',
-                    accuracy: '75%'
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function generateTickets() {
+            const seed = document.getElementById('random-seed').value || Date.now();
+            const mainPool = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 69"]').value) || 69;
+            const mainPick = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 5"]').value) || 5;
+            const bonusPool = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 26"]').value) || 26;
+            const bonusPick = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 1"]').value) || 1;
+            const numTickets = parseInt(document.querySelector('#smart-generator input[placeholder="e.g., 5"]').value) || 1;
+
+            // Simple random number generator with seed
+            let seedValue = parseInt(seed);
+            function seededRandom() {
+                seedValue = (seedValue * 9301 + 49297) % 233280;
+                return seedValue / 233280;
+            }
+
+            let tickets = [];
+            for (let i = 0; i < numTickets; i++) {
+                let mainNumbers = [];
+                let numbers = Array.from({ length: mainPool }, (_, i) => i + 1);
+                for (let j = 0; j < mainPick; j++) {
+                    const index = Math.floor(seededRandom() * numbers.length);
+                    mainNumbers.push(numbers.splice(index, 1)[0]);
                 }
-            },
-            user: null,
-            settings: {
-                theme: localStorage.getItem('theme') || 'system',
-                language: localStorage.getItem('language') || 'en',
-                currency: localStorage.getItem('currency') || 'USD',
-                notifications: {
-                    draws: localStorage.getItem('notify-draws') === 'true',
-                    wins: localStorage.getItem('notify-wins') === 'true',
-                    updates: localStorage.getItem('notify-updates') === 'true'
+                mainNumbers.sort((a, b) => a - b);
+                let bonusNumbers = [];
+                numbers = Array.from({ length: bonusPool }, (_, i) => i + 1);
+                for (let j = 0; j < bonusPick; j++) {
+                    const index = Math.floor(seededRandom() * numbers.length);
+                    bonusNumbers.push(numbers.splice(index, 1)[0]);
                 }
-            }
-        };
-
-        // Initialize the application
-        function initApp() {
-            initTheme();
-            initTabs();
-            initEventListeners();
-            initNumberMatrices();
-            loadSampleData();
-            registerServiceWorker();
-            initUserAuth();
-            initCharts();
-        }
-
-        // Theme initialization
-        function initTheme() {
-            const theme = appState.settings.theme;
-            if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.body.classList.add('dark');
-                document.documentElement.style.setProperty('--bg-color', '#1f2937');
-                document.documentElement.style.setProperty('--text-color', '#f9fafb');
-            } else {
-                document.body.classList.remove('dark');
-                document.documentElement.style.setProperty('--bg-color', '#f3f4f6');
-                document.documentElement.style.setProperty('--text-color', '#1f2937');
-            }
-        }
-
-        // Register service worker
-        function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('Service Worker registered'))
-                    .catch(err => console.error('Service Worker registration failed:', err));
-            }
-        }
-
-        // User authentication
-        function initUserAuth() {
-            const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                appState.user = JSON.parse(storedUser);
-                updateUserUI();
+                tickets.push(`Ticket ${i + 1}: ${mainNumbers.join(', ')} + Bonus: ${bonusNumbers.join(', ')}`);
             }
 
-            document.getElementById('login-button').addEventListener('click', () => {
-                const user = {
-                    email: 'user@example.com',
-                    since: new Date().toISOString(),
-                    id: 'user_' + Math.random().toString(36).substr(2, 9)
-                };
-                appState.user = user;
-                localStorage.setItem('user', JSON.stringify(user));
-                updateUserUI();
-                syncSavedTickets();
-            });
-
-            document.getElementById('logout-button').addEventListener('click', () => {
-                appState.user = null;
-                localStorage.removeItem('user');
-                updateUserUI();
-            });
+            document.getElementById('generated-tickets').innerText = tickets.join('\n');
         }
 
-        function updateUserUI() {
-            const loginButton = document.getElementById('login-button');
-            const logoutButton = document.getElementById('logout-button');
-            const userInfo = document.getElementById('user-info');
-            const userEmail = document.getElementById('user-email');
-            const userSince = document.getElementById('user-since');
-
-            if (appState.user) {
-                loginButton.classList.add('hidden');
-                logoutButton.classList.remove('hidden');
-                userInfo.classList.remove('hidden');
-                userEmail.textContent = `Email: ${appState.user.email}`;
-                userSince.textContent = `Member since: ${new Date(appState.user.since).toLocaleDateString()}`;
-            } else {
-                loginButton.classList.remove('hidden');
-                logoutButton.classList.add('hidden');
-                userInfo.classList.add('hidden');
-            }
-        }
-
-        async function syncSavedTickets() {
-            if (!appState.user) return;
-
-            try {
-                const response = await fetch('/api/sync-tickets', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${appState.user.id}`
-                    },
-                    body: JSON.stringify(appState.savedTickets)
-                });
-                if (response.ok) {
-                    showToast('Tickets synced with server', 'success', 'cloud');
-                }
-            } catch (error) {
-                showToast('Failed to sync tickets', 'danger', 'exclamation-triangle');
-            }
-        }
-
-        // Initialize charts
-        function initCharts() {
-            appState.charts.coverage = new Chart(document.getElementById('coverage-chart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Number Coverage',
-                        data: [],
-                        backgroundColor: '#4a6bff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-
-            appState.charts.frequency = new Chart(document.getElementById('frequency-chart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Number Frequency',
-                        data: [],
-                        backgroundColor: '#4a6bff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-
-            appState.charts.analyzer = new Chart(document.getElementById('analyzer-chart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Number Distribution',
-                        data: [],
-                        backgroundColor: '#4a6bff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-
-            appState.charts.history = new Chart(document.getElementById('history-chart').getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Number Trends',
-                        data: [],
-                        borderColor: '#4a6bff',
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-
-            appState.charts.hotCold = new Chart(document.getElementById('hot-cold-chart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Hot Numbers',
-                            data: [],
-                            backgroundColor: '#ef4444'
-                        },
-                        {
-                            label: 'Cold Numbers',
-                            data: [],
-                            backgroundColor: '#3b82f6'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-
-            appState.charts.strategy = new Chart(document.getElementById('strategy-chart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Strategy Performance',
-                        data: [],
-                        backgroundColor: '#4a6bff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-
-            appState.charts.simulation = new Chart(document.getElementById('simulation-chart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Win Distribution',
-                        data: [],
-                        backgroundColor: '#4a6bff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-
-            appState.charts.prediction = new Chart(document.getElementById('prediction-chart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Prediction Confidence',
-                        data: [],
-                        backgroundColor: '#4a6bff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-        }
-
-        // Tab navigation
-        function initTabs() {
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                    document.getElementById(button.dataset.tab).classList.add('active');
-                    appState.currentTab = button.dataset.tab;
-
-                    if (button.dataset.tab === 'generator') {
-                        updateNumberMatrix();
-                        updateProbabilityCalculator();
-                    } else if (button.dataset.tab === 'analyzer') {
-                        updateAnalyzerMatrix();
-                    } else if (button.dataset.tab === 'strategies') {
-                        updateStrategyParams();
-                        updateStrategyExplanation();
-                    } else if (button.dataset.tab === 'probability') {
-                        updateSimulator();
-                    } else if (button.dataset.tab === 'predictor') {
-                        updatePredictor();
-                    }
-                });
-            });
-        }
-
-        // Event listeners
-        function initEventListeners() {
-            document.getElementById('game-type').addEventListener('change', () => {
-                updateCustomGameOptions();
-                updateNumberMatrix();
-                updateProbabilityCalculator();
-            });
-            document.getElementById('generation-method').addEventListener('change', updateGeneratorParams);
-            document.getElementById('generate-button').addEventListener('click', generateNumbers);
-            document.getElementById('quick-pick').addEventListener('click', quickPick);
-            document.getElementById('clear-generator').addEventListener('click', clearGenerator);
-            document.getElementById('export-txt').addEventListener('click', () => exportTickets('txt'));
-            document.getElementById('export-csv').addEventListener('click', () => exportTickets('csv'));
-            document.getElementById('export-json').addEventListener('click', () => exportTickets('json'));
-            document.getElementById('copy-clipboard').addEventListener('click', copyToClipboard);
-            document.getElementById('print-tickets').addEventListener('click', printTickets);
-            document.getElementById('save-tickets').addEventListener('click', saveTickets);
-            document.getElementById('analyzer-game-type').addEventListener('change', updateAnalyzerMatrix);
-            document.getElementById('analyze-button').addEventListener('click', analyzeNumbers);
-            document.getElementById('clear-analyzer').addEventListener('click', clearAnalyzer);
-            document.getElementById('load-saved').addEventListener('click', loadSavedTickets);
-            document.getElementById('load-history').addEventListener('click', loadHistoricalData);
-            document.getElementById('clear-history').addEventListener('click', clearHistoryTable);
-            document.getElementById('download-history').addEventListener('click', downloadHistoricalData);
-            document.querySelectorAll('.strategy-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    appState.currentStrategy = button.dataset.strategy;
-                    document.querySelectorAll('.strategy-button').forEach(btn => btn.classList.remove('bg-blue-600'));
-                    button.classList.add('bg-blue-600');
-                    updateStrategyParams();
-                    updateStrategyExplanation();
-                });
-            });
-            document.getElementById('generate-strategy').addEventListener('click', generateWithStrategy);
-            document.getElementById('test-strategy').addEventListener('click', testStrategy);
-            document.getElementById('save-strategy').addEventListener('click', saveStrategy);
-            document.getElementById('export-strategy').addEventListener('click', exportStrategy);
-            document.getElementById('import-strategy').addEventListener('click', () => document.getElementById('strategy-file-input').click());
-            document.getElementById('strategy-file-input').addEventListener('change', importStrategy);
-            document.getElementById('run-simulation').addEventListener('click', runSimulation);
-            document.getElementById('stop-simulation').addEventListener('click', stopSimulation);
-            document.getElementById('clear-simulation').addEventListener('click', clearSimulation);
-            document.getElementById('load-sample').addEventListener('click', loadSampleTickets);
-            document.getElementById('predictor-game-type').addEventListener('change', updatePredictor);
-            document.getElementById('predictor-method').addEventListener('change', updateModelDetails);
-            document.getElementById('generate-predictions').addEventListener('click', generatePredictions);
-            document.getElementById('analyze-predictions').addEventListener('click', analyzePredictions);
-            document.getElementById('clear-predictions').addEventListener('click', clearPredictions);
-
-            ['notify-draws', 'notify-wins', 'notify-updates'].forEach(id => {
-                document.getElementById(id).addEventListener('change', (e) => {
-                    appState.settings.notifications[id.replace('notify-', '')] = e.target.checked;
-                    localStorage.setItem(id, e.target.checked);
-                });
-            });
-
-            document.getElementById('theme').addEventListener('change', (e) => {
-                appState.settings.theme = e.target.value;
-                localStorage.setItem('theme', e.target.value);
-                initTheme();
-            });
-
-            document.getElementById('language').addEventListener('change', (e) => {
-                appState.settings.language = e.target.value;
-                localStorage.setItem('language', e.target.value);
-                updateLanguage();
-            });
-
-            document.getElementById('currency').addEventListener('change', (e) => {
-                appState.settings.currency = e.target.value;
-                localStorage.setItem('currency', e.target.value);
-                updateCurrency();
-            });
-        }
-
-        // Update language
-        function updateLanguage() {
-            showToast(`Language changed to ${appState.settings.language}`, 'success', 'globe');
-        }
-
-        // Update currency
-        function updateCurrency() {
-            const currencySymbols = {
-                USD: '$',
-                EUR: '€',
-                GBP: '£'
-            };
-            document.querySelectorAll('[data-currency]').forEach(el => {
-                const value = parseFloat(el.dataset.value);
-                el.textContent = `${currencySymbols[appState.settings.currency]}${value.toLocaleString()}`;
-            });
-            showToast(`Currency changed to ${appState.settings.currency}`, 'success', 'money-bill');
-        }
-
-        // Number matrix initialization
-        function initNumberMatrices() {
-            updateNumberMatrix();
-            updateAnalyzerMatrix();
-            updateSimulatorMatrix();
-        }
-
-        function updateNumberMatrix() {
-            const gameType = document.getElementById('game-type').value;
-            const matrix = document.getElementById('number-matrix');
-            matrix.innerHTML = '';
-
-            let poolSize;
-            switch (gameType) {
-                case 'powerball':
-                    poolSize = 69;
-                    break;
-                case 'megamillions':
-                    poolSize = 70;
-                    break;
-                case 'euromillions':
-                    poolSize = 50;
-                    break;
-                case 'lotto649':
-                    poolSize = 49;
-                    break;
-                case 'custom':
-                    poolSize = parseInt(document.getElementById('main-numbers').value) || 69;
-                    break;
-            }
-
-            for (let i = 1; i <= poolSize; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'number-cell';
-                cell.textContent = i;
-                cell.setAttribute('aria-label', `Number ${i}`);
-                cell.addEventListener('click', () => toggleNumberSelection(cell, i));
-                matrix.appendChild(cell);
-            }
-        }
-
-        function updateAnalyzerMatrix() {
-            const gameType = document.getElementById('analyzer-game-type').value;
-            const matrix = document.getElementById('analyzer-number-matrix');
-            matrix.innerHTML = '';
-
-            let poolSize;
-            switch (gameType) {
-                case 'powerball':
-                    poolSize = 69;
-                    break;
-                case 'megamillions':
-                    poolSize = 70;
-                    break;
-                case 'euromillions':
-                    poolSize = 50;
-                    break;
-                case 'lotto649':
-                    poolSize = 49;
-                    break;
-            }
-
-            for (let i = 1; i <= poolSize; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'number-cell';
-                cell.textContent = i;
-                cell.setAttribute('aria-label', `Number ${i}`);
-                cell.addEventListener('click', () => toggleAnalyzerNumberSelection(cell, i));
-                matrix.appendChild(cell);
-            }
-        }
-
-        function updateSimulatorMatrix() {
-            const gameType = document.getElementById('simulator-game-type').value;
-            const matrix = document.getElementById('simulator-number-matrix');
-            matrix.innerHTML = '';
-
-            let poolSize;
-            switch (gameType) {
-                case 'powerball':
-                    poolSize = 69;
-                    break;
-                case 'megamillions':
-                    poolSize = 70;
-                    break;
-                case 'euromillions':
-                    poolSize = 50;
-                    break;
-                case 'lotto649':
-                    poolSize = 49;
-                    break;
-            }
-
-            for (let i = 1; i <= poolSize; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'number-cell';
-                cell.textContent = i;
-                cell.setAttribute('aria-label', `Number ${i}`);
-                cell.addEventListener('click', () => toggleSimulatorNumberSelection(cell, i));
-                matrix.appendChild(cell);
-            }
-        }
-
-        function toggleNumberSelection(cell, number) {
-            cell.classList.toggle('selected');
-            updateNumberCoverage();
-        }
-
-        function toggleAnalyzerNumberSelection(cell, number) {
-            cell.classList.toggle('selected');
-            const selectedNumbers = Array.from(document.querySelectorAll('#analyzer-number-matrix .number-cell.selected'))
-                .map(cell => parseInt(cell.textContent));
-            document.getElementById('analyzer-numbers').value = selectedNumbers.join(', ');
-        }
-
-        function toggleSimulatorNumberSelection(cell, number) {
-            cell.classList.toggle('selected');
-            const selectedNumbers = Array.from(document.querySelectorAll('#simulator-number-matrix .number-cell.selected'))
-                .map(cell => parseInt(cell.textContent));
-            const tickets = document.getElementById('simulator-tickets').value.split('\n').filter(line => line.trim());
-            const gameType = document.getElementById('simulator-game-type').value;
-            let pickCount = gameType === 'lotto649' ? 6 : 5;
-            if (selectedNumbers.length === pickCount) {
-                tickets.push(selectedNumbers.join(','));
-                document.getElementById('simulator-tickets').value = tickets.join('\n');
-                document.querySelectorAll('#simulator-number-matrix .number-cell').forEach(c => c.classList.remove('selected'));
-            }
-        }
-
-        function updateCustomGameOptions() {
-            const gameType = document.getElementById('game-type').value;
-            document.getElementById('custom-game-options').classList.toggle('hidden', gameType !== 'custom');
-            updateNumberMatrix();
-            updateProbabilityCalculator();
-        }
-
-        function showToast(message, type, icon) {
-            const toast = document.createElement('div');
-            toast.className = `toast bg-${type}-500 text-white p-4 rounded shadow-lg flex items-center`;
-            toast.innerHTML = `<i class="fas fa-${icon} mr-2"></i>${message}`;
-            document.getElementById('toast-container').appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function updateGeneratorParams() {
-            const method = document.getElementById('generation-method').value;
-            const paramsContainer = document.getElementById('generator-params');
-            let html = '';
-
-            switch (method) {
-                case 'low-high':
-                    html = `
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="generator-low-count" class="block mb-1">Low numbers:</label>
-                                <input type="number" id="generator-low-count" class="w-full p-2 border rounded" min="0" value="3" aria-label="Number of low numbers">
-                            </div>
-                            <div>
-                                <label for="generator-high-count" class="block mb-1">High numbers:</label>
-                                <input type="number" id="generator-high-count" class="w-full p-2 border rounded" min="0" value="2" aria-label="Number of high numbers">
-                            </div>
-                        </div>
-                    `;
-                    break;
-                case 'odd-even':
-                    html = `
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="generator-odd-count" class="block mb-1">Odd numbers:</label>
-                                <input type="number" id="generator-odd-count" class="w-full p-2 border rounded" min="0" value="3" aria-label="Number of odd numbers">
-                            </div>
-                            <div>
-                                <label for="generator-even-count" class="block mb-1">Even numbers:</label>
-                                <input type="number" id="generator-even-count" class="w-full p-2 border rounded" min="0" value="2" aria-label="Number of even numbers">
-                            </div>
-                        </div>
-                    `;
-                    break;
-                case 'hot-cold':
-                    html = `
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="generator-hot-count" class="block mb-1">Hot numbers:</label>
-                                <input type="number" id="generator-hot-count" class="w-full p-2 border rounded" min="0" value="3" aria-label="Number of hot numbers">
-                            </div>
-                            <div>
-                                <label for="generator-cold-count" class="block mb-1">Cold numbers:</label>
-                                <input type="number" id="generator-cold-count" class="w-full p-2 border rounded" min="0" value="2" aria-label="Number of cold numbers">
-                            </div>
-                        </div>
-                        <p class="mt-2 text-gray-600">Hot/Cold strategy requires historical data to be loaded.</p>
-                    `;
-                    break;
-                case 'ai':
-                    html = `
-                        <label for="generator-ai-model" class="block mb-1">AI Model:</label>
-                        <select id="generator-ai-model" class="w-full p-2 border rounded" aria-label="Select AI model">
-                            <option value="markov">Markov Chain</option>
-                            <option value="neural">Neural Network</option>
-                            <option value="combined">Combined Model</option>
-                        </select>
-                        <div class="mt-4">
-                            <label for="generator-ai-confidence" class="block mb-1">Minimum confidence threshold:</label>
-                            <input type="range" id="generator-ai-confidence" class="w-full" min="50" max="95" value="75" aria-label="AI confidence threshold">
-                            <span id="generator-confidence-value">75%</span>
-                        </div>
-                        <p class="mt-2 text-gray-600">AI models perform better with historical data loaded.</p>
-                    `;
-                    break;
-            }
-
-            paramsContainer.innerHTML = html;
-            if (method === 'ai') {
-                document.getElementById('generator-ai-confidence').addEventListener('input', function () {
-                    document.getElementById('generator-confidence-value').textContent = this.value + '%';
-                });
-            }
-        }
-
-        function generateNumbers() {
-            const method = document.getElementById('generation-method').value;
-            const ticketCount = parseInt(document.getElementById('ticket-count').value);
-            const gameType = document.getElementById('game-type').value;
-            let seed = document.getElementById('random-seed').value;
-
-            let mainPool, pickCount, bonusPool, bonusCount;
-
-            if (gameType === 'custom') {
-                mainPool = parseInt(document.getElementById('main-numbers').value) || 69;
-                pickCount = parseInt(document.getElementById('pick-numbers').value) || 5;
-                bonusPool = parseInt(document.getElementById('bonus-numbers').value) || 26;
-                bonusCount = parseInt(document.getElementById('pick-bonus').value) || 1;
-            } else {
-                switch (gameType) {
-                    case 'powerball':
-                        mainPool = 69;
-                        pickCount = 5;
-                        bonusPool = 26;
-                        bonusCount = 1;
-                        break;
-                    case 'megamillions':
-                        mainPool = 70;
-                        pickCount = 5;
-                        bonusPool = 25;
-                        bonusCount = 1;
-                        break;
-                    case 'euromillions':
-                        mainPool = 50;
-                        pickCount = 5;
-                        bonusPool = 12;
-                        bonusCount = 2;
-                        break;
-                    case 'lotto649':
-                        mainPool = 49;
-                        pickCount = 6;
-                        bonusPool = 0;
-                        bonusCount = 0;
-                        break;
-                }
-            }
-
-            const results = [];
-            for (let i = 0; i < ticketCount; i++) {
-                let mainNumbers, bonusNumbers;
-
-                switch (method) {
-                    case 'random':
-                        mainNumbers = generateRandomNumbers(mainPool, pickCount, 'standard', seed);
-                        break;
-                    case 'fisher-yates':
-                        mainNumbers = generateRandomNumbers(mainPool, pickCount, 'fisher-yates', seed);
-                        break;
-                    case 'crypto':
-                        mainNumbers = generateRandomNumbers(mainPool, pickCount, 'crypto', seed);
-                        break;
-                    case 'low-high':
-                        mainNumbers = generateLowHighNumbers(mainPool, pickCount);
-                        break;
-                    case 'odd-even':
-                        mainNumbers = generateOddEvenNumbers(mainPool, pickCount);
-                        break;
-                    case 'prime':
-                        mainNumbers = generatePrimeNumbers(mainPool, pickCount);
-                        break;
-                    case 'fibonacci':
-                        mainNumbers = generateFibonacciNumbers(mainPool, pickCount);
-                        break;
-                    case 'lucky':
-                        mainNumbers = generateLuckyNumbers(mainPool, pickCount);
-                        break;
-                    case 'hot-cold':
-                        mainNumbers = generateHotColdNumbers(mainPool, pickCount, gameType);
-                        break;
-                    case 'wheel':
-                        mainNumbers = generateWheelNumbers(mainPool, pickCount);
-                        break;
-                    case 'ai':
-                        mainNumbers = generateAINumbers(mainPool, pickCount, gameType);
-                        break;
-                }
-
-                if (bonusCount > 0) {
-                    bonusNumbers = generateRandomNumbers(bonusPool, bonusCount, 'standard', seed);
-                }
-
-                results.push({
-                    numbers: mainNumbers.sort((a, b) => a - b),
-                    bonusNumbers: bonusNumbers ? bonusNumbers.sort((a, b) => a - b) : null
-                });
-
-                seed = generateNewSeed(seed);
-            }
-
-            displayResults(results);
-            updateNumberCoverage();
-            updateFrequencyAnalysis(results);
-            showToast(`${ticketCount} tickets generated successfully`, 'success', 'ticket-alt');
-        }
-
-        function generateRandomNumbers(poolSize, count, method, seed = '') {
-            let numbers = [];
-            let available = Array.from({ length: poolSize }, (_, i) => i + 1);
-
-            if (method === 'crypto' && window.crypto && window.crypto.getRandomValues) {
-                const array = new Uint32Array(count);
-                window.crypto.getRandomValues(array);
-                for (let i = 0; i < count && available.length > 0; i++) {
-                    const index = array[i] % available.length;
-                    numbers.push(available.splice(index, 1)[0]);
-                }
-            } else if (method === 'fisher-yates') {
-                let seededRandom = seed ? mulberry32(hashString(seed)) : Math.random;
-                for (let i = available.length - 1; i > 0 && numbers.length < count; i--) {
-                    const j = Math.floor(seededRandom() * (i + 1));
-                    [available[i], available[j]] = [available[j], available[i]];
-                    numbers.push(available.pop());
-                }
-            } else {
-                let seededRandom = seed ? mulberry32(hashString(seed)) : Math.random;
-                while (numbers.length < count && available.length > 0) {
-                    const index = Math.floor(seededRandom() * available.length);
-                    numbers.push(available.splice(index, 1)[0]);
-                }
-            }
-
-            while (numbers.length < count && available.length > 0) {
-                numbers.push(available.pop());
-            }
-
-            return numbers;
-        }
-
-        function hashString(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return hash >>> 0;
-        }
-
-        function mulberry32(seed) {
-            return function () {
-                let t = seed += 0x6D2B79F5;
-                t = Math.imul(t ^ t >>> 15, t | 1);
-                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-                return ((t ^ t >>> 14) >>> 0) / 4294967296;
-            };
-        }
-
-        function generateNewSeed(seed) {
-            return (hashString(seed + Date.now().toString()) >>> 0).toString();
-        }
-
-        function generateLowHighNumbers(poolSize, count) {
-            const lowCount = parseInt(document.getElementById('generator-low-count').value) || Math.floor(count / 2);
-            const highCount = count - lowCount;
-            const midpoint = Math.floor(poolSize / 2);
-            let numbers = [];
-
-            let lowNumbers = generateRandomNumbers(midpoint, lowCount, 'standard');
-            let highNumbers = generateRandomNumbers(poolSize - midpoint, highCount, 'standard')
-                .map(n => n + midpoint);
-
-            numbers = [...lowNumbers, ...highNumbers];
-            return numbers.slice(0, count);
-        }
-
-        function generateOddEvenNumbers(poolSize, count) {
-            const oddCount = parseInt(document.getElementById('generator-odd-count').value) || Math.floor(count / 2);
-            const evenCount = count - oddCount;
-            let oddNumbers = [], evenNumbers = [];
-
-            for (let i = 1; i <= poolSize; i++) {
-                if (i % 2 === 1 && oddNumbers.length < oddCount) {
-                    oddNumbers.push(i);
-                } else if (i % 2 === 0 && evenNumbers.length < evenCount) {
-                    evenNumbers.push(i);
-                }
-            }
-
-            oddNumbers = generateRandomNumbers(oddNumbers.length, oddCount, 'standard')
-                .map(i => oddNumbers[i - 1]);
-            evenNumbers = generateRandomNumbers(evenNumbers.length, evenCount, 'standard')
-                .map(i => evenNumbers[i - 1]);
-
-            return [...oddNumbers, ...evenNumbers];
-        }
-
-        function generatePrimeNumbers(poolSize, count) {
-            const primes = [];
-            for (let i = 2; i <= poolSize; i++) {
-                if (isPrime(i)) primes.push(i);
-            }
-            return generateRandomNumbers(primes.length, Math.min(count, primes.length), 'standard')
-                .map(i => primes[i - 1]);
-        }
-
-        function isPrime(num) {
-            if (num < 2) return false;
-            for (let i = 2; i <= Math.sqrt(num); i++) {
-                if (num % i === 0) return false;
-            }
-            return true;
-        }
-
-        function generateFibonacciNumbers(poolSize, count) {
-            const fib = [1, 2];
-            while (fib[fib.length - 1] <= poolSize) {
-                fib.push(fib[fib.length - 1] + fib[fib.length - 2]);
-            }
-            return generateRandomNumbers(fib.length, Math.min(count, fib.length), 'standard')
-                .map(i => fib[i - 1]);
-        }
-
-        function generateLuckyNumbers(poolSize, count) {
-            const lucky = [3, 7, 8, 9, 13, 17, 21, 23, 27, 33, 37, 42, 49];
-            const available = lucky.filter(n => n <= poolSize);
-            return generateRandomNumbers(available.length, Math.min(count, available.length), 'standard')
-                .map(i => available[i - 1]);
-        }
-
-        function generateHotColdNumbers(poolSize, count, gameType) {
-            if (!appState.hotColdData[gameType] || !appState.hotColdData[gameType].hot) {
-                showToast('No hot/cold data available. Using standard random.', 'warning', 'exclamation-triangle');
-                return generateRandomNumbers(poolSize, count, 'standard');
-            }
-
-            const hotCount = parseInt(document.getElementById('generator-hot-count').value
-                                      ) || Math.floor(count / 2);
-            const coldCount = count - hotCount;
-            const hotNumbers = appState.hotColdData[gameType].hot.slice(0, hotCount);
-            const coldNumbers = appState.hotColdData[gameType].cold.slice(0, coldCount);
-            const remainingCount = count - (hotNumbers.length + coldNumbers.length);
-            const remainingPool = Array.from({ length: poolSize }, (_, i) => i + 1)
-                .filter(n => !hotNumbers.includes(n) && !coldNumbers.includes(n));
-
-            let numbers = [...hotNumbers, ...coldNumbers];
-            if (remainingCount > 0) {
-                const remainingNumbers = generateRandomNumbers(remainingPool.length, remainingCount, 'standard')
-                    .map(i => remainingPool[i - 1]);
-                numbers = [...numbers, ...remainingNumbers];
-            }
-
-            return numbers.slice(0, count);
-        }
-
-        function generateWheelNumbers(poolSize, count) {
-            const wheel = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39];
-            const available = wheel.filter(n => n <= poolSize);
-            return generateRandomNumbers(available.length, Math.min(count, available.length), 'standard')
-                .map(i => available[i - 1]);
-        }
-
-        function generateAINumbers(poolSize, count, gameType) {
-            const model = document.getElementById('generator-ai-model').value;
-            const confidence = parseInt(document.getElementById('generator-ai-confidence').value) / 100;
-
-            let numbers;
-            switch (model) {
-                case 'markov':
-                    numbers = generateMarkovNumbers(poolSize, count, gameType);
-                    break;
-                case 'neural':
-                    numbers = generateNeuralNumbers(poolSize, count, gameType);
-                    break;
-                case 'combined':
-                    numbers = generateCombinedNumbers(poolSize, count, gameType);
-                    break;
-                default:
-                    numbers = generateRandomNumbers(poolSize, count, 'standard');
-            }
-
-            return numbers.filter(() => Math.random() < confidence).slice(0, count);
-        }
-
-        function generateMarkovNumbers(poolSize, count, gameType) {
-            if (!appState.historicalData[gameType]) return generateRandomNumbers(poolSize, count, 'standard');
-
-            const transitions = {};
-            const draws = appState.historicalData[gameType].map(draw => draw.numbers);
-            for (let i = 0; i < draws.length - 1; i++) {
-                const current = draws[i];
-                const next = draws[i + 1];
-                current.forEach(num => {
-                    transitions[num] = transitions[num] || {};
-                    next.forEach(nextNum => {
-                        transitions[num][nextNum] = (transitions[num][nextNum] || 0) + 1;
-                    });
-                });
-            }
-
-            let numbers = [];
-            let current = generateRandomNumbers(poolSize, 1, 'standard')[0];
-            numbers.push(current);
-
-            while (numbers.length < count) {
-                const probs = transitions[current] || {};
-                const total = Object.values(probs).reduce((sum, val) => sum + val, 0);
-                let rand = Math.random() * total;
-                let nextNum = null;
-                for (const [num, freq] of Object.entries(probs)) {
-                    rand -= freq;
-                    if (rand <= 0) {
-                        nextNum = parseInt(num);
-                        break;
-                    }
-                }
-                if (!nextNum || numbers.includes(nextNum)) {
-                    nextNum = generateRandomNumbers(poolSize, 1, 'standard')[0];
-                }
-                if (!numbers.includes(nextNum)) {
-                    numbers.push(nextNum);
-                }
-                current = nextNum;
-            }
-
-            return numbers;
-        }
-
-        function generateNeuralNumbers(poolSize, count, gameType) {
-            if (!appState.historicalData[gameType]) return generateRandomNumbers(poolSize, count, 'standard');
-
-            const draws = appState.historicalData[gameType].map(draw => draw.numbers);
-            const weights = Array(poolSize).fill(0);
-            draws.forEach(draw => {
-                draw.forEach(num => {
-                    weights[num - 1] += 1;
-                });
-            });
-
-            const normalized = weights.map(w => w / Math.max(...weights));
-            let numbers = [];
-            while (numbers.length < count) {
-                const rand = Math.random();
-                let selected = null;
-                for (let i = 0; i < poolSize; i++) {
-                    if (rand < normalized[i] && !numbers.includes(i + 1)) {
-                        selected = i + 1;
-                        break;
-                    }
-                }
-                if (selected) numbers.push(selected);
-                else numbers.push(generateRandomNumbers(poolSize, 1, 'standard')[0]);
-            }
-
-            return numbers;
-        }
-
-        function generateCombinedNumbers(poolSize, count, gameType) {
-            const markov = generateMarkovNumbers(poolSize, count, gameType);
-            const neural = generateNeuralNumbers(poolSize, count, gameType);
-            const numbers = [];
-            for (let i = 0; i < count; i++) {
-                numbers.push(Math.random() < 0.5 ? markov[i] : neural[i]);
-            }
-            return [...new Set(numbers.slice(0, count))];
-        }
-
-        function displayResults(results) {
-            const resultsDiv = document.getElementById('generated-results');
-            const gameType = document.getElementById('game-type').value;
-            resultsDiv.innerHTML = '';
-
-            results.forEach((ticket, index) => {
-                const ticketDiv = document.createElement('div');
-                ticketDiv.className = 'lotto-balls mb-2';
-                ticketDiv.innerHTML = `<strong>Ticket ${index + 1}:</strong> `;
-                ticket.numbers.forEach(num => {
-                    const ball = document.createElement('span');
-                    ball.className = 'ball';
-                    ball.textContent = num;
-                    ticketDiv.appendChild(ball);
-                });
-                if (ticket.bonusNumbers) {
-                    ticket.bonusNumbers.forEach(num => {
-                        const ball = document.createElement('span');
-                        ball.className = `ball ${gameType === 'powerball' ? 'powerball' : gameType === 'megamillions' ? 'megaball' : 'eurostar'}`;
-                        ball.textContent = num;
-                        ticketDiv.appendChild(ball);
-                    });
-                }
-                resultsDiv.appendChild(ticketDiv);
-            });
-        }
-
-        function updateNumberCoverage() {
-            const gameType = document.getElementById('game-type').value;
-            let poolSize;
-            switch (gameType) {
-                case 'powerball':
-                    poolSize = 69;
-                    break;
-                case 'megamillions':
-                    poolSize = 70;
-                    break;
-                case 'euromillions':
-                    poolSize = 50;
-                    break;
-                case 'lotto649':
-                    poolSize = 49;
-                    break;
-                case 'custom':
-                    poolSize = parseInt(document.getElementById('main-numbers').value) || 69;
-                    break;
-            }
-
-            const selected = Array.from(document.querySelectorAll('#number-matrix .number-cell.selected'))
-                .map(cell => parseInt(cell.textContent));
-            const coverage = (selected.length / poolSize * 100).toFixed(2);
-            document.getElementById('coverage-stats').textContent = `${coverage}% of numbers covered`;
-
-            appState.charts.coverage.data.labels = Array.from({ length: poolSize }, (_, i) => i + 1);
-            appState.charts.coverage.data.datasets[0].data = Array(poolSize).fill(0);
-            selected.forEach(num => {
-                appState.charts.coverage.data.datasets[0].data[num - 1] = 1;
-            });
-            appState.charts.coverage.update();
-        }
-
-        function updateFrequencyAnalysis(tickets) {
-            const gameType = document.getElementById('game-type').value;
-            let poolSize;
-            switch (gameType) {
-                case 'powerball':
-                    poolSize = 69;
-                    break;
-                case 'megamillions':
-                    poolSize = 70;
-                    break;
-                case 'euromillions':
-                    poolSize = 50;
-                    break;
-                case 'lotto649':
-                    poolSize = 49;
-                    break;
-                case 'custom':
-                    poolSize = parseInt(document.getElementById('main-numbers').value) || 69;
-                    break;
-            }
-
-            const frequency = Array(poolSize).fill(0);
-            tickets.forEach(ticket => {
-                ticket.numbers.forEach(num => {
-                    frequency[num - 1]++;
-                });
-                if (ticket.bonusNumbers) {
-                    ticket.bonusNumbers.forEach(num => {
-                        frequency[num - 1]++;
-                    });
-                }
-            });
-
-            document.getElementById('frequency-analysis').textContent = `Most frequent numbers: ${frequency
-                .map((count, i) => ({ num: i + 1, count }))
-                .sort((a, b) => b.count - a.count)
-                .slice(0, 5)
-                .map(item => item.num)
-                .join(', ')}`;
-
-            appState.charts.frequency.data.labels = Array.from({ length: poolSize }, (_, i) => i + 1);
-            appState.charts.frequency.data.datasets[0].data = frequency;
-            appState.charts.frequency.update();
-        }
-
-        function quickPick() {
-            document.getElementById('generation-method').value = 'random';
-            updateGeneratorParams();
-            generateNumbers();
-        }
-
-        function clearGenerator() {
-            document.getElementById('generated-results').innerHTML = 'Generate some numbers to see results';
-            document.getElementById('number-matrix').querySelectorAll('.number-cell').forEach(cell => cell.classList.remove('selected'));
-            updateNumberCoverage();
-            updateFrequencyAnalysis([]);
-            showToast('Generator cleared', 'info', 'eraser');
-        }
-
-        function exportTickets(format) {
-            const resultsDiv = document.getElementById('generated-results');
-            const tickets = Array.from(resultsDiv.querySelectorAll('.lotto-balls')).map(ticket => {
-                const numbers = Array.from(ticket.querySelectorAll('.ball:not(.powerball):not(.megaball):not(.eurostar)')).map(ball => parseInt(ball.textContent));
-                const bonus = Array.from(ticket.querySelectorAll('.powerball, .megaball, .eurostar')).map(ball => parseInt(ball.textContent));
-                return { numbers, bonus };
-            });
-
-            let content;
-            let mimeType;
-            let extension;
-
-            switch (format) {
-                case 'txt':
-                    content = tickets.map((ticket, i) => `Ticket ${i + 1}: ${ticket.numbers.join(', ')}${ticket.bonus.length ? ' Bonus: ' + ticket.bonus.join(', ') : ''}`).join('\n');
-                    mimeType = 'text/plain';
-                    extension = 'txt';
-                    break;
-                case 'csv':
-                    content = 'Ticket,Numbers,Bonus\n' + tickets.map((ticket, i) => `${i + 1},"${ticket.numbers.join(',')}","${ticket.bonus.join(',')}"`).join('\n');
-                    mimeType = 'text/csv';
-                    extension = 'csv';
-                    break;
-                case 'json':
-                    content = JSON.stringify(tickets, null, 2);
-                    mimeType = 'application/json';
-                    extension = 'json';
-                    break;
-            }
-
-            const blob = new Blob([content], { type: mimeType });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `lotto-tickets-${new Date().toISOString().split('T')[0]}.${extension}`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast(`Tickets exported as ${format.toUpperCase()}`, 'success', 'file-export');
-        }
-
-        function copyToClipboard() {
-            const resultsDiv = document.getElementById('generated-results');
-            const text = Array.from(resultsDiv.querySelectorAll('.lotto-balls'))
-                .map((ticket, i) => {
-                    const numbers = Array.from(ticket.querySelectorAll('.ball:not(.powerball):not(.megaball):not(.eurostar)')).map(ball => ball.textContent);
-                    const bonus = Array.from(ticket.querySelectorAll('.powerball, .megaball, .eurostar')).map(ball => ball.textContent);
-                    return `Ticket ${i + 1}: ${numbers.join(', ')}${bonus.length ? ' Bonus: ' + bonus.join(', ') : ''}`;
-                })
-                .join('\n');
-
-            navigator.clipboard.writeText(text)
-                .then(() => showToast('Tickets copied to clipboard', 'success', 'copy'))
-                .catch(() => showToast('Failed to copy to clipboard', 'danger', 'exclamation-triangle'));
-        }
-
-        function printTickets() {
-            const resultsDiv = document.getElementById('generated-results');
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>Lotto Pro Tickets</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; }
-                            .lotto-balls { margin: 10px 0; }
-                            .ball { display: inline-block; width: 30px; height: 30px; border-radius: 50%; background-color: #4a6bff; color: white; text-align: center; line-height: 30px; margin-right: 5px; }
-                            .powerball, .megaball, .eurostar { background-color: #ef4444; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>Lotto Pro Tickets</h1>
-                        ${resultsDiv.innerHTML}
-                    </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
-            showToast('Tickets sent to printer', 'success', 'print');
-        }
-
-        function saveTickets() {
-            const resultsDiv = document.getElementById('generated-results');
-            const gameType = document.getElementById('game-type').value;
-            const tickets = Array.from(resultsDiv.querySelectorAll('.lotto-balls')).map(ticket => {
-                const numbers = Array.from(ticket.querySelectorAll('.ball:not(.powerball):not(.megaball):not(.eurostar)')).map(ball => parseInt(ball.textContent));
-                const bonus = Array.from(ticket.querySelectorAll('.powerball, .megaball, .eurostar')).map(ball => parseInt(ball.textContent));
-                return { numbers, bonus, date: new Date().toISOString() };
-            });
-
-            appState.savedTickets[gameType] = appState.savedTickets[gameType] || [];
-            appState.savedTickets[gameType].push(...tickets);
-            localStorage.setItem('savedTickets', JSON.stringify(appState.savedTickets));
-            syncSavedTickets();
-            showToast('Tickets saved successfully', 'success', 'save');
-        }
-
-        function loadSavedTickets() {
-            const gameType = document.getElementById('analyzer-game-type').value;
-            const tickets = appState.savedTickets[gameType] || [];
-            if (tickets.length === 0) {
-                showToast('No saved tickets found for this game', 'warning', 'exclamation-triangle');
+        function reverseEngineerSeed() {
+            const numbersInput = document.getElementById('generated-numbers').value;
+            const numbers = numbersInput.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+            if (numbers.length < 5) {
+                document.getElementById('seed-results').innerText = 'Please enter at least 5 numbers.';
                 return;
             }
 
-            const numbers = tickets[tickets.length - 1].numbers.join(', ');
-            const bonus = tickets[tickets.length - 1].bonus.join(', ');
-            document.getElementById('analyzer-numbers').value = `${numbers}${bonus.length ? ', ' + bonus : ''}`;
-            analyzeNumbers();
-            showToast('Loaded saved tickets', 'success', 'file-import');
-        }
-
-        function analyzeNumbers() {
-            const gameType = document.getElementById('analyzer-game-type').value;
-            const input = document.getElementById('analyzer-numbers').value;
-            const numbers = input.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-            let pickCount, bonusCount;
-
-            switch (gameType) {
-                case 'powerball':
-                    pickCount = 5;
-                    bonusCount = 1;
-                    break;
-                case 'megamillions':
-                    pickCount = 5;
-                    bonusCount = 1;
-                    break;
-                case 'euromillions':
-                    pickCount = 5;
-                    bonusCount = 2;
-                    break;
-                case 'lotto649':
-                    pickCount = 6;
-                    bonusCount = 0;
-                    break;
-            }
-
-            if (numbers.length !== (pickCount + bonusCount)) {
-                showToast(`Please enter exactly ${pickCount} main numbers${bonusCount ? ` and ${bonusCount} bonus number${bonusCount > 1 ? 's' : ''}` : ''}`, 'danger', 'exclamation-triangle');
-                return;
-            }
-
-            const mainNumbers = numbers.slice(0, pickCount).sort((a, b) => a - b);
-            const bonusNumbers = bonusCount ? numbers.slice(pickCount).sort((a, b) => a - b) : [];
-            const resultsDiv = document.getElementById('analyzer-results');
-            resultsDiv.innerHTML = '';
-
-            const ticketDiv = document.createElement('div');
-            ticketDiv.className = 'lotto-balls';
-            mainNumbers.forEach(num => {
-                const ball = document.createElement('span');
-                ball.className = 'ball';
-                ball.textContent = num;
-                ticketDiv.appendChild(ball);
-            });
-            bonusNumbers.forEach(num => {
-                const ball = document.createElement('span');
-                ball.className = `ball ${gameType === 'powerball' ? 'powerball' : gameType === 'megamillions' ? 'megaball' : 'eurostar'}`;
-                ball.textContent = num;
-                ticketDiv.appendChild(ball);
-            });
-            resultsDiv.appendChild(ticketDiv);
-
-            // Sum analysis
-            const sum = mainNumbers.reduce((a, b) => a + b, 0);
-            const avgSum = appState.historicalData[gameType]
-                ? appState.historicalData[gameType].reduce((sum, draw) => sum + draw.numbers.reduce((a, b) => a + b, 0), 0) / appState.historicalData[gameType].length
-                : 0;
-            document.getElementById('sum-analysis').innerHTML = `
-                Sum: ${sum}<br>
-                Average historical sum: ${avgSum ? avgSum.toFixed(2) : 'N/A'}<br>
-                ${sum < avgSum * 0.8 ? 'Below average' : sum > avgSum * 1.2 ? 'Above average' : 'Near average'}
-            `;
-
-            // Gap analysis
-            const gaps = mainNumbers.slice(1).map((num, i) => num - mainNumbers[i]);
-            const avgGap = gaps.length ? gaps.reduce((a, b) => a + b, 0) / gaps.length : 0;
-            document.getElementById('gap-analysis').innerHTML = `
-                Average gap: ${avgGap.toFixed(2)}<br>
-                Largest gap: ${Math.max(...gaps) || 'N/A'}<br>
-                Smallest gap: ${Math.min(...gaps) || 'N/A'}
-            `;
-
-            // Pattern recognition
-            const patterns = detectPatterns(mainNumbers);
-            document.getElementById('pattern-recognition').innerHTML = `
-                Consecutive numbers: ${patterns.consecutive.join(', ') || 'None'}<br>
-                Same last digit: ${patterns.sameLastDigit.join(', ') || 'None'}<br>
-                All odd/even: ${patterns.allOdd ? 'All odd' : patterns.allEven ? 'All even' : 'Mixed'}
-            `;
-
-            // Update chart
-            appState.charts.analyzer.data.labels = mainNumbers;
-            appState.charts.analyzer.data.datasets[0].data = Array(mainNumbers.length).fill(1);
-            appState.charts.analyzer.update();
-
-            showToast('Numbers analyzed successfully', 'success', 'chart-bar');
-        }
-
-        function detectPatterns(numbers) {
-            const consecutive = [];
-            for (let i = 1; i < numbers.length; i++) {
-                if (numbers[i] === numbers[i - 1] + 1) {
-                    consecutive.push(numbers[i - 1], numbers[i]);
+            // Simplified reverse-engineering (for demo purposes)
+            // Attempts to find a seed that generates the first few numbers
+            const mainPool = parseInt(document.querySelector('#seed-reverse-engineer select').value.match(/(\d+)\/(\d+)/)[2]) || 69;
+            const mainPick = parseInt(document.querySelector('#seed-reverse-engineer select').value.match(/(\d+)\/(\d+)/)[1]) || 5;
+            let possibleSeeds = [];
+            for (let seed = 1; seed <= 10000; seed++) {
+                let seedValue = seed;
+                function seededRandom() {
+                    seedValue = (seedValue * 9301 + 49297) % 233280;
+                    return seedValue / 233280;
+                }
+                let generated = [];
+                let numbers = Array.from({ length: mainPool }, (_, i) => i + 1);
+                for (let i = 0; i < mainPick; i++) {
+                    const index = Math.floor(seededRandom() * numbers.length);
+                    generated.push(numbers.splice(index, 1)[0]);
+                }
+                generated.sort((a, b) => a - b);
+                if (generated.every((n, i) => n === numbers[i])) {
+                    possibleSeeds.push(seed);
+                    if (possibleSeeds.length >= 5) break;
                 }
             }
-            const lastDigits = numbers.map(n => n % 10);
-            const sameLastDigit = numbers.filter((n, i) => lastDigits.indexOf(n % 10) !== i);
-            const allOdd = numbers.every(n => n % 2 === 1);
-            const allEven = numbers.every(n => n % 2 === 0);
 
-            return {
-                consecutive: [...new Set(consecutive)],
-                sameLastDigit: [...new Set(sameLastDigit)],
-                allOdd,
-                allEven
-            };
-        }
-
-        function clearAnalyzer() {
-            document.getElementById('analyzer-numbers').value = '';
-            document.getElementById('analyzer-results').innerHTML = 'Enter numbers to analyze them';
-            document.getElementById('sum-analysis').innerHTML = 'Analyze numbers to see sum statistics';
-            document.getElementById('gap-analysis').innerHTML = 'Analyze numbers to see gap statistics';
-            document.getElementById('pattern-recognition').innerHTML = 'Analyze numbers to detect patterns';
-            document.querySelectorAll('#analyzer-number-matrix .number-cell').forEach(cell => cell.classList.remove('selected'));
-            appState.charts.analyzer.data.labels = [];
-            appState.charts.analyzer.data.datasets[0].data = [];
-            appState.charts.analyzer.update();
-            showToast('Analyzer cleared', 'info', 'eraser');
-        }
-
-        function loadSampleData() {
-            const sampleData = {
-                powerball: [
-                    { date: '2025-06-01', numbers: [3, 15, 27, 42, 58], bonus: [12], jackpot: 500000000 },
-                    { date: '2025-05-25', numbers: [7, 19, 34, 46, 63], bonus: [8], jackpot: 450000000 }
-                ],
-                megamillions: [
-                    { date: '2025-06-01', numbers: [4, 16, 28, 41, 59], bonus: [10], jackpot: 600000000 }
-                ],
-                euromillions: [
-                    { date: '2025-06-01', numbers: [2, 14, 26, 38, 49], bonus: [5, 11], jackpot: 150000000 }
-                ],
-                lotto649: [
-                    { date: '2025-06-01', numbers: [6, 17, 28, 39, 45, 49], bonus: [], jackpot: 5000000 }
-                ]
-            };
-
-            appState.historicalData = sampleData;
-            updateHotColdNumbers();
-        }
-
-        function loadHistoricalData() {
-            const gameType = document.getElementById('history-game-type').value;
-            const drawCount = parseInt(document.getElementById('history-draw-count').value);
-            const tableBody = document.getElementById('history-table-body');
-            tableBody.innerHTML = '';
-
-            const draws = appState.historicalData[gameType] || [];
-            draws.slice(0, drawCount).forEach(draw => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="p-2">${draw.date}</td>
-                    <td class="p-2">${draw.numbers.join(', ')}</td>
-                    <td class="p-2">${draw.bonus.join(', ') || 'N/A'}</td>
-                    <td class="p-2">${draw.jackpot.toLocaleString()}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            updateHotColdNumbers();
-            updateHistoryChart(gameType);
-            showToast(`Loaded ${draws.length} draws`, 'success', 'history');
-        }
-
-        function updateHotColdNumbers() {
-            const gameType = document.getElementById('history-game-type').value;
-            const draws = appState.historicalData[gameType] || [];
-            let poolSize;
-            switch (gameType) {
-                case 'powerball':
-                    poolSize = 69;
-                    break;
-                case 'megamillions':
-                    poolSize = 70;
-                    break;
-                case 'euromillions':
-                    poolSize = 50;
-                    break;
-                case 'lotto649':
-                    poolSize = 49;
-                    break;
-            }
-
-            const frequency = Array(poolSize).fill(0);
-            draws.forEach(draw => {
-                draw.numbers.forEach(num => {
-                    frequency[num - 1]++;
-                });
-            });
-
-            const sorted = frequency.map((count, i) => ({ num: i + 1, count }))
-                .sort((a, b) => b.count - a.count);
-            const hot = sorted.slice(0, 10).map(item => item.num);
-            const cold = sorted.slice(-10).map(item => item.num).reverse();
-
-            appState.hotColdData[gameType] = { hot, cold };
-            document.getElementById('hot-cold-numbers').innerHTML = `
-                Hot Numbers: ${hot.join(', ') || 'N/A'}<br>
-                Cold Numbers: ${cold.join(', ') || 'N/A'}
-            `;
-
-            appState.charts.hotCold.data.labels = [...hot, ...cold];
-            appState.charts.hotCold.data.datasets[0].data = sorted.slice(0, 10).map(item => item.count);
-            appState.charts.hotCold.data.datasets[1].data = sorted.slice(-10).map(item => item.count).reverse();
-            appState.charts.hotCold.update();
-        }
-
-        function updateHistoryChart(gameType) {
-            const draws = appState.historicalData[gameType] || [];
-            const labels = draws.map(draw => draw.date);
-            const data = draws.map(draw => draw.numbers.reduce((a, b) => a + b, 0));
-
-            appState.charts.history.data.labels = labels.reverse();
-            appState.charts.history.data.datasets[0].data = data.reverse();
-            appState.charts.history.update();
-        }
-
-        function clearHistoryTable() {
-            document.getElementById('history-table-body').innerHTML = '';
-            document.getElementById('hot-cold-numbers').innerHTML = 'Load historical data to see hot and cold numbers';
-            appState.charts.history.data.labels = [];
-            appState.charts.history.data.datasets[0].data = [];
-            appState.charts.history.update();
-            appState.charts.hotCold.data.labels = [];
-            appState.charts.hotCold.data.datasets[0].data = [];
-            appState.charts.hotCold.data.datasets[1].data = [];
-            appState.charts.hotCold.update();
-            showToast('History cleared', 'info', 'eraser');
-        }
-
-        function downloadHistoricalData() {
-            const gameType = document.getElementById('history-game-type').value;
-            const draws = appState.historicalData[gameType] || [];
-            const content = JSON.stringify(draws, null, 2);
-            const blob = new Blob([content], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `lotto-history-${gameType}-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Historical data downloaded', 'success', 'file-export');
-        }
-
-        function updateStrategyParams() {
-            const paramsContainer = document.getElementById('strategy-params');
-            let html = '';
-
-            switch (appState.currentStrategy) {
-                case 'low-high':
-                    html = `
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="strategy-low-count" class="block mb-1">Low numbers:</label>
-                                <input type="number" id="strategy-low-count" class="w-full p-2 border rounded" min="0" value="3" aria-label="Number of low numbers">
-                            </div>
-                            <div>
-                                <label for="strategy-high-count" class="block mb-1">High numbers:</label>
-                                <input type="number" id="strategy-high-count" class="w-full p-2 border rounded" min="0" value="2" aria-label="Number of high numbers">
-                            </div>
-                        </div>
-                    `;
-                    break;
-                case 'odd-even':
-                    html = `
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="strategy-odd-count" class="block mb-1">Odd numbers:</label>
-                                <input type="number" id="strategy-odd-count" class="w-full p-2 border rounded" min="0" value="3" aria-label="Number of odd numbers">
-                            </div>
-                            <div>
-                                <label for="strategy-even-count" class="block mb-1">Even numbers:</label>
-                                <input type="number" id="strategy-even-count" class="w-full p-2 border rounded" min="0" value="2" aria-label="Number of even numbers">
-                            </div>
-                        </div>
-                    `;
-                    break;
-                case 'hot-cold':
-                    html = `
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="strategy-hot-count" class="block mb-1">Hot numbers:</label>
-                                <input type="number" id="strategy-hot-count" class="w-full p-2 border rounded" min="0" value="3" aria-label="Number of hot numbers">
-                            </div>
-                            <div>
-                                <label for="strategy-cold-count" class="block mb-1">Cold numbers:</label>
-                                <input type="number" id="strategy-cold-count" class="w-full p-2 border rounded" min="0" value="2" aria-label="Number of cold numbers">
-                            </div>
-                        </div>
-                    `;
-                    break;
-                case 'ai':
-                    html = `
-                        <label for="strategy-ai-model" class="block mb-1">AI Model:</label>
-                        <select id="strategy-ai-model" class="w-full p-2 border rounded" aria-label="Select AI model">
-                            <option value="markov">Markov Chain</option>
-                            <option value="neural">Neural Network</option>
-                            <option value="combined">Combined Model</option>
-                        </select>
-                    `;
-                    break;
-            }
-
-            paramsContainer.innerHTML = html;
-        }
-
-        function updateStrategyExplanation() {
-            const explanations = {
-                random: 'The Random strategy generates numbers completely at random with no particular pattern or strategy. This mimics how lottery numbers are actually drawn.',
-                'low-high': 'The Low-High strategy balances numbers between the lower and upper halves of the number pool to create a more evenly distributed ticket.',
-                'odd-even': 'The Odd-Even strategy balances odd and even numbers to create a ticket with a mix of both, based on historical trends.',
-                prime: 'The Prime strategy selects only prime numbers, which some players believe have special significance.',
-                fibonacci: 'The Fibonacci strategy uses numbers from the Fibonacci sequence, believed by some to have mathematical significance in lotteries.',
-                lucky: 'The Lucky strategy uses culturally significant lucky numbers, such as 7, 8, or 13, to create tickets.',
-                'hot-cold': 'The Hot/Cold strategy selects numbers that have appeared frequently (hot) or infrequently (cold) in past draws.',
-                birthday: 'The Birthday strategy uses numbers commonly associated with dates (1-31) to create tickets based on common player patterns.',
-                ai: 'The AI strategy uses advanced machine learning models to predict numbers based on historical data and patterns.'
-            };
-
-            document.getElementById('strategy-explanation').textContent = explanations[appState.currentStrategy] || 'Select a strategy to see its description.';
-        }
-
-        function generateWithStrategy() {
-            const gameType = document.getElementById('game-type').value;
-            let mainPool, pickCount, bonusPool, bonusCount;
-
-            switch (gameType) {
-                case 'powerball':
-                    mainPool = 69;
-                    pickCount = 5;
-                    bonusPool = 26;
-                    bonusCount = 1;
-                    break;
-                case 'megamillions':
-                    mainPool = 70;
-                    pickCount = 5;
-                    bonusPool = 25;
-                    bonusCount = 1;
-                    break;
-                case 'euromillions':
-                    mainPool = 50;
-                    pickCount = 5;
-                    bonusPool = 12;
-                    bonusCount = 2;
-                    break;
-                case 'lotto649':
-                    mainPool = 49;
-                    pickCount = 6;
-                    bonusPool = 0;
-                    bonusCount = 0;
-                    break;
-                case 'custom':
-                    mainPool = parseInt(document.getElementById('main-numbers').value) || 69;
-                    pickCount = parseInt(document.getElementById('pick-numbers').value) || 5;
-                    bonusPool = parseInt(document.getElementById('bonus-numbers').value) || 26;
-                    bonusCount = parseInt(document.getElementById('pick-bonus').value) || 1;
-                    break;
-            }
-
-            let mainNumbers;
-            switch (appState.currentStrategy) {
-                case 'random':
-                    mainNumbers = generateRandomNumbers(mainPool, pickCount, 'standard');
-                    break;
-                case 'low-high':
-                    mainNumbers = generateLowHighNumbers(mainPool, pickCount);
-                    break;
-                case 'odd-even':
-                    mainNumbers = generateOddEvenNumbers(mainPool, pickCount);
-                    break;
-                case 'prime':
-                    mainNumbers = generatePrimeNumbers(mainPool, pickCount);
-                    break;
-                case 'fibonacci':
-                    mainNumbers = generateFibonacciNumbers(mainPool, pickCount);
-                    break;
-                case 'lucky':
-                    mainNumbers = generateLuckyNumbers(mainPool, pickCount);
-                    break;
-                case 'hot-cold':
-                    mainNumbers = generateHotColdNumbers(mainPool, pickCount, gameType);
-                    break;
-                case 'birthday':
-                    mainNumbers = generateRandomNumbers(31, pickCount, 'standard');
-                    break;
-                case 'ai':
-                    mainNumbers = generateAINumbers(mainPool, pickCount, gameType);
-                    break;
-            }
-
-            const bonusNumbers = bonusCount > 0 ? generateRandomNumbers(bonusPool, bonusCount, 'standard') : [];
-            const results = [{
-                numbers: mainNumbers.sort((a, b) => a - b),
-                bonusNumbers: bonusNumbers.sort((a, b) => a - b)
-            }];
-
-            document.getElementById('strategy-results').innerHTML = '';
-            displayResults(results);
-
-            const stats = {
-                sum: mainNumbers.reduce((a, b) => a + b, 0),
-                oddCount: mainNumbers.filter(n => n % 2 === 1).length,
-                evenCount: mainNumbers.filter(n => n % 2 === 0).length,
-                highCount: mainNumbers.filter(n => n > mainPool / 2).length,
-                lowCount: mainNumbers.filter(n => n <= mainPool / 2).length
-            };
-
-            document.getElementById('strategy-stats').innerHTML = `
-                Sum: ${stats.sum}<br>
-                Odd/Even: ${stats.oddCount}/${stats.evenCount}<br>
-                High/Low: ${stats.highCount}/${stats.lowCount}
-            `;
-
-            appState.charts.strategy.data.labels = ['Sum', 'Odd', 'Even', 'High', 'Low'];
-            appState.charts.strategy.data.datasets[0].data = [
-                stats.sum,
-                stats.oddCount,
-                stats.evenCount,
-                stats.highCount,
-                stats.lowCount
-            ];
-            appState.charts.strategy.update();
-
-            showToast('Strategy numbers generated', 'success', 'cogs');
-        }
-
-        function testStrategy() {
-            const gameType = document.getElementById('game-type').value;
-            const results = [];
-            for (let i = 0; i < 1000; i++) {
-                let mainNumbers;
-                switch (appState.currentStrategy) {
-                    case 'random':
-                        mainNumbers = generateRandomNumbers(69, 5, 'standard');
-                        break;
-                    case 'low-high':
-                        mainNumbers = generateLowHighNumbers(69, 5);
-                        break;
-                    case 'odd-even':
-                        mainNumbers = generateOddEvenNumbers(69, 5);
-                        break;
-                    case 'prime':
-                        mainNumbers = generatePrimeNumbers(69, 5);
-                        break;
-                    case 'fibonacci':
-                        mainNumbers = generateFibonacciNumbers(69, 5);
-                        break;
-                    case 'lucky':
-                        mainNumbers = generateLuckyNumbers(69, 5);
-                        break;
-                    case 'hot-cold':
-                        mainNumbers = generateHotColdNumbers(69, 5, gameType);
-                        break;
-                    case 'birthday':
-                        mainNumbers = generateRandomNumbers(31, 5, 'standard');
-                        break;
-                    case 'ai':
-                        mainNumbers = generateAINumbers(69, 5, gameType);
-                        break;
-                }
-                results.push(mainNumbers);
-            }
-
-            const frequency = Array(69).fill(0);
-            results.forEach(ticket => {
-                ticket.forEach(num => {
-                    frequency[num - 1]++;
-                });
-            });
-
-            document.getElementById('strategy-performance').style.display = 'block';
-            document.getElementById('performance-results').innerHTML = `
-                Most frequent numbers: ${frequency
-                    .map((count, i) => ({ num: i + 1, count }))
-                    .sort((a, b) => b.count - a.count)
-                    .slice(0, 5)
-                    .map(item => item.num)
-                    .join(', ')}
-            `;
-
-            appState.charts.strategy.data.labels = Array.from({ length: 69 }, (_, i) => i + 1);
-            appState.charts.strategy.data.datasets[0].data = frequency;
-            appState.charts.strategy.update();
-
-            showToast('Strategy tested over 1000 simulations', 'success', 'chart-line');
-        }
-
-        function saveStrategy() {
-            const strategy = {
-                name: appState.currentStrategy,
-                params: {},
-                date: new Date().toISOString()
-            };
-
-            switch (appState.currentStrategy) {
-                case 'low-high':
-                    strategy.params.lowCount = parseInt(document.getElementById('strategy-low-count').value);
-                    strategy.params.highCount = parseInt(document.getElementById('strategy-high-count').value);
-                    break;
-                case 'odd-even':
-                    strategy.params.oddCount = parseInt(document.getElementById('strategy-odd-count').value);
-                    strategy.params.evenCount = parseInt(document.getElementById('strategy-even-count').value);
-                    break;
-                case 'hot-cold':
-                    strategy.params.hotCount = parseInt(document.getElementById('strategy-hot-count').value);
-                    strategy.params.coldCount = parseInt(document.getElementById('strategy-cold-count').value);
-                    break;
-                case 'ai':
-                    strategy.params.model = document.getElementById('strategy-ai-model').value;
-                    break;
-            }
-
-            appState.savedStrategies[appState.currentStrategy] = appState.savedStrategies[appState.currentStrategy] || [];
-            appState.savedStrategies[appState.currentStrategy].push(strategy);
-            localStorage.setItem('savedStrategies', JSON.stringify(appState.savedStrategies));
-            showToast('Strategy saved', 'success', 'save');
-        }
-
-        function exportStrategy() {
-            const strategy = {
-                name: appState.currentStrategy,
-                params: {}
-            };
-
-            switch (appState.currentStrategy) {
-                case 'low-high':
-                    strategy.params.lowCount = parseInt(document.getElementById('strategy-low-count').value);
-                    strategy.params.highCount = parseInt(document.getElementById('strategy-high-count').value);
-                    break;
-                case 'odd-even':
-                    strategy.params.oddCount = parseInt(document.getElementById('strategy-odd-count').value);
-                    strategy.params.evenCount = parseInt(document.getElementById('strategy-even-count').value);
-                    break;
-                case 'hot-cold':
-                    strategy.params.hotCount = parseInt(document.getElementById('strategy-hot-count').value);
-                    strategy.params.coldCount = parseInt(document.getElementById('strategy-cold-count').value);
-                    break;
-                case 'ai':
-                    strategy.params.model = document.getElementById('strategy-ai-model').value;
-                    break;
-            }
-
-            const content = JSON.stringify(strategy, null, 2);
-            const blob = new Blob([content], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `lotto-strategy-${appState.currentStrategy}-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Strategy exported', 'success', 'file-export');
-        }
-
-        function importStrategy(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                try {
-                    const strategy = JSON.parse(e.target.result);
-                    appState.savedStrategies[strategy.name] = appState.savedStrategies[strategy.name] || [];
-                    appState.savedStrategies[strategy.name].push({
-                        ...strategy,
-                        date: new Date().toISOString()
-                    });
-                    localStorage.setItem('savedStrategies', JSON.stringify(appState.savedStrategies));
-                    showToast('Strategy imported successfully', 'success', 'file-import');
-                } catch (error) {
-                    showToast('Failed to import strategy', 'danger', 'exclamation-triangle');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function updateProbabilityCalculator() {
-            const gameType = document.getElementById('simulator-game-type').value;
-            let mainPool, pickCount, bonusPool, bonusCount;
-
-            switch (gameType) {
-                case 'powerball':
-                    mainPool = 69;
-                    pickCount = 5;
-                    bonusPool = 26;
-                    bonusCount = 1;
-                    break;
-                case 'megamillions':
-                    mainPool = 70;
-                    pickCount = 5;
-                    bonusPool = 25;
-                    bonusCount = 1;
-                    break;
-                case 'euromillions':
-                    mainPool = 50;
-                    pickCount = 5;
-                    bonusPool = 12;
-                    bonusCount = 2;
-                    break;
-                case 'lotto649':
-                    mainPool = 49;
-                    pickCount = 6;
-                    bonusPool = 0;
-                    bonusCount = 0;
-                    break;
-            }
-
-            const jackpotOdds = calculateCombinations(mainPool, pickCount) * (bonusCount ? calculateCombinations(bonusPool, bonusCount) : 1);
-            document.getElementById('jackpot-odds').textContent = `1 in ${jackpotOdds.toLocaleString()}`;
-
-            const ticketPrice = 2; // Assuming $2 per ticket
-            const breakEven = jackpotOdds * ticketPrice;
-            document.getElementById('break-even').textContent = `${appState.settings.currency}${breakEven.toLocaleString()}`;
-
-            const expectedValue = -ticketPrice + (1 / jackpotOdds) * breakEven;
-            document.getElementById('expected-value').textContent = `${appState.settings.currency}${expectedValue.toFixed(2)}`;
-        }
-
-        function calculateCombinations(n, k) {
-            let result = 1;
-            for (let i = 0; i < k; i++) {
-                result *= (n - i) / (i + 1);
-            }
-            return Math.round(result);
-        }
-
-        function runSimulation() {
-            if (appState.simulationRunning) {
-                showToast('Simulation already running', 'warning', 'exclamation-triangle');
-                return;
-            }
-
-            const gameType = document.getElementById('simulator-game-type').value;
-            const ticketsText = document.getElementById('simulator-tickets').value;
-            const simulationCount = parseInt(document.getElementById('simulation-count').value);
-            let mainPool, pickCount, bonusPool, bonusCount;
-
-            switch (gameType) {
-                case 'powerball':
-                    mainPool = 69;
-                    pickCount = 5;
-                    bonusPool = 26;
-                    bonusCount = 1;
-                    break;
-                case 'megamillions':
-                    mainPool = 70;
-                    pickCount = 5;
-                    bonusPool = 25;
-                    bonusCount = 1;
-                    break;
-                case 'euromillions':
-                    mainPool = 50;
-                    pickCount = 5;
-                    bonusPool = 12;
-                    bonusCount = 2;
-                    break;
-                case 'lotto649':
-                    mainPool = 49;
-                    pickCount = 6;
-                    bonusPool = 0;
-                    bonusCount = 0;
-                    break;
-            }
-
-            const tickets = ticketsText.split('\n').map(line => {
-                const nums = line.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-                return {
-                    numbers: nums.slice(0, pickCount).sort((a, b) => a - b),
-                    bonus: nums.slice(pickCount).sort((a, b) => a - b)
-                };
-            }).filter(ticket => ticket.numbers.length === pickCount && (!bonusCount || ticket.bonus.length === bonusCount));
-
-            if (tickets.length === 0) {
-                showToast('Please enter valid tickets', 'danger', 'exclamation-triangle');
-                return;
-            }
-
-            appState.simulationRunning = true;
-            document.getElementById('run-simulation').disabled = true;
-            document.getElementById('stop-simulation').disabled = false;
-
-            const workerCode = `
-                self.onmessage = function(e) {
-                    const { mainPool, pickCount, bonusPool, bonusCount, tickets, simulationCount } = e.data;
-                    const results = { wins: 0, matches: Array(pickCount + 1).fill(0) };
-
-                    function generateRandomNumbers(pool, count) {
-                        const numbers = [];
-                        const available = Array.from({ length: pool }, (_, i) => i + 1);
-                        while (numbers.length < count && available.length > 0) {
-                            const index = Math.floor(Math.random() * available.length);
-                            numbers.push(available.splice(index, 1)[0]);
-                        }
-                        return numbers.sort((a, b) => a - b);
-                    }
-
-                    for (let i = 0; i < simulationCount; i++) {
-                        if (self.stopSimulation) break;
-                        const winningNumbers = generateRandomNumbers(mainPool, pickCount);
-                        const winningBonus = bonusCount ? generateRandomNumbers(bonusPool, bonusCount) : [];
-                        tickets.forEach(ticket => {
-                            const mainMatches = ticket.numbers.filter(n => winningNumbers.includes(n)).length;
-                            const bonusMatches = bonusCount ? ticket.bonus.filter(n => winningBonus.includes(n)).length : 0;
-                            if (mainMatches === pickCount && (!bonusCount || bonusMatches === bonusCount)) {
-                                results.wins++;
-                            }
-                            results.matches[mainMatches]++;
-                        });
-                    }
-
-                    self.postMessage(results);
-                };
-            `;
-
-            const blob = new Blob([workerCode], { type: 'application/javascript' });
-            const workerURL = URL.createObjectURL(blob);
-            appState.simulationWorker = new Worker(workerURL);
-
-            appState.simulationWorker.onmessage = function (e) {
-                const results = e.data;
-                document.getElementById('simulation-results').innerHTML = `
-                    Simulations run: ${simulationCount}<br>
-                    Jackpot wins: ${results.wins}<br>
-                    Win probability: ${(results.wins / simulationCount * 100).toFixed(4)}%
-                `;
-
-                const winningNumbers = generateRandomNumbers(mainPool, pickCount);
-                const winningBonus = bonusCount ? generateRandomNumbers(bonusPool, bonusCount) : [];
-                const winningDiv = document.getElementById('winning-numbers');
-                winningDiv.innerHTML = '';
-                const ticketDiv = document.createElement('div');
-                ticketDiv.className = 'lotto-balls';
-                winningNumbers.forEach(num => {
-                    const ball = document.createElement('span');
-                    ball.className = 'ball';
-                    ball.textContent = num;
-                    ticketDiv.appendChild(ball);
-                });
-                winningBonus.forEach(num => {
-                    const ball = document.createElement('span');
-                    ball.className = `ball ${gameType === 'powerball' ? 'powerball' : gameType === 'megamillions' ? 'megaball' : 'eurostar'}`;
-                    ball.textContent = num;
-                    ticketDiv.appendChild(ball);
-                });
-                winningDiv.appendChild(ticketDiv);
-
-                appState.charts.simulation.data.labels = Array.from({ length: pickCount + 1 }, (_, i) => `${i} Matches`);
-                appState.charts.simulation.data.datasets[0].data = results.matches;
-                appState.charts.simulation.update();
-
-                appState.simulationRunning = false;
-                document.getElementById('run-simulation').disabled = false;
-                document.getElementById('stop-simulation').disabled = true;
-                URL.revokeObjectURL(workerURL);
-                showToast('Simulation completed', 'success', 'play');
-            };
-
-            appState.simulationWorker.postMessage({
-                mainPool,
-                pickCount,
-                bonusPool,
-                bonusCount,
-                tickets,
-                simulationCount
-            });
-        }
-
-        function stopSimulation() {
-            if (appState.simulationWorker) {
-                appState.simulationWorker.terminate();
-                appState.simulationRunning = false;
-                document.getElementById('run-simulation').disabled = false;
-                document.getElementById('stop-simulation').disabled = true;
-                showToast('Simulation stopped', 'info', 'stop');
+            if (possibleSeeds.length > 0) {
+                document.getElementById('seed-results').innerText = `Possible seeds: ${possibleSeeds.join(', ')}`;
+            } else {
+                document.getElementById('seed-results').innerText = 'No matching seeds found in range.';
             }
         }
-
-        function clearSimulation() {
-            document.getElementById('simulator-tickets').value = '';
-            document.getElementById('simulation-results').innerHTML = 'Run a simulation to see results';
-            document.getElementById('winning-numbers').innerHTML = 'Run a simulation to see winning numbers';
-            document.querySelectorAll('#simulator-number-matrix .number-cell').forEach(cell => cell.classList.remove('selected'));
-            appState.charts.simulation.data.labels = [];
-            appState.charts.simulation.data.datasets[0].data = [];
-            appState.charts.simulation.update();
-            stopSimulation();
-            showToast('Simulation cleared', 'info', 'eraser');
-        }
-
-        function loadSampleTickets() {
-            const gameType = document.getElementById('simulator-game-type').value;
-            let pickCount, bonusCount;
-            switch (gameType) {
-                case 'powerball':
-                    pickCount = 5;
-                    bonusCount = 1;
-                    break;
-                case 'megamillions':
-                    pickCount = 5;
-                    bonusCount = 1;
-                    break;
-                case 'euromillions':
-                    pickCount = 5;
-                    bonusCount = 2;
-                    break;
-                case 'lotto649':
-                    pickCount = 6;
-                    bonusCount = 0;
-                    break;
-            }
-
-            const sampleTickets = [
-                generateRandomNumbers(pickCount === 6 ? 49 : 69, pickCount, 'standard')
-                    .concat(bonusCount ? generateRandomNumbers(pickCount === 6 ? 0 : 26, bonusCount, 'standard') : [])
-                    .join(',')
-            ];
-            document.getElementById('simulator-tickets').value = sampleTickets.join('\n');
-            showToast('Sample tickets loaded', 'success', 'file-import');
-        }
-
-        function updatePredictor() {
-            updateModelDetails();
-            updateProbabilityCalculator();
-        }
-
-        function updateModelDetails() {
-            const method = document.getElementById('predictor-method').value;
-            const model = appState.predictionModels[method];
-            document.getElementById('model-details').innerHTML = `
-                <strong>${model.name}</strong><br>
-                ${model.description}<br>
-                Estimated accuracy: ${model.acuracy}
-            `;
-        }
-
-        function generatePredictions() {
-            const gameType = document.getElementById('predictor-game-type').value;
-            const method = document.getElementById('predictor-method').value;
-            const count = parseInt(document.getElementById('prediction-count').value);
-            let mainPool, pickCount, bonusPool, bonusCount;
-
-            switch (gameType) {
-                case 'powerball':
-                    mainPool = 69;
-                    pickCount = 5;
-                    bonusPool = 26;
-                    bonusCount = 1;
-                    break;
-                case 'megamillions':
-                    mainPool = 70;
-                    pickCount = 5;
-                    bonusPool = 25;
-                    bonusCount = 1;
-                    break;
-                case 'euromillions':
-                    mainPool = 50;
-                    pickCount = 5;
-                    bonusPool = 12;
-                    bonusCount = 2;
-                    break;
-                case 'lotto649':
-                    mainPool = 49;
-                    pickCount = 6;
-                    bonusPool = 0;
-                    bonusCount = 0;
-                    break;
-            }
-
-            const results = [];
-            for (let i = 0; i < count; i++) {
-                let mainNumbers;
-                switch (method) {
-                    case 'markov':
-                        mainNumbers = generateMarkovNumbers(mainPool, pickCount, gameType);
-                        break;
-                    case 'neural':
-                        mainNumbers = generateNeuralNumbers(mainPool, pickCount, gameType);
-                        break;
-                    case 'regression':
-                        mainNumbers = generateRandomNumbers(mainPool, pickCount, 'standard'); // Simplified
-                        break;
-                    case 'frequency':
-                        mainNumbers = generateHotColdNumbers(mainPool, pickCount, gameType);
-                        break;
-                    case 'combined':
-                        mainNumbers = generateCombinedNumbers(mainPool, pickCount, gameType);
-                        break;
-                }
-                const bonusNumbers = bonusCount ? generateRandomNumbers(bonusPool, bonusCount, 'standard') : [];
-                results.push({
-                    numbers: mainNumbers.sort((a, b) => a - b),
-                    bonusNumbers
-                });
-            }
-
-            const resultsDiv = document.getElementById('prediction-results');
-            resultsDiv.innerHTML = '';
-            results.forEach((ticket, index) => {
-                const ticketDiv = document.createElement('div');
-                ticketDiv.className = 'lotto-balls mb-2';
-                ticketDiv.innerHTML = `<strong>Prediction ${index + 1}:</strong> `;
-                ticket.numbers.forEach(num => {
-                    const ball = document.createElement('span');
-                    ball.className = 'ball';
-                    ball.textContent = num;
-                    ticketDiv.appendChild(ball);
-                });
-                ticket.bonusNumbers.forEach(num => {
-                    const ball = document.createElement('span');
-                    ball.className = `ball ${gameType === 'powerball' ? 'powerball' : gameType === 'megamillions' ? 'megaball' : 'eurostar'}`;
-                    ball.textContent = num;
-                    ticketDiv.appendChild(ball);
-                });
-                resultsDiv.appendChild(ticketDiv);
-            });
-
-            appState.charts.prediction.data.labels = results[0].numbers;
-            appState.charts.prediction.data.datasets[0].data = Array(results[0].numbers.length).fill(1);
-            appState.charts.prediction.update();
-
-            document.getElementById('prediction-analysis').textContent = `Generated ${count} predictions using ${appState.predictionModels[method].name}.`;
-
-            showToast('Predictions generated', 'success', 'brain');
-        }
-
-        function analyzePredictions() {
-            const resultsDiv = document.getElementById('prediction-results');
-            const tickets = Array.from(resultsDiv.querySelectorAll('.lotto-balls')).map(ticket => {
-                const numbers = Array.from(ticket.querySelectorAll('.ball:not(.powerball):not(.megaball):not(.eurostar)')).map(ball => parseInt(ball.textContent));
-                const bonus = Array.from(ticket.querySelectorAll('.powerball, .megaball, .eurostar')).map(ball => parseInt(ball.textContent));
-                return { numbers, bonus };
-            });
-
-            const frequency = Array(70).fill(0);
-            tickets.forEach(ticket => {
-                ticket.numbers.forEach(num => {
-                    frequency[num - 1]++;
-                });
-            });
-
-            document.getElementById('prediction-analysis').innerHTML = `
-                Most frequent numbers: ${frequency
-                    .map((count, i) => ({ num: i + 1, count }))
-                    .sort((a, b) => b.count - a.count)
-                    .slice(0, 5)
-                    .map(item => item.num)
-                    .join(', ')}<br>
-                Average sum: ${tickets.reduce((sum, ticket) => sum + ticket.numbers.reduce((a, b) => a + b, 0), 0) / tickets.length}
-            `;
-
-            appState.charts.prediction.data.labels = Array.from({ length: 70 }, (_, i) => i + 1);
-            appState.charts.prediction.data.datasets[0].data = frequency;
-            appState.charts.prediction.update();
-
-            showToast('Predictions analyzed', 'success', 'chart-bar');
-        }
-
-        function clearPredictions() {
-            document.getElementById('prediction-results').innerHTML = 'Generate predictions to see results';
-            document.getElementById('prediction-analysis').innerHTML = 'Generate predictions to see analysis';
-            appState.charts.prediction.data.labels = [];
-            appState.charts.prediction.data.datasets[0].data = [];
-            appState.charts.prediction.update();
-            showToast('Predictions cleared', 'info', 'eraser');
-        }
-
-        // Initialize the app
-        initApp();
     </script>
+</body>
+</html>
