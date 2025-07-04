@@ -6,7 +6,6 @@
     <title>Lotto Genius Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Lodash is not strictly necessary for this update but kept as it was in the original -->
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
     <script>
         tailwind.config = {
@@ -226,12 +225,11 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium">Random Seed (for reproducible random numbers)</label>
+                            <label class="block text-sm font-medium">Random Seed</label>
                             <div class="flex gap-2">
-                                <input id="randomSeed" type="text" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="Enter seed or leave empty for true random">
+                                <input id="randomSeed" type="text" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="Enter seed">
                                 <button id="randomSeedBtn" class="p-2 bg-primary text-white rounded-lg">🎲 Random</button>
                             </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Note: This seed is for reproducible pseudo-random generation, not a literal lottery draw seed.</p>
                         </div>
                     </div>
 
@@ -470,6 +468,14 @@
                             </select>
                         </div>
                         <div>
+                            <label class="block text-sm font-medium">Seed Determination Algorithm</label>
+                            <select id="seedAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
+                                <option value="statisticalMatching">Statistical Matching</option>
+                                <option value="patternRecognition">Pattern Recognition</option>
+                                <option value="historicalProximity">Historical Proximity</option>
+                            </select>
+                        </div>
+                        <div>
                             <label class="block text-sm font-medium">Numbers to Reverse Analyze</label>
                             <textarea id="numbersToReverse" class="w-full p-2 border rounded-lg dark:bg-gray-700 h-32" placeholder="Enter numbers (e.g., 5, 12, 23, 34, 45, 6)"></textarea>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formats: 5,12,23,34,45,6 or 5 12 23 34 45 6</p>
@@ -479,10 +485,6 @@
                             <button id="interpretSeedProfile" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 flex-1">Interpret Profile ✨</button>
                             <button id="clearSeedReverse" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
                         </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                            The "Seed Profile" below represents the statistical characteristics and patterns of your input numbers. 
-                            It's not a literal random number generator seed, but a descriptive "seed" for understanding and potentially regenerating similar number sets.
-                        </p>
                     </div>
 
                     <!-- Output for Seed Reverser -->
@@ -1417,10 +1419,6 @@
         }
 
         function generateRandomSeed() {
-            // Generates a random string that can be used as a pseudo-seed for reproducible random numbers
-            // Note: Math.random() itself cannot be truly re-seeded in standard JavaScript without a library.
-            // This string would typically be used with a custom PRNG implementation or a library like 'seedrandom'.
-            // For this app, it's a placeholder for a user-defined "seed" for generation.
             document.getElementById('randomSeed').value = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         }
 
@@ -1896,20 +1894,8 @@
                 return `Numbers: ${numbers.join(', ')} | Bonus: ${bonus.join(', ')}`;
             }).join('\n');
             
-            // Create a temporary textarea to copy text
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = tickets;
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            try {
-                document.execCommand('copy');
-                showNotification('Tickets copied to clipboard!');
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-                showNotification('Failed to copy tickets. Please copy manually.');
-            } finally {
-                document.body.removeChild(tempTextArea);
-            }
+            document.execCommand('copy'); // Use execCommand for clipboard due to iframe restrictions
+            showNotification('Tickets copied to clipboard!');
         }
 
         function saveTickets() {
@@ -2043,8 +2029,8 @@
             const consecutivePairs = countConsecutivePairs(numbers);
             const primes = numbers.filter(isPrime).length;
             const fibs = numbers.filter(n => isFibonacci(n)).length;
-            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
             const stdDev = calculateStandardDeviation(numbers);
+            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
 
             let prompt = `Analyze the following lottery numbers for a ${game} game (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers): ${numbers.join(', ')}.
             Their sum is ${sum}, average is ${avg.toFixed(2)}, with ${oddCount} odd and ${evenCount} even numbers.
@@ -2120,11 +2106,7 @@
             if (numbers.length < 2) return 0;
             const sorted = [...numbers].sort((a, b) => a - b);
             const range = sorted[sorted.length - 1] - sorted[0];
-            // Normalize spread based on the range of numbers (e.g., 1-69 for Powerball)
-            // A simple approach: percentage of the total possible range covered
-            const game = document.getElementById('analyzerGame').value;
-            const mainPool = gameConfigs[game].mainPool;
-            return (range / (mainPool - 1)) * 100; 
+            return (range / (sorted.length - 1)) * 100; // Percentage spread over number count
         }
 
         function calculateLowHighRatio(numbers, mainPool) {
@@ -2227,8 +2209,61 @@
             const game = document.getElementById('seedReverseGame').value;
             const config = gameConfigs[game];
             const mainPool = config.mainPool;
+            const seedAlgorithm = document.getElementById('seedAlgorithm').value;
 
-            // Calculate statistical properties for the "seed profile"
+            let seedProfile = {};
+            let comparisonResult = '';
+
+            switch (seedAlgorithm) {
+                case 'statisticalMatching':
+                    seedProfile = getStatisticalSeedProfile(numbers, config);
+                    comparisonResult = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config));
+                    break;
+                case 'patternRecognition':
+                    seedProfile = getPatternRecognitionSeedProfile(numbers, config);
+                    comparisonResult = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config)); // Still compare to optimal for context
+                    break;
+                case 'historicalProximity':
+                    if (appState.historicalData.length === 0) {
+                        showNotification('Load historical data to use Historical Proximity algorithm!');
+                        return;
+                    }
+                    seedProfile = getHistoricalProximitySeedProfile(numbers, appState.historicalData, config);
+                    comparisonResult = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config)); // Still compare to optimal for context
+                    break;
+            }
+
+            document.getElementById('seedProfileResults').innerHTML = `
+                <p class="font-medium">Seed Profile Generated (${seedAlgorithm.replace(/([A-Z])/g, ' $1').trim()} Algorithm)</p>
+                <p class="text-sm">Characteristics of the input numbers:</p>
+            `;
+
+            document.getElementById('seedStats').innerHTML = `
+                <p>Numbers Count: ${numbers.length} (out of ${config.pickCount} expected)</p>
+                <p>Sum: ${seedProfile.sum} (Avg: ${seedProfile.avg.toFixed(2)})</p>
+                <p>Odd/Even Ratio: ${seedProfile.oddCount}/${seedProfile.evenCount}</p>
+                <p>Low/High Ratio (to ${mainPool/2}): ${seedProfile.lowHighRatio.toFixed(2)}</p>
+                <p>Standard Deviation: ${seedProfile.stdDev.toFixed(2)}</p>
+            `;
+
+            document.getElementById('seedPatterns').innerHTML = `
+                <p>Consecutive Pairs: ${seedProfile.consecutivePairs}</p>
+                <p>Prime Numbers: ${seedProfile.primes}</p>
+                <p>Fibonacci Numbers: ${seedProfile.fibs}</p>
+                <p>Gaps: ${seedProfile.gaps.join(', ')}</p>
+                <p>Last Digit Freq: ${JSON.stringify(seedProfile.digitDistribution)}</p>
+                <p>Group Freq: ${JSON.stringify(seedProfile.groupDistribution)}</p>
+            `;
+
+            document.getElementById('seedComparison').innerHTML = comparisonResult;
+
+            // Update visual representation chart
+            updateSeedVisualsChart(numbers);
+
+            showNotification('Seed profile generated successfully!');
+        }
+
+        function getStatisticalSeedProfile(numbers, config) {
             const sum = numbers.reduce((a, b) => a + b, 0);
             const avg = sum / numbers.length;
             const oddCount = numbers.filter(n => n % 2 === 1).length;
@@ -2236,48 +2271,103 @@
             const consecutivePairs = countConsecutivePairs(numbers);
             const primes = numbers.filter(isPrime).length;
             const fibs = numbers.filter(n => isFibonacci(n)).length;
-            const lowHighRatio = calculateLowHighRatio(numbers, mainPool);
+            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
             const stdDev = calculateStandardDeviation(numbers);
             const digitDistribution = getDigitDistribution(numbers);
-            const groupDistribution = getGroupDistribution(numbers, mainPool);
+            const groupDistribution = getGroupDistribution(numbers, config.mainPool);
+            const gaps = calculateGaps(numbers);
 
-            document.getElementById('seedProfileResults').innerHTML = `
-                <p class="font-medium">Seed Profile Generated</p>
-                <p class="text-sm">The following characteristics represent the "seed" of your input numbers for potential regeneration or analysis:</p>
-                <div class="flex flex-wrap gap-1 mt-2">
-                    ${numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
-                </div>
-            `;
+            return {
+                sum, avg, oddCount, evenCount, consecutivePairs, primes, fibs,
+                lowHighRatio, stdDev, digitDistribution, groupDistribution, gaps
+            };
+        }
 
-            document.getElementById('seedStats').innerHTML = `
-                <p>Numbers Count: ${numbers.length} (Expected for ${game}: ${config.pickCount})</p>
-                <p>Sum: ${sum} (Average: ${avg.toFixed(2)})</p>
-                <p>Odd/Even Ratio: ${oddCount}/${evenCount}</p>
-                <p>Low/High Ratio (to ${mainPool/2}): ${lowHighRatio.toFixed(2)}</p>
-                <p>Standard Deviation: ${stdDev.toFixed(2)}</p>
-            `;
+        function getPatternRecognitionSeedProfile(numbers, config) {
+            const profile = getStatisticalSeedProfile(numbers, config); // Start with statistical base
 
-            document.getElementById('seedPatterns').innerHTML = `
-                <p>Consecutive Pairs: ${consecutivePairs}</p>
-                <p>Prime Numbers: ${primes}</p>
-                <p>Fibonacci Numbers: ${fibs}</p>
-                <p>Gaps: ${calculateGaps(numbers).join(', ')}</p>
-                <p>Last Digit Freq: ${JSON.stringify(digitDistribution)}</p>
-                <p>Group Freq: ${JSON.stringify(groupDistribution)}</p>
-            `;
+            // Enhance with pattern-specific metrics
+            profile.commonPairs = getCommonPairs(numbers);
+            profile.commonTriplets = getCommonTriplets(numbers);
+            profile.sequenceLength = getLongestSequence(numbers);
+            profile.digitSum = numbers.map(n => String(n).split('').reduce((a, c) => a + parseInt(c), 0));
 
-            // Comparison to Optimal/Historical
-            const optimalStats = getOptimalGameCharacteristics(config);
-            const comparisonResult = compareSeedToOptimal({
-                sum, oddCount, evenCount, consecutivePairs, primes, fibs, lowHighRatio, groupDistribution
-            }, optimalStats);
-            document.getElementById('seedComparison').innerHTML = comparisonResult;
+            return profile;
+        }
 
+        function getHistoricalProximitySeedProfile(inputNumbers, historicalData, config) {
+            let bestMatch = null;
+            let minDifference = Infinity;
 
-            // Update visual representation chart
-            updateSeedVisualsChart(numbers);
+            historicalData.forEach(draw => {
+                const drawNumbers = draw.numbers;
+                // Simple difference metric (e.g., sum of absolute differences)
+                let difference = 0;
+                for (let i = 0; i < Math.min(inputNumbers.length, drawNumbers.length); i++) {
+                    difference += Math.abs(inputNumbers[i] - drawNumbers[i]);
+                }
+                // Add penalty for different lengths if pickCount is fixed
+                if (inputNumbers.length !== drawNumbers.length) {
+                    difference += Math.abs(inputNumbers.length - drawNumbers.length) * (config.mainPool / 2); // Heuristic penalty
+                }
 
-            showNotification('Seed profile generated successfully!');
+                if (difference < minDifference) {
+                    minDifference = difference;
+                    bestMatch = drawNumbers;
+                }
+            });
+
+            if (bestMatch) {
+                // Return statistical profile of the best matching historical draw
+                return getStatisticalSeedProfile(bestMatch, config);
+            } else {
+                // Fallback to statistical profile of input numbers if no historical data or match
+                return getStatisticalSeedProfile(inputNumbers, config);
+            }
+        }
+
+        function getCommonPairs(numbers) {
+            const pairs = {};
+            const sortedNumbers = [...numbers].sort((a,b) => a-b);
+            for (let i = 0; i < sortedNumbers.length; i++) {
+                for (let j = i + 1; j < sortedNumbers.length; j++) {
+                    const pair = `${sortedNumbers[i]}-${sortedNumbers[j]}`;
+                    pairs[pair] = (pairs[pair] || 0) + 1;
+                }
+            }
+            // Return top 3 common pairs
+            return Object.entries(pairs).sort((a,b) => b[1] - a[1]).slice(0,3).map(p => p[0]);
+        }
+
+        function getCommonTriplets(numbers) {
+            const triplets = {};
+            const sortedNumbers = [...numbers].sort((a,b) => a-b);
+            for (let i = 0; i < sortedNumbers.length; i++) {
+                for (let j = i + 1; j < sortedNumbers.length; j++) {
+                    for (let k = j + 1; k < sortedNumbers.length; k++) {
+                        const triplet = `${sortedNumbers[i]}-${sortedNumbers[j]}-${sortedNumbers[k]}`;
+                        triplets[triplet] = (triplets[triplet] || 0) + 1;
+                    }
+                }
+            }
+            // Return top 2 common triplets
+            return Object.entries(triplets).sort((a,b) => b[1] - a[1]).slice(0,2).map(t => t[0]);
+        }
+
+        function getLongestSequence(numbers) {
+            if (numbers.length === 0) return 0;
+            const sortedNumbers = [...numbers].sort((a,b) => a-b);
+            let maxLength = 1;
+            let currentLength = 1;
+            for (let i = 1; i < sortedNumbers.length; i++) {
+                if (sortedNumbers[i] - sortedNumbers[i-1] === 1) {
+                    currentLength++;
+                } else {
+                    currentLength = 1;
+                }
+                maxLength = Math.max(maxLength, currentLength);
+            }
+            return maxLength;
         }
 
         async function interpretSeedProfile() {
@@ -2300,40 +2390,37 @@
 
             const game = document.getElementById('seedReverseGame').value;
             const config = gameConfigs[game];
+            const seedAlgorithm = document.getElementById('seedAlgorithm').value;
 
-            const sum = numbers.reduce((a, b) => a + b, 0);
-            const avg = sum / numbers.length;
-            const oddCount = numbers.filter(n => n % 2 === 1).length;
-            const evenCount = numbers.length - oddCount;
-            const consecutivePairs = countConsecutivePairs(numbers);
-            const primes = numbers.filter(isPrime).length;
-            const fibs = numbers.filter(n => isFibonacci(n)).length;
-            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
-            const stdDev = calculateStandardDeviation(numbers);
-            const gaps = calculateGaps(numbers).join(', ');
-            const digitDistribution = getDigitDistribution(numbers);
-            const groupDistribution = getGroupDistribution(numbers, config.mainPool);
-            const optimalStats = getOptimalGameCharacteristics(config);
-            const comparisonResult = compareSeedToOptimal({
-                sum, oddCount, evenCount, consecutivePairs, primes, fibs, lowHighRatio, groupDistribution
-            }, optimalStats, true); // Pass true to get raw comparison text
+            let seedProfile = {};
+            let comparisonText = '';
 
-            let prompt = `Interpret the following statistical and pattern profile for a set of lottery numbers from a ${game} game (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers):
+            switch (seedAlgorithm) {
+                case 'statisticalMatching':
+                    seedProfile = getStatisticalSeedProfile(numbers, config);
+                    comparisonText = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config), true);
+                    break;
+                case 'patternRecognition':
+                    seedProfile = getPatternRecognitionSeedProfile(numbers, config);
+                    comparisonText = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config), true);
+                    break;
+                case 'historicalProximity':
+                    if (appState.historicalData.length === 0) {
+                        seedInterpretationText.textContent = 'Historical data is required for Historical Proximity interpretation.';
+                        seedInterpretationLoading.classList.add('hidden');
+                        return;
+                    }
+                    seedProfile = getHistoricalProximitySeedProfile(numbers, appState.historicalData, config);
+                    comparisonText = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config), true);
+                    break;
+            }
+
+            let prompt = `Interpret the following statistical and pattern profile for a set of lottery numbers from a ${game} game (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers), generated using the "${seedAlgorithm.replace(/([A-Z])/g, ' $1').trim()}" algorithm:
             Numbers: ${numbers.join(', ')}
-            Count: ${numbers.length}
-            Sum: ${sum} (Average: ${avg.toFixed(2)})
-            Odd/Even: ${oddCount} odd, ${evenCount} even
-            Consecutive Pairs: ${consecutivePairs}
-            Prime Numbers: ${primes}
-            Fibonacci Numbers: ${fibs}
-            Low/High Ratio: ${lowHighRatio.toFixed(2)}
-            Standard Deviation: ${stdDev.toFixed(2)}
-            Gaps between sorted numbers: ${gaps}
-            Last Digit Distribution: ${JSON.stringify(digitDistribution)}
-            Number Group Distribution: ${JSON.stringify(groupDistribution)}
-            Comparison to Optimal/Historical Patterns: ${comparisonResult}
+            Profile: ${JSON.stringify(seedProfile)}
+            Comparison to Optimal/Historical Patterns: ${comparisonText}
 
-            Provide a concise, human-readable interpretation of what this "seed profile" suggests about the numbers. For example, comment on their balance, predictability, any unusual characteristics, and how they compare to typical winning patterns for this lottery game. Suggest if this "seed" is well-balanced or has specific biases.`;
+            Provide a concise, human-readable interpretation of what this "seed profile" suggests about the numbers. For example, comment on their balance, predictability, any unusual characteristics, and how they compare to typical winning patterns for this lottery game. Suggest if this "seed" is well-balanced or has specific biases. Highlight insights specific to the chosen algorithm if applicable.`;
 
             let chatHistory = [];
             chatHistory.push({ role: "user", parts: [{ text: prompt }] });
@@ -2374,14 +2461,13 @@
         }
 
         function getGroupDistribution(numbers, mainPool) {
-            // Define groups dynamically based on mainPool for better adaptability
+            const groupSizes = [10, 10, 10, 10, 10, 10, 10]; // Default for up to 70
             const groups = {};
-            const groupSize = 10; // Default group size
             let currentStart = 1;
-
-            while (currentStart <= mainPool) {
-                const groupEnd = Math.min(currentStart + groupSize - 1, mainPool);
-                const groupName = `${currentStart}-${groupEnd}`;
+            for (let i = 0; i < groupSizes.length; i++) {
+                const groupEnd = currentStart + groupSizes[i] - 1;
+                if (currentStart > mainPool) break;
+                const groupName = `${currentStart}-${Math.min(groupEnd, mainPool)}`;
                 groups[groupName] = 0;
                 currentStart = groupEnd + 1;
             }
@@ -3392,7 +3478,7 @@
                 
             return {
                 numbers,
-                bonus: predictedBonus,
+                bonus,
                 confidence: (Math.random() * 20 + 70).toFixed(1)
             };
         }
