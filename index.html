@@ -27,29 +27,35 @@
         }
     </script>
     <style>
+        /* Base styles for body and typography */
         body {
             font-family: 'Inter', sans-serif;
         }
+        /* Sidebar transition for smooth hide/show */
         .sidebar {
             transition: transform 0.3s ease-in-out;
         }
         .sidebar-hidden {
             transform: translateX(-100%);
         }
+        /* Chart container to manage max height and responsiveness */
         .chart-container {
-            max-height: 200px;
+            max-height: 200px; /* Limits height for smaller screens, responsive width */
+            width: 100%; /* Ensures charts take full available width */
         }
+        /* Styling for number balls */
         .number-ball {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            width: 36px; /* Slightly larger for better touch target */
+            height: 36px; /* Slightly larger for better touch target */
             border-radius: 50%;
             background-color: #3B82F6;
             color: white;
             font-weight: bold;
-            margin: 2px;
+            margin: 4px; /* Increased margin for better spacing on mobile */
+            flex-shrink: 0; /* Prevent shrinking on small screens */
         }
         .bonus-ball {
             background-color: #8B5CF6;
@@ -63,11 +69,53 @@
         .due-number {
             background-color: #F59E0B;
         }
+
+        /* Responsive adjustments for main content area */
+        @media (min-width: 768px) { /* md breakpoint */
+            .main-content-area {
+                margin-left: 16rem; /* Equivalent to md:ml-64 */
+            }
+        }
+        /* General button styling for better touch targets */
+        button {
+            padding: 0.75rem 1rem; /* Increase padding for better touch area */
+            border-radius: 0.5rem; /* More rounded corners */
+            font-weight: 500; /* Medium font weight */
+            transition: background-color 0.2s ease-in-out;
+        }
+        /* Textarea and input styling for consistency */
+        textarea, input[type="text"], input[type="number"], select {
+            padding: 0.6rem;
+            border-radius: 0.375rem;
+            border: 1px solid #D1D5DB; /* Light gray border */
+        }
+        .dark textarea, .dark input[type="text"], .dark input[type="number"], .dark select {
+            border-color: #4B5563; /* Darker border in dark mode */
+        }
+        .loading-indicator {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            -webkit-animation: spin 1s ease-in-out infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { -webkit-transform: rotate(360deg); }
+        }
+        @-webkit-keyframes spin {
+            to { -webkit-transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-dark text-gray-900 dark:text-white transition-colors duration-300">
     <!-- Sidebar -->
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg p-4 sidebar">
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg p-4 sidebar z-40 md:translate-x-0 sidebar-hidden">
         <div class="flex items-center mb-6">
             <h1 class="text-2xl font-bold text-primary">Lotto Genius</h1>
             <span class="ml-2 px-2 py-1 text-xs bg-accent text-white rounded-full">PRO</span>
@@ -77,6 +125,7 @@
                 <li><a href="#dashboard" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">📊 Dashboard</a></li>
                 <li><a href="#generator" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🎰 Smart Generator</a></li>
                 <li><a href="#analyzer" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🔍 Advanced Analyzer</a></li>
+                <li><a href="#seed-reverser" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🔄 Seed Reverser</a></li>
                 <li><a href="#historical" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">📈 Historical Data</a></li>
                 <li><a href="#strategies" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🧠 AI Strategies</a></li>
                 <li><a href="#probability" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">📉 Probability Lab</a></li>
@@ -87,12 +136,12 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="ml-0 md:ml-64 p-4">
+    <div class="ml-0 p-4 main-content-area">
         <header class="flex justify-between items-center mb-6">
-            <button id="toggleSidebar" class="md:hidden p-2 bg-primary text-white rounded">☰</button>
+            <button id="toggleSidebar" class="md:hidden p-2 bg-primary text-white rounded-lg">☰</button>
             <div class="flex space-x-4">
-                <button id="themeToggle" class="p-2 bg-primary text-white rounded">🌙 Toggle Theme</button>
-                <button id="notifications" class="p-2 bg-secondary text-white rounded relative">
+                <button id="themeToggle" class="p-2 bg-primary text-white rounded-lg">🌙 Toggle Theme</button>
+                <button id="notifications" class="p-2 bg-secondary text-white rounded-lg relative">
                     🔔 Notifications
                     <span id="notificationBadge" class="absolute -top-2 -right-2 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
                 </button>
@@ -113,9 +162,9 @@
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <h3 class="text-lg font-medium mb-2">Quick Actions</h3>
                         <div class="flex flex-wrap gap-2">
-                            <button class="quick-action p-2 bg-primary text-white rounded text-sm" data-action="quickPick">Quick Pick</button>
-                            <button class="quick-action p-2 bg-secondary text-white rounded text-sm" data-action="analyzeLast">Analyze Last</button>
-                            <button class="quick-action p-2 bg-accent text-white rounded text-sm" data-action="checkOdds">Check Odds</button>
+                            <button class="quick-action p-2 bg-primary text-white rounded-lg text-sm" data-action="quickPick">Quick Pick</button>
+                            <button class="quick-action p-2 bg-secondary text-white rounded-lg text-sm" data-action="analyzeLast">Analyze Last</button>
+                            <button class="quick-action p-2 bg-accent text-white rounded-lg text-sm" data-action="checkOdds">Check Odds</button>
                         </div>
                     </div>
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
@@ -146,7 +195,7 @@
                         <h3 class="text-xl font-medium">Game Setup</h3>
                         <div class="space-y-2">
                             <label class="block text-sm font-medium">Lottery Game</label>
-                            <select id="lotteryGame" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="lotteryGame" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="powerball">Powerball (5/69 + 1/26)</option>
                                 <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
                                 <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
@@ -159,27 +208,27 @@
                         <div id="customGameConfig" class="grid grid-cols-2 gap-2 hidden">
                             <div>
                                 <label class="block text-sm font-medium">Main Pool</label>
-                                <input id="mainPool" type="number" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 69">
+                                <input id="mainPool" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 69">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Pick Count</label>
-                                <input id="pickCount" type="number" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 5">
+                                <input id="pickCount" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 5">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Bonus Pool</label>
-                                <input id="bonusPool" type="number" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 26">
+                                <input id="bonusPool" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 26">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Bonus Count</label>
-                                <input id="bonusCount" type="number" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 1">
+                                <input id="bonusCount" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 1">
                             </div>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium">Random Seed</label>
                             <div class="flex gap-2">
-                                <input id="randomSeed" type="text" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="Enter seed">
-                                <button id="randomSeedBtn" class="p-2 bg-primary text-white rounded">🎲 Random</button>
+                                <input id="randomSeed" type="text" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="Enter seed">
+                                <button id="randomSeedBtn" class="p-2 bg-primary text-white rounded-lg">🎲 Random</button>
                             </div>
                         </div>
                     </div>
@@ -189,7 +238,7 @@
                         <h3 class="text-xl font-medium">Generation Method</h3>
                         <div class="space-y-2">
                             <label class="block text-sm font-medium">Algorithm</label>
-                            <select id="generationMethod" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="generationMethod" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="standard">Standard Random</option>
                                 <option value="fisherYates">Fisher-Yates Shuffle</option>
                                 <option value="crypto">Cryptographically Secure</option>
@@ -198,7 +247,7 @@
                                 <option value="prime">Prime Number Filter</option>
                                 <option value="fibonacci">Fibonacci Filter</option>
                                 <option value="statistical">Statistical Weighted</option>
-                                <option value="ai">AI-Powered</option>
+                                <option value="ai">AI-Powered ✨</option>
                             </select>
                         </div>
                         
@@ -218,12 +267,12 @@
                         <h3 class="text-xl font-medium">Advanced Options</h3>
                         <div>
                             <label class="block text-sm font-medium">Number of Tickets</label>
-                            <input id="numTickets" type="number" min="1" max="100" class="w-full p-2 border rounded dark:bg-gray-700" value="1">
+                            <input id="numTickets" type="number" min="1" max="100" class="w-full p-2 border rounded-lg dark:bg-gray-700" value="1">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium">Sum Filter</label>
-                            <select id="sumFilter" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="sumFilter" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="any">Any Sum</option>
                                 <option value="low">Low Sum</option>
                                 <option value="medium">Medium Sum</option>
@@ -234,7 +283,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium">Consecutive Numbers</label>
-                            <select id="consecutiveFilter" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="consecutiveFilter" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="any">Any Consecutives</option>
                                 <option value="none">No Consecutives</option>
                                 <option value="max1">Max 1 Pair</option>
@@ -248,10 +297,10 @@
                 <div class="mt-6">
                     <h3 class="text-xl font-medium mb-2">Quick Actions</h3>
                     <div class="flex flex-wrap gap-2">
-                        <button id="generateSmart" class="p-2 bg-primary text-white rounded hover:bg-blue-700">Generate Smart Numbers</button>
-                        <button id="quickPick" class="p-2 bg-secondary text-white rounded hover:bg-purple-700">Quick Pick (Random)</button>
-                        <button id="generateWheeling" class="p-2 bg-accent text-white rounded hover:bg-green-700">Generate Wheeling System</button>
-                        <button id="clearGenerator" class="p-2 bg-danger text-white rounded hover:bg-red-600">Clear All</button>
+                        <button id="generateSmart" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700">Generate Smart Numbers</button>
+                        <button id="quickPick" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700">Quick Pick (Random)</button>
+                        <button id="generateWheeling" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Generate Wheeling System</button>
+                        <button id="clearGenerator" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear All</button>
                     </div>
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Tip: Combine AI-Powered generation with historical data for statistically optimized numbers.</p>
                 </div>
@@ -260,14 +309,14 @@
                 <div class="mt-6">
                     <div class="flex justify-between items-center mb-2">
                         <h3 class="text-xl font-medium">Generated Tickets</h3>
-                        <div class="flex gap-2">
-                            <button id="exportTxt" class="p-2 bg-primary text-white rounded hover:bg-blue-700 text-sm">TXT</button>
-                            <button id="exportCsv" class="p-2 bg-primary text-white rounded hover:bg-blue-700 text-sm">CSV</button>
-                            <button id="copyTickets" class="p-2 bg-primary text-white rounded hover:bg-blue-700 text-sm">Copy</button>
-                            <button id="saveTickets" class="p-2 bg-accent text-white rounded hover:bg-green-700 text-sm">Save</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="exportTxt" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">TXT</button>
+                            <button id="exportCsv" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">CSV</button>
+                            <button id="copyTickets" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">Copy</button>
+                            <button id="saveTickets" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700 text-sm">Save</button>
                         </div>
                     </div>
-                    <div id="generatedTickets" class="p-4 bg-gray-100 dark:bg-gray-700 rounded min-h-20">
+                    <div id="generatedTickets" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20">
                         <p class="text-gray-500 dark:text-gray-400">Generate some numbers to see results</p>
                     </div>
                 </div>
@@ -298,7 +347,7 @@
                         <h3 class="text-xl font-medium">Input Numbers</h3>
                         <div>
                             <label class="block text-sm font-medium">Game Type</label>
-                            <select id="analyzerGame" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="analyzerGame" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="powerball">Powerball (5/69 + 1/26)</option>
                                 <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
                                 <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
@@ -309,16 +358,17 @@
                         
                         <div>
                             <label class="block text-sm font-medium">Numbers to Analyze</label>
-                            <textarea id="numbersToAnalyze" class="w-full p-2 border rounded dark:bg-gray-700 h-32" placeholder="Enter numbers (e.g., 5, 12, 23, 34, 45, 6)"></textarea>
+                            <textarea id="numbersToAnalyze" class="w-full p-2 border rounded-lg dark:bg-gray-700 h-32" placeholder="Enter numbers (e.g., 5, 12, 23, 34, 45, 6)"></textarea>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formats: 5,12,23,34,45,6 or 5 12 23 34 45 6 or 5-12-23-34-45-6</p>
                         </div>
                         
-                        <div class="flex gap-2">
-                            <button id="analyzeNumbers" class="p-2 bg-primary text-white rounded hover:bg-blue-700 flex-1">Analyze</button>
-                            <button id="clearAnalyzer" class="p-2 bg-danger text-white rounded hover:bg-red-600">Clear</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="analyzeNumbers" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Analyze</button>
+                            <button id="getAIInsights" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 flex-1">AI Insights ✨</button>
+                            <button id="clearAnalyzer" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Sample Inputs</h4>
                             <div class="text-xs space-y-1 mt-1">
                                 <button class="sample-input text-primary hover:underline" data-sample="5,12,23,34,45,6">Powerball</button><br>
@@ -331,24 +381,30 @@
                     <!-- Basic Analysis Results -->
                     <div class="space-y-4">
                         <h3 class="text-xl font-medium">Basic Analysis</h3>
-                        <div id="analysisResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div id="analysisResults" class="p-4 bg-gray-10- dark:bg-gray-700 rounded-lg">
                             <p class="text-gray-500 dark:text-gray-400">Enter numbers to analyze them</p>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-2">
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <h4 class="font-medium text-sm">Number Properties</h4>
                                 <div id="numberProps" class="text-xs mt-1"></div>
                             </div>
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <h4 class="font-medium text-sm">Pattern Analysis</h4>
                                 <div id="patternStats" class="text-xs mt-1"></div>
                             </div>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Visual Analysis</h4>
                             <div id="visualAnalysis" class="flex flex-wrap gap-1 mt-2"></div>
+                        </div>
+                        <!-- AI Insights Output -->
+                        <div id="aiInsightsOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hidden">
+                            <h4 class="font-medium text-sm">AI Insights</h4>
+                            <div id="aiInsightsText" class="text-xs mt-1"></div>
+                            <div id="aiInsightsLoading" class="loading-indicator hidden mx-auto mt-2"></div>
                         </div>
                     </div>
 
@@ -356,21 +412,21 @@
                     <div class="space-y-4">
                         <div class="flex justify-between items-center">
                             <h3 class="text-xl font-medium">Advanced Metrics</h3>
-                            <button id="exportAnalysis" class="p-2 bg-primary text-white rounded hover:bg-blue-700 text-sm">Export</button>
+                            <button id="exportAnalysis" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">Export</button>
                         </div>
                         
                         <div class="grid grid-cols-1 gap-2">
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <h4 class="font-medium text-sm">Basic Statistics</h4>
                                 <div id="basicStats" class="text-xs mt-1"></div>
                             </div>
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <h4 class="font-medium text-sm">Advanced Metrics</h4>
                                 <div id="advancedMetrics" class="text-xs mt-1"></div>
                             </div>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Number Frequency</h4>
                             <canvas id="freqDistributionChart" class="chart-container"></canvas>
                         </div>
@@ -379,17 +435,80 @@
                 
                 <!-- Detailed Analysis Charts -->
                 <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <h4 class="font-medium text-sm">Last Digit Distribution</h4>
                         <canvas id="lastDigitDistributionChart" class="chart-container"></canvas>
                     </div>
-                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <h4 class="font-medium text-sm">Number Sum Distribution</h4>
                         <canvas id="sumDistributionChart" class="chart-container"></canvas>
                     </div>
-                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <h4 class="font-medium text-sm">Odd/Even Distribution</h4>
                         <canvas id="oddEvenDistributionChart" class="chart-container"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seed Reverser Section (New) -->
+            <section id="seed-reverser" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Advance Lotto Seed Reverser</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Input for Seed Reverser -->
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-medium">Input Numbers for Profile</h3>
+                        <div>
+                            <label class="block text-sm font-medium">Lottery Game</label>
+                            <select id="seedReverseGame" class="w-full p-2 border rounded-lg dark:bg-gray-700">
+                                <option value="powerball">Powerball (5/69 + 1/26)</option>
+                                <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
+                                <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
+                                <option value="lotto649">Lotto 6/49</option>
+                                <option value="lotto645">Lotto 6/45</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium">Numbers to Reverse Analyze</label>
+                            <textarea id="numbersToReverse" class="w-full p-2 border rounded-lg dark:bg-gray-700 h-32" placeholder="Enter numbers (e.g., 5, 12, 23, 34, 45, 6)"></textarea>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formats: 5,12,23,34,45,6 or 5 12 23 34 45 6</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="reverseSeedBtn" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Generate Seed Profile</button>
+                            <button id="interpretSeedProfile" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 flex-1">Interpret Profile ✨</button>
+                            <button id="clearSeedReverse" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Output for Seed Reverser -->
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-medium">Generated Seed Profile</h3>
+                        <div id="seedProfileResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                            <p class="text-gray-500 dark:text-gray-400">Enter numbers and generate profile</p>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2">
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <h4 class="font-medium text-sm">Statistical Characteristics</h4>
+                                <div id="seedStats" class="text-xs mt-1"></div>
+                            </div>
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <h4 class="font-medium text-sm">Pattern Indicators</h4>
+                                <div id="seedPatterns" class="text-xs mt-1"></div>
+                            </div>
+                        </div>
+                         <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                            <h4 class="font-medium text-sm">Comparison to Optimal/Historical</h4>
+                            <div id="seedComparison" class="text-xs mt-1"></div>
+                        </div>
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                            <h4 class="font-medium text-sm">Visual Representation</h4>
+                            <canvas id="seedVisualsChart" class="chart-container"></canvas>
+                        </div>
+                        <!-- AI Interpretation Output -->
+                        <div id="seedInterpretationOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hidden">
+                            <h4 class="font-medium text-sm">AI Interpretation</h4>
+                            <div id="seedInterpretationText" class="text-xs mt-1"></div>
+                            <div id="seedInterpretationLoading" class="loading-indicator hidden mx-auto mt-2"></div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -403,7 +522,7 @@
                         <h3 class="text-xl font-medium">Data Source</h3>
                         <div>
                             <label class="block text-sm font-medium">Game Type</label>
-                            <select id="historicalGame" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="historicalGame" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="powerball">Powerball (5/69 + 1/26)</option>
                                 <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
                                 <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
@@ -414,7 +533,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium">Data Source</label>
-                            <select id="dataSource" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="dataSource" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="sample">Sample Data (Built-in)</option>
                                 <option value="api">Live API (Premium)</option>
                                 <option value="csv">Upload CSV</option>
@@ -423,13 +542,13 @@
                         
                         <div id="csvUploadContainer" class="hidden">
                             <label class="block text-sm font-medium">Upload CSV File</label>
-                            <input id="csvUpload" type="file" accept=".csv" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <input id="csvUpload" type="file" accept=".csv" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">CSV format: Date,Number1,Number2,...,Bonus1,Bonus2</p>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium">Number of Past Draws</label>
-                            <select id="pastDraws" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="pastDraws" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="10">10</option>
                                 <option value="50">50</option>
                                 <option value="100">100</option>
@@ -438,31 +557,31 @@
                             </select>
                         </div>
                         
-                        <div class="flex gap-2">
-                            <button id="loadData" class="p-2 bg-primary text-white rounded hover:bg-blue-700 flex-1">Load Data</button>
-                            <button id="clearHistorical" class="p-2 bg-danger text-white rounded hover:bg-red-600">Clear</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="loadData" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Load Data</button>
+                            <button id="clearHistorical" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
                         </div>
                     </div>
 
                     <!-- Data Summary -->
                     <div class="space-y-4">
                         <h3 class="text-xl font-medium">Data Summary</h3>
-                        <div id="dataSummary" class="p-4 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div id="dataSummary" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <p class="text-gray-500 dark:text-gray-400">Load historical data to see summary</p>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-2">
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <h4 class="font-medium text-sm">Most Frequent</h4>
                                 <div id="mostFrequent" class="text-xs mt-1"></div>
                             </div>
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <h4 class="font-medium text-sm">Least Frequent</h4>
                                 <div id="leastFrequent" class="text-xs mt-1"></div>
                             </div>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Due Numbers</h4>
                             <div id="dueNumbers" class="text-xs mt-1"></div>
                         </div>
@@ -472,20 +591,20 @@
                     <div class="space-y-4">
                         <div class="flex justify-between items-center">
                             <h3 class="text-xl font-medium">Quick Analysis</h3>
-                            <button id="exportHistorical" class="p-2 bg-primary text-white rounded hover:bg-blue-700 text-sm">Export</button>
+                            <button id="exportHistorical" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">Export</button>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Recent Trends</h4>
                             <div id="recentTrends" class="text-xs mt-1"></div>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Pattern Frequency</h4>
                             <div id="patternFrequency" class="text-xs mt-1"></div>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Sum Statistics</h4>
                             <div id="sumStatistics" class="text-xs mt-1"></div>
                         </div>
@@ -514,26 +633,26 @@
                         </table>
                     </div>
                     
-                    <div class="flex justify-between items-center mt-2">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mt-2 gap-2">
                         <div class="text-sm text-gray-600 dark:text-gray-400" id="paginationInfo">Showing 0 of 0</div>
                         <div class="flex gap-2">
-                            <button id="prevPage" class="p-2 bg-primary text-white rounded hover:bg-blue-700 disabled:opacity-50" disabled><</button>
-                            <button id="nextPage" class="p-2 bg-primary text-white rounded hover:bg-blue-700 disabled:opacity-50" disabled>></button>
+                            <button id="prevPage" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50" disabled><</button>
+                            <button id="nextPage" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50" disabled>></button>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Historical Analysis Charts -->
                 <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <h4 class="font-medium text-sm">Number Frequency Heatmap</h4>
                         <canvas id="freqHeatmapChart" class="chart-container"></canvas>
                     </div>
-                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <h4 class="font-medium text-sm">Frequency Over Time</h4>
                         <canvas id="freqOverTimeChart" class="chart-container"></canvas>
                     </div>
-                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <h4 class="font-medium text-sm">Gap Analysis</h4>
                         <canvas id="gapAnalysisChart" class="chart-container"></canvas>
                     </div>
@@ -548,19 +667,19 @@
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-primary">
                         <h3 class="text-xl font-medium">Frequency Analysis</h3>
                         <p class="text-sm mt-2">Identifies hot (frequently drawn) and cold (rarely drawn) numbers based on historical data patterns.</p>
-                        <button class="applyStrategy mt-4 p-2 bg-primary text-white rounded hover:bg-blue-700 w-full" data-strategy="frequency">Apply Strategy</button>
+                        <button class="applyStrategy mt-4 p-2 bg-primary text-white rounded-lg hover:bg-blue-700 w-full" data-strategy="frequency">Apply Strategy</button>
                     </div>
                     
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-secondary">
                         <h3 class="text-xl font-medium">Gap Analysis</h3>
                         <p class="text-sm mt-2">Finds numbers that are statistically "due" to be drawn based on the time since their last appearance.</p>
-                        <button class="applyStrategy mt-4 p-2 bg-secondary text-white rounded hover:bg-purple-700 w-full" data-strategy="gap">Apply Strategy</button>
+                        <button class="applyStrategy mt-4 p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 w-full" data-strategy="gap">Apply Strategy</button>
                     </div>
                     
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-accent">
                         <h3 class="text-xl font-medium">Pattern Recognition</h3>
                         <p class="text-sm mt-2">Detects number patterns and sequences that frequently occur in winning combinations.</p>
-                        <button class="applyStrategy mt-4 p-2 bg-accent text-white rounded hover:bg-green-700 w-full" data-strategy="pattern">Apply Strategy</button>
+                        <button class="applyStrategy mt-4 p-2 bg-accent text-white rounded-lg hover:bg-green-700 w-full" data-strategy="pattern">Apply Strategy</button>
                     </div>
                 </div>
                 
@@ -608,23 +727,23 @@
                     </div>
                     
                     <div class="mt-4">
-                        <button id="buildStrategy" class="p-2 bg-primary text-white rounded hover:bg-blue-700 w-full">Build & Apply Custom Strategy</button>
+                        <button id="buildStrategy" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 w-full">Build & Apply Custom Strategy</button>
                     </div>
                 </div>
                 
                 <!-- Strategy Results -->
                 <div class="mt-6">
                     <h3 class="text-xl font-medium mb-2">Strategy Results</h3>
-                    <div id="strategyResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div id="strategyResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <p class="text-gray-500 dark:text-gray-400">Apply a strategy to see recommendations</p>
                     </div>
                     
                     <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Recommended Numbers</h4>
                             <div id="recommendedNumbers" class="flex flex-wrap gap-1 mt-2"></div>
                         </div>
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Strategy Analysis</h4>
                             <div id="strategyAnalysis" class="text-xs mt-1"></div>
                         </div>
@@ -642,7 +761,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium">Game Type</label>
-                            <select id="probabilityGame" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="probabilityGame" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="powerball">Powerball (5/69 + 1/26)</option>
                                 <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
                                 <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
@@ -655,41 +774,41 @@
                         <div id="customProbabilityConfig" class="grid grid-cols-2 gap-2 hidden">
                             <div>
                                 <label class="block text-sm font-medium">Main Pool</label>
-                                <input id="probMainPool" type="number" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 69">
+                                <input id="probMainPool" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 69">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Pick Count</label>
-                                <input id="probPickCount" type="number" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 5">
+                                <input id="probPickCount" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 5">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Bonus Pool</label>
-                                <input id="probBonusPool" type="number" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 26">
+                                <input id="probBonusPool" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 26">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Bonus Count</label>
-                                <input id="probBonusCount" type="number" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 1">
+                                <input id="probBonusCount" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 1">
                             </div>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium">Tickets to Play</label>
-                            <input id="ticketsToPlay" type="number" min="1" max="1000000" class="w-full p-2 border rounded dark:bg-gray-700" value="1">
+                            <input id="ticketsToPlay" type="number" min="1" max="1000000" class="w-full p-2 border rounded-lg dark:bg-gray-700" value="1">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="block text-sm font-medium">Jackpot Size ($)</label>
-                                <input id="jackpotSize" type="number" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 1000000">
+                                <input id="jackpotSize" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 1000000">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium">Tax Rate (%)</label>
-                                <input id="taxRate" type="number" min="0" max="100" class="w-full p-2 border rounded dark:bg-gray-700" placeholder="e.g., 30">
+                                <input id="taxRate" type="number" min="0" max="100" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 30">
                             </div>
                         </div>
                         
-                        <div class="flex gap-2">
-                            <button id="calculateProb" class="p-2 bg-primary text-white rounded hover:bg-blue-700 flex-1">Calculate</button>
-                            <button id="resetProb" class="p-2 bg-danger text-white rounded hover:bg-red-600">Reset</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="calculateProb" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Calculate</button>
+                            <button id="resetProb" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Reset</button>
                         </div>
                     </div>
                     
@@ -697,30 +816,30 @@
                     <div class="space-y-4">
                         <div class="flex justify-between items-center">
                             <h3 class="text-xl font-medium">Probability Results</h3>
-                            <button id="exportProb" class="p-2 bg-primary text-white rounded hover:bg-blue-700 text-sm">Export</button>
+                            <button id="exportProb" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">Export</button>
                         </div>
                         
-                        <div id="probResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div id="probResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <p class="text-gray-500 dark:text-gray-400">Calculate probabilities to see results</p>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-2">
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <h4 class="font-medium text-sm">Basic Probabilities</h4>
                                 <div id="basicProbs" class="text-xs mt-1"></div>
                             </div>
-                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <h4 class="font-medium text-sm">Winning Chances</h4>
                                 <div id="winChances" class="text-xs mt-1"></div>
                             </div>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Expected Value</h4>
                             <div id="expectedValue" class="text-lg font-bold mt-1">$0.00</div>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Probability Distribution</h4>
                             <canvas id="probDistributionChart" class="chart-container"></canvas>
                         </div>
@@ -731,11 +850,11 @@
                 <div class="mt-6">
                     <h3 class="text-xl font-medium mb-2">Advanced Probability Analysis</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Probability Comparisons</h4>
                             <div id="probComparisons" class="text-xs mt-1"></div>
                         </div>
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Investment Analysis</h4>
                             <div id="investmentAnalysis" class="text-xs mt-1"></div>
                         </div>
@@ -751,19 +870,19 @@
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-primary">
                         <h3 class="text-xl font-medium">Next Draw Prediction</h3>
                         <p class="text-sm mt-2">Our AI analyzes historical patterns and trends to predict the most likely numbers for the next draw.</p>
-                        <button id="generatePrediction" class="p-2 bg-primary text-white rounded hover:bg-blue-700 mt-4 w-full">Generate Prediction</button>
+                        <button id="generatePrediction" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 mt-4 w-full">Generate Prediction</button>
                     </div>
                     
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-secondary">
                         <h3 class="text-xl font-medium">Multiple Draw Forecast</h3>
                         <p class="text-sm mt-2">Get predictions for several upcoming draws with confidence scores for each number.</p>
-                        <button id="forecastDraws" class="p-2 bg-secondary text-white rounded hover:bg-purple-700 mt-4 w-full">Forecast Next 5 Draws</button>
+                        <button id="forecastDraws" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 mt-4 w-full">Forecast Next 5 Draws</button>
                     </div>
                     
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-accent">
                         <h3 class="text-xl font-medium">Custom Prediction</h3>
                         <p class="text-sm mt-2">Configure specific parameters for the AI to focus on certain patterns or trends.</p>
-                        <button id="customPrediction" class="p-2 bg-accent text-white rounded hover:bg-green-700 mt-4 w-full" onclick="openModal()">Customize Prediction</button>
+                        <button id="customPrediction" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700 mt-4 w-full" onclick="openModal()">Customize Prediction</button>
                     </div>
                 </div>
                 
@@ -771,10 +890,10 @@
                 <div class="mt-6">
                     <div class="flex justify-between items-center mb-2">
                         <h3 class="text-xl font-medium">Prediction Results</h3>
-                        <button id="exportPrediction" class="p-2 bg-primary text-white rounded hover:bg-blue-700 text-sm">Export</button>
+                        <button id="exportPrediction" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">Export</button>
                     </div>
                     
-                    <div id="predictionResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div id="predictionResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <p class="text-gray-500 dark:text-gray-400">Generate predictions to see results</p>
                     </div>
                     
@@ -799,19 +918,19 @@
                 <div class="mt-6">
                     <h3 class="text-xl font-medium mb-2">How Our AI Works</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Machine Learning Models</h4>
                             <p class="text-xs mt-1">Our prediction engine uses an ensemble of machine learning models including Random Forests, Gradient Boosting, and Neural Networks to analyze historical lottery data and identify complex patterns.</p>
                         </div>
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Statistical Analysis</h4>
                             <p class="text-xs mt-1">Advanced statistical methods like Markov Chains, Monte Carlo simulations, and Bayesian inference are applied to calculate probabilities and identify trends beyond simple frequency analysis.</p>
                         </div>
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Pattern Recognition</h4>
                             <p class="text-xs mt-1">The AI examines number sequences, gaps between numbers, sum distributions, and other mathematical properties to detect subtle patterns that might indicate higher probability combinations.</p>
                         </div>
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Limitations</h4>
                             <p class="text-xs mt-1">While our AI provides sophisticated analysis, lottery draws are fundamentally random. These predictions should be used for entertainment purposes only, with no guarantee of winning.</p>
                         </div>
@@ -850,7 +969,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium mt-2">Default Game</label>
-                            <select id="defaultGame" class="w-full p-2 border rounded dark:bg-gray-700">
+                            <select id="defaultGame" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="powerball">Powerball</option>
                                 <option value="megamillions">Mega Millions</option>
                                 <option value="euromillions">EuroMillions</option>
@@ -866,18 +985,18 @@
                         
                         <div>
                             <label class="block text-sm font-medium">Clear All Data</label>
-                            <button id="clearAllData" class="p-2 bg-danger text-white rounded hover:bg-red-600 w-full mt-1">Reset Application</button>
+                            <button id="clearAllData" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600 w-full mt-1">Reset Application</button>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Warning: This will delete all saved data and reset to defaults</p>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium mt-2">Export All Data</label>
-                            <button id="exportAllData" class="p-2 bg-primary text-white rounded hover:bg-blue-700 w-full mt-1">Export Data</button>
+                            <button id="exportAllData" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 w-full mt-1">Export Data</button>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium mt-2">Import Data</label>
-                            <input type="file" id="importData" class="w-full p-2 border rounded dark:bg-gray-700 mt-1">
+                            <input type="file" id="importData" class="w-full p-2 border rounded-lg dark:bg-gray-700 mt-1">
                         </div>
                     </div>
                 </div>
@@ -885,7 +1004,7 @@
                 <!-- About Section -->
                 <div class="mt-6">
                     <h3 class="text-xl font-medium mb-2">About Lotto Genius Pro</h3>
-                    <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded">
+                    <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <p class="text-sm">Version: 2.0.0</p>
                         <p class="text-sm mt-1">Developed by: Lotto Genius Team</p>
                         <p class="text-sm mt-1">License: MIT</p>
@@ -902,7 +1021,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium">Prediction Model</label>
-                        <select id="predictionModel" class="w-full p-2 border rounded dark:bg-gray-700">
+                        <select id="predictionModel" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                             <option value="ensemble">Ensemble Model (Recommended)</option>
                             <option value="randomForest">Random Forest</option>
                             <option value="neuralNetwork">Neural Network</option>
@@ -913,7 +1032,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium">Historical Data Range</label>
-                        <select id="dataRange" class="w-full p-2 border rounded dark:bg-gray-700">
+                        <select id="dataRange" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                             <option value="1year">Last Year</option>
                             <option value="3years">Last 3 Years</option>
                             <option value="5years">Last 5 Years</option>
@@ -934,19 +1053,19 @@
                     
                     <div>
                         <label class="block text-sm font-medium">Number of Predictions</label>
-                        <input id="numPredictions" type="number" min="1" max="20" class="w-full p-2 border rounded dark:bg-gray-700" value="5">
+                        <input id="numPredictions" type="number" min="1" max="20" class="w-full p-2 border rounded-lg dark:bg-gray-700" value="5">
                     </div>
                     
-                    <div class="flex gap-2">
-                        <button id="cancelPrediction" class="p-2 bg-gray-500 text-white rounded hover:bg-gray-600 flex-1">Cancel</button>
-                        <button id="runPrediction" class="p-2 bg-primary text-white rounded hover:bg-blue-700 flex-1">Run Prediction</button>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="cancelPrediction" class="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">Cancel</button>
+                        <button id="runPrediction" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Run Prediction</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Success Notification -->
-        <div id="successNotification" class="fixed bottom-4 right-4 bg-accent text-white p-4 rounded-lg shadow-lg hidden transition-all duration-300 transform translate-y-4 opacity-0">
+        <div id="successNotification" class="fixed bottom-4 right-4 bg-accent text-white p-4 rounded-lg shadow-lg hidden transition-all duration-300 transform translate-y-4 opacity-0 z-50">
             Operation completed successfully!
         </div>
 
@@ -974,14 +1093,17 @@
     </div>
 
     <script>
+        // Gemini API Key (Leave empty for Canvas environment to provide)
+        const apiKey = ""; 
+
         // Game Configurations
         const gameConfigs = {
-            powerball: { mainPool: 69, pickCount: 5, bonusPool: 26, bonusCount: 1 },
-            megamillions: { mainPool: 70, pickCount: 5, bonusPool: 25, bonusCount: 1 },
-            euromillions: { mainPool: 50, pickCount: 5, bonusPool: 12, bonusCount: 2 },
-            lotto649: { mainPool: 49, pickCount: 6, bonusPool: 49, bonusCount: 1 },
-            lotto645: { mainPool: 45, pickCount: 6, bonusPool: 45, bonusCount: 1 },
-            custom: { mainPool: 69, pickCount: 5, bonusPool: 26, bonusCount: 1 }
+            powerball: { mainPool: 69, pickCount: 5, bonusPool: 26, bonusCount: 1, optimal: { sumRange: [130, 200], oddEvenRatio: [2,3], consecutiveMax: 1, primeCount: [1,2], fibCount: [0,1], groupDistribution: { '1-10': [0,2], '11-20': [1,3], '21-30': [1,3], '31-40': [0,2], '41-50': [0,2], '51-60': [0,2], '61-69': [0,1] } } },
+            megamillions: { mainPool: 70, pickCount: 5, bonusPool: 25, bonusCount: 1, optimal: { sumRange: [130, 200], oddEvenRatio: [2,3], consecutiveMax: 1, primeCount: [1,2], fibCount: [0,1], groupDistribution: { '1-10': [0,2], '11-20': [1,3], '21-30': [1,3], '31-40': [0,2], '41-50': [0,2], '51-60': [0,2], '61-70': [0,1] } } },
+            euromillions: { mainPool: 50, pickCount: 5, bonusPool: 12, bonusCount: 2, optimal: { sumRange: [100, 150], oddEvenRatio: [2,3], consecutiveMax: 1, primeCount: [1,2], fibCount: [0,1], groupDistribution: { '1-10': [1,2], '11-20': [1,2], '21-30': [1,2], '31-40': [0,1], '41-50': [0,1] } } },
+            lotto649: { mainPool: 49, pickCount: 6, bonusPool: 49, bonusCount: 1, optimal: { sumRange: [100, 180], oddEvenRatio: [3,3], consecutiveMax: 2, primeCount: [1,3], fibCount: [0,2], groupDistribution: { '1-10': [1,2], '11-20': [1,2], '21-30': [1,2], '31-40': [1,2], '41-49': [0,1] } } },
+            lotto645: { mainPool: 45, pickCount: 6, bonusPool: 45, bonusCount: 1, optimal: { sumRange: [90, 170], oddEvenRatio: [3,3], consecutiveMax: 2, primeCount: [1,3], fibCount: [0,2], groupDistribution: { '1-10': [1,2], '11-20': [1,2], '21-30': [1,2], '31-40': [1,2], '41-45': [0,1] } } },
+            custom: { mainPool: 69, pickCount: 5, bonusPool: 26, bonusCount: 1, optimal: { sumRange: [130, 200], oddEvenRatio: [2,3], consecutiveMax: 1, primeCount: [1,2], fibCount: [0,1], groupDistribution: { '1-10': [0,2], '11-20': [1,3], '21-30': [1,3], '31-40': [0,2], '41-50': [0,2], '51-60': [0,2], '61-69': [0,1] } } }
         };
 
         // Application State
@@ -1024,7 +1146,8 @@
                 { id: 'freqOverTimeChart', type: 'line', label: 'Frequency Over Time' },
                 { id: 'gapAnalysisChart', type: 'bar', label: 'Gap Analysis' },
                 { id: 'probDistributionChart', type: 'bar', label: 'Probability Distribution' },
-                { id: 'predictionVizChart', type: 'bar', label: 'Prediction Confidence' }
+                { id: 'predictionVizChart', type: 'bar', label: 'Prediction Confidence' },
+                { id: 'seedVisualsChart', type: 'bar', label: 'Seed Number Distribution' } // New chart for seed reverser
             ];
 
             chartConfigs.forEach(config => {
@@ -1070,6 +1193,7 @@
             document.getElementById('lotteryGame').addEventListener('change', handleGameChange);
             document.getElementById('probabilityGame').addEventListener('change', handleProbabilityGameChange);
             document.getElementById('randomSeedBtn').addEventListener('click', generateRandomSeed);
+            document.getElementById('seedReverseGame').addEventListener('change', () => { /* No specific action needed for game change here yet */ });
             
             // Generator Controls
             document.getElementById('generateSmart').addEventListener('click', generateSmartNumbers);
@@ -1085,12 +1209,18 @@
             
             // Analyzer Controls
             document.getElementById('analyzeNumbers').addEventListener('click', analyzeNumbers);
+            document.getElementById('getAIInsights').addEventListener('click', getAIInsights); // New AI Insights button
             document.getElementById('clearAnalyzer').addEventListener('click', clearAnalyzer);
             document.querySelectorAll('.sample-input').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.getElementById('numbersToAnalyze').value = e.target.dataset.sample;
                 });
             });
+
+            // Seed Reverser Controls (New)
+            document.getElementById('reverseSeedBtn').addEventListener('click', reverseSeedAnalysis);
+            document.getElementById('interpretSeedProfile').addEventListener('click', interpretSeedProfile); // New AI interpretation button
+            document.getElementById('clearSeedReverse').addEventListener('click', clearSeedReverse);
             
             // Historical Data Controls
             document.getElementById('dataSource').addEventListener('change', handleDataSourceChange);
@@ -1151,6 +1281,15 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('sidebar-hidden');
+            // Adjust main content margin based on sidebar visibility
+            const mainContent = document.querySelector('.main-content-area');
+            if (sidebar.classList.contains('sidebar-hidden')) {
+                mainContent.classList.remove('md:ml-64');
+                mainContent.classList.add('ml-0');
+            } else {
+                mainContent.classList.remove('ml-0');
+                mainContent.classList.add('md:ml-64');
+            }
         }
 
         function showNotifications() {
@@ -1212,6 +1351,19 @@
             
             // Update notification badge
             updateNotificationBadge();
+
+            // Ensure sidebar state is correct on load based on screen size
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content-area');
+            if (window.innerWidth < 768) { // If mobile
+                sidebar.classList.add('sidebar-hidden');
+                mainContent.classList.remove('md:ml-64');
+                mainContent.classList.add('ml-0');
+            } else { // If desktop
+                sidebar.classList.remove('sidebar-hidden');
+                mainContent.classList.remove('ml-0');
+                mainContent.classList.add('md:ml-64');
+            }
         }
 
         // Game Configuration Functions
@@ -1263,7 +1415,7 @@
         }
 
         // Number Generation Functions
-        function generateNumbers(config, method, options = {}) {
+        async function generateNumbers(config, method, options = {}) {
             const { mainPool, pickCount, bonusPool, bonusCount } = config;
             let numbers = [];
 
@@ -1337,7 +1489,7 @@
                     
                 case 'statistical':
                 case 'ai':
-                    numbers = generateUsingAI(config, options);
+                    numbers = await generateUsingAI(config, options); // Await the AI generation
                     break;
                     
                 default:
@@ -1397,42 +1549,74 @@
             return { numbers, bonus };
         }
 
-        function generateUsingAI(config, options) {
+        async function generateUsingAI(config, options) {
             const { mainPool, pickCount } = config;
-            let numbers = [];
-            
-            if (options.useHistorical && appState.historicalData.length > 0) {
-                const frequency = getNumberFrequency();
-                const gaps = getGapAnalysis();
-                
-                // Calculate weights based on options
-                const weights = {
-                    frequency: options.favorHot ? 0.4 : 0.2,
-                    gap: options.includeDue ? 0.4 : 0.2,
-                    random: 0.4
-                };
-                
-                // Create weighted candidates
-                const candidates = Array.from({ length: mainPool }, (_, i) => i + 1);
-                numbers = candidates
-                    .sort((a, b) => {
-                        const scoreA = (frequency[a] || 0) * weights.frequency + 
-                                       (gaps[a] || 0) * weights.gap + 
-                                       Math.random() * weights.random;
-                                       
-                        const scoreB = (frequency[b] || 0) * weights.frequency + 
-                                       (gaps[b] || 0) * weights.gap + 
-                                       Math.random() * weights.random;
-                                       
-                        return scoreB - scoreA;
-                    })
-                    .slice(0, pickCount);
-            } else {
-                // Fallback to standard random if no historical data
-                numbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
+            let generatedNumbers = [];
+
+            const generateSmartBtn = document.getElementById('generateSmart');
+            let loadingIndicator = generateSmartBtn.querySelector('.loading-indicator');
+            if (!loadingIndicator) {
+                loadingIndicator = document.createElement('span');
+                loadingIndicator.className = 'loading-indicator';
+                generateSmartBtn.appendChild(loadingIndicator);
+            }
+            loadingIndicator.classList.remove('hidden');
+
+            try {
+                let prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.`;
+                if (options.useHistorical && appState.historicalData.length > 0) {
+                    const frequency = getNumberFrequency();
+                    const gaps = getGapAnalysis();
+                    prompt += ` Consider the following historical data: Most frequent numbers: ${JSON.stringify(frequency)}. Numbers with longest gaps since last appearance: ${JSON.stringify(gaps)}.`;
+                    if (options.favorHot) prompt += ` Favor hot numbers.`;
+                    if (options.includeDue) prompt += ` Include numbers that are statistically due.`;
+                    if (options.avoidRepeats) prompt += ` Avoid numbers that have appeared in the last 5 draws.`;
+                }
+                prompt += ` Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    // Attempt to parse the numbers from the AI's response
+                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
+                    
+                    // Filter for uniqueness and ensure correct count
+                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+
+                    // Fallback if AI doesn't return enough numbers or valid numbers
+                    while (generatedNumbers.length < pickCount) {
+                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                        if (!generatedNumbers.includes(randomNum)) {
+                            generatedNumbers.push(randomNum);
+                        }
+                    }
+                } else {
+                    console.error("Gemini API did not return expected content structure.");
+                    showNotification("AI generation failed. Falling back to random numbers.");
+                    generatedNumbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API for AI generation:", error);
+                showNotification("AI generation failed due to an error. Falling back to random numbers.");
+                generatedNumbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
+            } finally {
+                if (loadingIndicator) loadingIndicator.classList.add('hidden');
             }
             
-            return numbers;
+            return generatedNumbers;
         }
 
         function getPrimesUpTo(max) {
@@ -1485,7 +1669,7 @@
         }
 
         // Generator Functions
-        function generateSmartNumbers() {
+        async function generateSmartNumbers() {
             const game = document.getElementById('lotteryGame').value;
             const config = game === 'custom' ? {
                 mainPool: parseInt(document.getElementById('mainPool').value) || 69,
@@ -1505,15 +1689,32 @@
             };
             
             const numTickets = parseInt(document.getElementById('numTickets').value) || 1;
-            const tickets = Array.from({ length: numTickets }, () => generateNumbers(config, method, options));
+            const tickets = [];
             
+            // Show loading indicator for smart generation
+            const generateSmartBtn = document.getElementById('generateSmart');
+            let loadingIndicator = generateSmartBtn.querySelector('.loading-indicator');
+            if (!loadingIndicator) {
+                loadingIndicator = document.createElement('span');
+                loadingIndicator.className = 'loading-indicator';
+                generateSmartBtn.appendChild(loadingIndicator);
+            }
+            loadingIndicator.classList.remove('hidden');
+
+            for (let i = 0; i < numTickets; i++) {
+                const ticket = await generateNumbers(config, method, options);
+                tickets.push(ticket);
+            }
+
+            loadingIndicator.classList.add('hidden'); // Hide loading indicator
+
             displayTickets(tickets);
             updateGeneratorCharts(tickets);
             updateStatsOverview(tickets);
             showNotification('Smart numbers generated successfully!');
         }
 
-        function quickPick() {
+        async function quickPick() {
             const game = document.getElementById('lotteryGame').value;
             const config = game === 'custom' ? {
                 mainPool: parseInt(document.getElementById('mainPool').value) || 69,
@@ -1522,14 +1723,14 @@
                 bonusCount: parseInt(document.getElementById('bonusCount').value) || 1
             } : gameConfigs[game];
             
-            const tickets = [generateNumbers(config, 'quick', {})];
+            const tickets = [await generateNumbers(config, 'quick', {})];
             displayTickets(tickets);
             updateGeneratorCharts(tickets);
             updateStatsOverview(tickets);
             showNotification('Quick pick generated successfully!');
         }
 
-        function generateWheelingSystem() {
+        async function generateWheelingSystem() {
             const game = document.getElementById('lotteryGame').value;
             const config = game === 'custom' ? {
                 mainPool: parseInt(document.getElementById('mainPool').value) || 69,
@@ -1556,7 +1757,7 @@
             }
             
             ticketsDiv.innerHTML = tickets.map((ticket, index) => `
-                <div class="p-3 bg-white dark:bg-gray-600 rounded mb-2 border border-gray-200 dark:border-gray-500">
+                <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-sm font-medium">Ticket ${index + 1}</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
@@ -1685,9 +1886,8 @@
                 return `Numbers: ${numbers.join(', ')} | Bonus: ${bonus.join(', ')}`;
             }).join('\n');
             
-            navigator.clipboard.writeText(tickets).then(() => {
-                showNotification('Tickets copied to clipboard!');
-            });
+            document.execCommand('copy'); // Use execCommand for clipboard due to iframe restrictions
+            showNotification('Tickets copied to clipboard!');
         }
 
         function saveTickets() {
@@ -1771,9 +1971,13 @@
             const visualAnalysisDiv = document.getElementById('visualAnalysis');
             visualAnalysisDiv.innerHTML = numbers.map(n => {
                 let className = 'number-ball';
-                if (isHotNumber(n)) className += ' hot-number';
-                if (isDueNumber(n)) className += ' due-number';
-                if (!isHotNumber(n) && !isDueNumber(n)) className += ' cold-number';
+                // These functions rely on historicalData being loaded, so add a check
+                if (appState.historicalData.length > 0) {
+                    if (isHotNumber(n)) className += ' hot-number';
+                    if (isDueNumber(n)) className += ' due-number';
+                    // If not hot or due, consider it cold for visual representation
+                    if (!isHotNumber(n) && !isDueNumber(n) && getNumberFrequency()[n] !== undefined) className += ' cold-number';
+                }
                 return `<span class="${className}">${n}</span>`;
             }).join('');
             
@@ -1787,6 +1991,73 @@
             `;
             
             showNotification('Analysis completed!');
+        }
+
+        async function getAIInsights() {
+            const input = document.getElementById('numbersToAnalyze').value;
+            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+
+            const aiInsightsOutput = document.getElementById('aiInsightsOutput');
+            const aiInsightsText = document.getElementById('aiInsightsText');
+            const aiInsightsLoading = document.getElementById('aiInsightsLoading');
+
+            aiInsightsOutput.classList.remove('hidden');
+            aiInsightsText.innerHTML = '';
+            aiInsightsLoading.classList.remove('hidden');
+
+            if (numbers.length === 0) {
+                aiInsightsText.textContent = 'Please enter numbers to get AI insights.';
+                aiInsightsLoading.classList.add('hidden');
+                return;
+            }
+
+            const game = document.getElementById('analyzerGame').value;
+            const config = gameConfigs[game];
+
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const avg = sum / numbers.length;
+            const oddCount = numbers.filter(n => n % 2 === 1).length;
+            const evenCount = numbers.length - oddCount;
+            const consecutivePairs = countConsecutivePairs(numbers);
+            const primes = numbers.filter(isPrime).length;
+            const fibs = numbers.filter(n => isFibonacci(n)).length;
+            const stdDev = calculateStandardDeviation(numbers);
+            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
+
+            let prompt = `Analyze the following lottery numbers for a ${game} game (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers): ${numbers.join(', ')}.
+            Their sum is ${sum}, average is ${avg.toFixed(2)}, with ${oddCount} odd and ${evenCount} even numbers.
+            There are ${consecutivePairs} consecutive pairs, ${primes} prime numbers, and ${fibs} Fibonacci numbers.
+            The standard deviation is ${stdDev.toFixed(2)} and the low/high ratio is ${lowHighRatio.toFixed(2)}.
+            Provide an insightful, concise analysis of these numbers, highlighting any interesting patterns, strengths, or weaknesses for a lottery draw. Focus on common lottery number analysis concepts like balance, distribution, and historical trends if applicable.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    aiInsightsText.textContent = result.candidates[0].content.parts[0].text;
+                } else {
+                    aiInsightsText.textContent = 'Could not retrieve AI insights.';
+                    console.error("Gemini API did not return expected content structure for insights.");
+                }
+            } catch (error) {
+                aiInsightsText.textContent = 'Error fetching AI insights.';
+                console.error("Error calling Gemini API for AI insights:", error);
+            } finally {
+                aiInsightsLoading.classList.add('hidden');
+            }
+            showNotification('AI Insights generated!');
         }
 
         function isPrime(num) {
@@ -1816,6 +2087,7 @@
         }
 
         function calculateStandardDeviation(numbers) {
+            if (numbers.length === 0) return 0;
             const avg = numbers.reduce((a, b) => a + b, 0) / numbers.length;
             const squareDiffs = numbers.map(n => Math.pow(n - avg, 2));
             const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
@@ -1823,30 +2095,36 @@
         }
 
         function calculateSpread(numbers) {
+            if (numbers.length < 2) return 0;
             const sorted = [...numbers].sort((a, b) => a - b);
             const range = sorted[sorted.length - 1] - sorted[0];
-            return (range / (sorted.length - 1)) * 100;
+            return (range / (sorted.length - 1)) * 100; // Percentage spread over number count
         }
 
         function calculateLowHighRatio(numbers, mainPool) {
+            if (numbers.length === 0) return 0;
             const mid = mainPool / 2;
             const low = numbers.filter(n => n <= mid).length;
             const high = numbers.length - low;
-            return low / (high || 1);
+            return low / (high || 1); // Avoid division by zero
         }
 
         function isHotNumber(num) {
             if (appState.historicalData.length === 0) return false;
             const frequency = getNumberFrequency();
-            const avgFrequency = Object.values(frequency).reduce((a, b) => a + b, 0) / Object.keys(frequency).length;
-            return frequency[num] > avgFrequency * 1.2;
+            const values = Object.values(frequency);
+            if (values.length === 0) return false;
+            const avgFrequency = values.reduce((a, b) => a + b, 0) / values.length;
+            return (frequency[num] || 0) > avgFrequency * 1.2;
         }
 
         function isDueNumber(num) {
             if (appState.historicalData.length === 0) return false;
             const gaps = getGapAnalysis();
-            const avgGap = Object.values(gaps).reduce((a, b) => a + b, 0) / Object.keys(gaps).length;
-            return gaps[num] > avgGap * 1.5;
+            const values = Object.values(gaps);
+            if (values.length === 0) return false;
+            const avgGap = values.reduce((a, b) => a + b, 0) / values.length;
+            return (gaps[num] || 0) > avgGap * 1.5;
         }
 
         function updateAnalyzerCharts(numbers) {
@@ -1897,6 +2175,8 @@
             });
             
             document.getElementById('visualAnalysis').innerHTML = '';
+            document.getElementById('aiInsightsOutput').classList.add('hidden'); // Hide AI insights output
+            document.getElementById('aiInsightsText').textContent = ''; // Clear AI insights text
             
             // Reset charts
             ['freqDistributionChart', 'lastDigitDistributionChart', 'sumDistributionChart', 'oddEvenDistributionChart'].forEach(id => {
@@ -1907,6 +2187,274 @@
             
             showNotification('Analyzer cleared!');
         }
+
+        // Seed Reverser Functions (New)
+        function reverseSeedAnalysis() {
+            const input = document.getElementById('numbersToReverse').value;
+            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+
+            if (numbers.length === 0) {
+                showNotification('Please enter valid numbers for seed reversal!');
+                return;
+            }
+
+            const game = document.getElementById('seedReverseGame').value;
+            const config = gameConfigs[game];
+            const mainPool = config.mainPool;
+
+            // Calculate statistical properties for the "seed profile"
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const avg = sum / numbers.length;
+            const oddCount = numbers.filter(n => n % 2 === 1).length;
+            const evenCount = numbers.length - oddCount;
+            const consecutivePairs = countConsecutivePairs(numbers);
+            const primes = numbers.filter(isPrime).length;
+            const fibs = numbers.filter(n => isFibonacci(n)).length;
+            const lowHighRatio = calculateLowHighRatio(numbers, mainPool);
+            const stdDev = calculateStandardDeviation(numbers);
+            const digitDistribution = getDigitDistribution(numbers);
+            const groupDistribution = getGroupDistribution(numbers, mainPool);
+
+            document.getElementById('seedProfileResults').innerHTML = `
+                <p class="font-medium">Seed Profile Generated</p>
+                <p class="text-sm">Characteristics of the input numbers:</p>
+            `;
+
+            document.getElementById('seedStats').innerHTML = `
+                <p>Numbers Count: ${numbers.length} (out of ${config.pickCount} expected)</p>
+                <p>Sum: ${sum} (Avg: ${avg.toFixed(2)})</p>
+                <p>Odd/Even Ratio: ${oddCount}/${evenCount}</p>
+                <p>Low/High Ratio (to ${mainPool/2}): ${lowHighRatio.toFixed(2)}</p>
+                <p>Standard Deviation: ${stdDev.toFixed(2)}</p>
+            `;
+
+            document.getElementById('seedPatterns').innerHTML = `
+                <p>Consecutive Pairs: ${consecutivePairs}</p>
+                <p>Prime Numbers: ${primes}</p>
+                <p>Fibonacci Numbers: ${fibs}</p>
+                <p>Gaps: ${calculateGaps(numbers).join(', ')}</p>
+                <p>Last Digit Freq: ${JSON.stringify(digitDistribution)}</p>
+                <p>Group Freq: ${JSON.stringify(groupDistribution)}</p>
+            `;
+
+            // Comparison to Optimal/Historical
+            const optimalStats = getOptimalGameCharacteristics(config);
+            const comparisonResult = compareSeedToOptimal({
+                sum, oddCount, evenCount, consecutivePairs, primes, fibs, lowHighRatio, groupDistribution
+            }, optimalStats);
+            document.getElementById('seedComparison').innerHTML = comparisonResult;
+
+
+            // Update visual representation chart
+            updateSeedVisualsChart(numbers);
+
+            showNotification('Seed profile generated successfully!');
+        }
+
+        async function interpretSeedProfile() {
+            const input = document.getElementById('numbersToReverse').value;
+            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+
+            const seedInterpretationOutput = document.getElementById('seedInterpretationOutput');
+            const seedInterpretationText = document.getElementById('seedInterpretationText');
+            const seedInterpretationLoading = document.getElementById('seedInterpretationLoading');
+
+            seedInterpretationOutput.classList.remove('hidden');
+            seedInterpretationText.innerHTML = '';
+            seedInterpretationLoading.classList.remove('hidden');
+
+            if (numbers.length === 0) {
+                seedInterpretationText.textContent = 'Please generate a seed profile first to get AI interpretation.';
+                seedInterpretationLoading.classList.add('hidden');
+                return;
+            }
+
+            const game = document.getElementById('seedReverseGame').value;
+            const config = gameConfigs[game];
+
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const avg = sum / numbers.length;
+            const oddCount = numbers.filter(n => n % 2 === 1).length;
+            const evenCount = numbers.length - oddCount;
+            const consecutivePairs = countConsecutivePairs(numbers);
+            const primes = numbers.filter(isPrime).length;
+            const fibs = numbers.filter(n => isFibonacci(n)).length;
+            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
+            const stdDev = calculateStandardDeviation(numbers);
+            const gaps = calculateGaps(numbers).join(', ');
+            const digitDistribution = getDigitDistribution(numbers);
+            const groupDistribution = getGroupDistribution(numbers, config.mainPool);
+            const optimalStats = getOptimalGameCharacteristics(config);
+            const comparisonResult = compareSeedToOptimal({
+                sum, oddCount, evenCount, consecutivePairs, primes, fibs, lowHighRatio, groupDistribution
+            }, optimalStats, true); // Pass true to get raw comparison text
+
+            let prompt = `Interpret the following statistical and pattern profile for a set of lottery numbers from a ${game} game (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers):
+            Numbers: ${numbers.join(', ')}
+            Count: ${numbers.length}
+            Sum: ${sum} (Average: ${avg.toFixed(2)})
+            Odd/Even: ${oddCount} odd, ${evenCount} even
+            Consecutive Pairs: ${consecutivePairs}
+            Prime Numbers: ${primes}
+            Fibonacci Numbers: ${fibs}
+            Low/High Ratio: ${lowHighRatio.toFixed(2)}
+            Standard Deviation: ${stdDev.toFixed(2)}
+            Gaps between sorted numbers: ${gaps}
+            Last Digit Distribution: ${JSON.stringify(digitDistribution)}
+            Number Group Distribution: ${JSON.stringify(groupDistribution)}
+            Comparison to Optimal/Historical Patterns: ${comparisonResult}
+
+            Provide a concise, human-readable interpretation of what this "seed profile" suggests about the numbers. For example, comment on their balance, predictability, any unusual characteristics, and how they compare to typical winning patterns for this lottery game. Suggest if this "seed" is well-balanced or has specific biases.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    seedInterpretationText.textContent = result.candidates[0].content.parts[0].text;
+                } else {
+                    seedInterpretationText.textContent = 'Could not retrieve AI interpretation.';
+                    console.error("Gemini API did not return expected content structure for interpretation.");
+                }
+            } catch (error) {
+                seedInterpretationText.textContent = 'Error fetching AI interpretation.';
+                console.error("Error calling Gemini API for AI interpretation:", error);
+            } finally {
+                seedInterpretationLoading.classList.add('hidden');
+            }
+            showNotification('AI Interpretation generated!');
+        }
+
+        function getDigitDistribution(numbers) {
+            const distribution = Array(10).fill(0); // 0-9
+            numbers.forEach(num => {
+                distribution[num % 10]++;
+            });
+            return distribution;
+        }
+
+        function getGroupDistribution(numbers, mainPool) {
+            const groupSizes = [10, 10, 10, 10, 10, 10, 10]; // Default for up to 70
+            const groups = {};
+            let currentStart = 1;
+            for (let i = 0; i < groupSizes.length; i++) {
+                const groupEnd = currentStart + groupSizes[i] - 1;
+                if (currentStart > mainPool) break;
+                const groupName = `${currentStart}-${Math.min(groupEnd, mainPool)}`;
+                groups[groupName] = 0;
+                currentStart = groupEnd + 1;
+            }
+
+            numbers.forEach(num => {
+                for (const groupName in groups) {
+                    const [start, end] = groupName.split('-').map(Number);
+                    if (num >= start && num <= end) {
+                        groups[groupName]++;
+                        break;
+                    }
+                }
+            });
+            return groups;
+        }
+
+        function getOptimalGameCharacteristics(config) {
+            // This is simplified. In a real app, this would come from extensive historical analysis.
+            // For now, it uses predefined optimal ranges in gameConfigs.
+            return config.optimal;
+        }
+
+        function compareSeedToOptimal(seedStats, optimalStats, rawText = false) {
+            let comparisons = [];
+
+            // Sum
+            const sumStatus = (seedStats.sum >= optimalStats.sumRange[0] && seedStats.sum <= optimalStats.sumRange[1]) ? 'within optimal range' : 'outside optimal range';
+            comparisons.push(`Sum (${seedStats.sum}): ${sumStatus} (${optimalStats.sumRange[0]}-${optimalStats.sumRange[1]})`);
+
+            // Odd/Even Ratio
+            const oddEvenSum = seedStats.oddCount + seedStats.evenCount;
+            const oddRatio = (seedStats.oddCount / oddEvenSum).toFixed(2);
+            const evenRatio = (seedStats.evenCount / oddEvenSum).toFixed(2);
+            const optimalOdd = optimalStats.oddEvenRatio[0];
+            const optimalEven = optimalStats.oddEvenRatio[1];
+            const oddEvenStatus = (seedStats.oddCount >= optimalOdd - 1 && seedStats.oddCount <= optimalOdd + 1 &&
+                                   seedStats.evenCount >= optimalEven - 1 && seedStats.evenCount <= optimalEven + 1) ? 'well-balanced' : 'imbalanced';
+            comparisons.push(`Odd/Even (${seedStats.oddCount}/${seedStats.evenCount}): ${oddEvenStatus} (Optimal: ${optimalOdd}/${optimalEven})`);
+
+            // Consecutive Pairs
+            const consecutiveStatus = (seedStats.consecutivePairs <= optimalStats.consecutiveMax) ? 'within acceptable limit' : 'too many consecutive pairs';
+            comparisons.push(`Consecutive Pairs (${seedStats.consecutivePairs}): ${consecutiveStatus} (Max Optimal: ${optimalStats.consecutiveMax})`);
+
+            // Prime Numbers
+            const primeStatus = (seedStats.primes >= optimalStats.primeCount[0] && seedStats.primes <= optimalStats.primeCount[1]) ? 'within optimal range' : 'outside optimal range';
+            comparisons.push(`Prime Numbers (${seedStats.primes}): ${primeStatus} (Optimal: ${optimalStats.primeCount[0]}-${optimalStats.primeCount[1]})`);
+            
+            // Fibonacci Numbers
+            const fibStatus = (seedStats.fibs >= optimalStats.fibCount[0] && seedStats.fibs <= optimalStats.fibCount[1]) ? 'within optimal range' : 'outside optimal range';
+            comparisons.push(`Fibonacci Numbers (${seedStats.fibs}): ${fibStatus} (Optimal: ${optimalStats.fibCount[0]}-${optimalStats.fibCount[1]})`);
+
+            // Group Distribution (simplified check)
+            let groupStatus = 'balanced across groups';
+            for (const groupName in seedStats.groupDistribution) {
+                const count = seedStats.groupDistribution[groupName];
+                const optimalRange = optimalStats.groupDistribution[groupName];
+                if (optimalRange && (count < optimalRange[0] || count > optimalRange[1])) {
+                    groupStatus = 'imbalanced in some groups';
+                    break;
+                }
+            }
+            comparisons.push(`Group Distribution: ${groupStatus}`);
+
+            if (rawText) {
+                return comparisons.join('; ');
+            } else {
+                return comparisons.map(c => `<p>${c}</p>`).join('');
+            }
+        }
+
+        function updateSeedVisualsChart(numbers) {
+            const frequencyMap = numbers.reduce((acc, num) => {
+                acc[num] = (acc[num] || 0) + 1;
+                return acc;
+            }, {});
+            
+            const labels = Object.keys(frequencyMap).sort((a, b) => a - b);
+            const data = labels.map(label => frequencyMap[label]);
+
+            charts.seedVisualsChart.data.labels = labels;
+            charts.seedVisualsChart.data.datasets[0].data = data;
+            charts.seedVisualsChart.data.datasets[0].label = 'Frequency of Input Numbers';
+            charts.seedVisualsChart.data.datasets[0].backgroundColor = '#10B981'; // Accent color for seed visuals
+            charts.seedVisualsChart.update();
+        }
+
+        function clearSeedReverse() {
+            document.getElementById('numbersToReverse').value = '';
+            document.getElementById('seedProfileResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Enter numbers and generate profile</p>';
+            document.getElementById('seedStats').innerHTML = '';
+            document.getElementById('seedPatterns').innerHTML = '';
+            document.getElementById('seedComparison').innerHTML = ''; // Clear new comparison section
+            document.getElementById('seedInterpretationOutput').classList.add('hidden'); // Hide AI interpretation output
+            document.getElementById('seedInterpretationText').textContent = ''; // Clear AI interpretation text
+            
+            // Clear seed visuals chart
+            charts.seedVisualsChart.data.labels = [];
+            charts.seedVisualsChart.data.datasets[0].data = [];
+            charts.seedVisualsChart.update();
+
+            showNotification('Seed Reverser cleared!');
+        }
+
 
         // Historical Data Functions
         function loadHistoricalData() {
@@ -2188,14 +2736,22 @@
                 gaps[i] = appState.historicalData.length; // Default to max gap
             }
             
-            // Update gaps based on actual appearances
+            // Track last seen index for each number
+            const lastSeenIndex = {};
             appState.historicalData.forEach((draw, index) => {
                 draw.numbers.forEach(num => {
-                    if (gaps[num] === appState.historicalData.length) {
-                        gaps[num] = appState.historicalData.length - index - 1;
-                    }
+                    lastSeenIndex[num] = index;
                 });
             });
+
+            // Calculate gaps
+            for (let i = 1; i <= mainPool; i++) {
+                if (lastSeenIndex[i] !== undefined) {
+                    gaps[i] = appState.historicalData.length - 1 - lastSeenIndex[i];
+                } else {
+                    gaps[i] = appState.historicalData.length; // If never seen, gap is full history length
+                }
+            }
             
             return gaps;
         }
@@ -2225,7 +2781,7 @@
 
         function exportHistoricalData() {
             if (appState.historicalData.length === 0) {
-                                showNotification('No historical data to export!');
+                showNotification('No historical data to export!');
                 return;
             }
             
@@ -2264,7 +2820,7 @@
                     const frequency = getNumberFrequency();
                     recommendedNumbers = Object.entries(frequency)
                         .sort((a, b) => b[1] - a[1])
-                        .slice(0, config.pickCount * 2)
+                        .slice(0, config.pickCount * 2) // Get more numbers than needed, then filter unique
                         .map(([num]) => parseInt(num));
                     break;
                     
@@ -2272,7 +2828,7 @@
                     const gaps = getGapAnalysis();
                     recommendedNumbers = Object.entries(gaps)
                         .sort((a, b) => b[1] - a[1])
-                        .slice(0, config.pickCount * 2)
+                        .slice(0, config.pickCount * 2) // Get more numbers than needed, then filter unique
                         .map(([num]) => parseInt(num));
                     break;
                     
@@ -2299,6 +2855,9 @@
                     break;
             }
             
+            // Ensure we have exactly pickCount unique numbers for recommendation
+            recommendedNumbers = [...new Set(recommendedNumbers)].slice(0, config.pickCount);
+
             // Display results
             document.getElementById('strategyResults').innerHTML = `
                 <p class="font-medium">${strategy.charAt(0).toUpperCase() + strategy.slice(1)} Strategy Applied</p>
@@ -2357,12 +2916,14 @@
                 let score = 0;
                 
                 if (components.includes('frequency')) {
-                    const freqScore = (frequency[num] || 0) / Math.max(...Object.values(frequency));
+                    const maxFreq = Math.max(...Object.values(frequency));
+                    const freqScore = maxFreq > 0 ? (frequency[num] || 0) / maxFreq : 0;
                     score += freqScore * weights.frequency;
                 }
                 
                 if (components.includes('gap')) {
-                    const gapScore = (gaps[num] || 0) / Math.max(...Object.values(gaps));
+                    const maxGap = Math.max(...Object.values(gaps));
+                    const gapScore = maxGap > 0 ? (gaps[num] || 0) / maxGap : 0;
                     score += gapScore * weights.gap;
                 }
                 
@@ -2374,15 +2935,12 @@
                             patternScore += pairFrequency[pair];
                         }
                     }
+                    const maxPairFreq = Math.max(...Object.values(pairFrequency));
+                    patternScore = maxPairFreq > 0 ? patternScore / maxPairFreq : 0;
                     score += patternScore * weights.pattern;
                 }
                 
-                // Other factors
-                if (components.includes('sum')) {
-                    // This would be more complex in a real implementation
-                    score += Math.random() * weights.other;
-                }
-                
+                // Other factors (sum, prime, fibonacci)
                 if (components.includes('prime') && isPrime(num)) {
                     score += weights.other;
                 }
@@ -2391,13 +2949,16 @@
                     score += weights.other;
                 }
                 
+                // Add a small random component to break ties and add variety
+                score += Math.random() * 0.01; 
+                
                 return { num, score };
             });
             
             // Sort by score and get top numbers
             const recommendedNumbers = scoredNumbers
                 .sort((a, b) => b.score - a.score)
-                .slice(0, config.pickCount * 2)
+                .slice(0, config.pickCount) // Get exactly pickCount numbers
                 .map(item => item.num);
             
             // Display results
@@ -2414,11 +2975,11 @@
                 
             document.getElementById('strategyAnalysis').innerHTML = `
                 <p>Components: ${components.join(', ')}</p>
-                <p>Weights: Frequency (${weights.frequency.toFixed(2)}), Gap (${weights.gap.toFixed(2)}), Pattern (${weights.pattern.toFixed(2)}), Other (${weights.other.toFixed(2)})</p>
+                <p>Weights: Frequency (${(weights.frequency*100).toFixed(0)}%), Gap (${(weights.gap*100).toFixed(0)}%), Pattern (${(weights.pattern*100).toFixed(0)}%), Other (${(weights.other*100).toFixed(0)}%)</p>
                 <p>Numbers recommended: ${recommendedNumbers.length}</p>
             `;
             
-            showNotification('Custom strategy applied successfully!');
+            showNotification('Custom strategy applied successfully! Check the recommended numbers.');
         }
 
         function getPairFrequency() {
@@ -2451,17 +3012,17 @@
                 checkedComponents.forEach(comp => {
                     switch (comp.value) {
                         case 'frequency':
-                            document.getElementById('freqWeight').value = weightPerComponent;
+                            document.getElementById('freqWeight').value = parseFloat(document.getElementById('freqWeight').value) + weightPerComponent;
                             break;
                         case 'gap':
-                            document.getElementById('gapWeight').value = weightPerComponent;
+                            document.getElementById('gapWeight').value = parseFloat(document.getElementById('gapWeight').value) + weightPerComponent;
                             break;
                         case 'pattern':
-                            document.getElementById('patternWeight').value = weightPerComponent;
+                            document.getElementById('patternWeight').value = parseFloat(document.getElementById('patternWeight').value) + weightPerComponent;
                             break;
-                        default:
+                        default: // For sum, prime, fibonacci, etc.
                             document.getElementById('otherWeight').value = 
-                                parseInt(document.getElementById('otherWeight').value) + weightPerComponent;
+                                parseFloat(document.getElementById('otherWeight').value) + weightPerComponent;
                     }
                 });
             }
@@ -2470,10 +3031,10 @@
         }
 
         function updateStrategyWeightValues() {
-            document.getElementById('freqWeightValue').textContent = document.getElementById('freqWeight').value + '%';
-            document.getElementById('gapWeightValue').textContent = document.getElementById('gapWeight').value + '%';
-            document.getElementById('patternWeightValue').textContent = document.getElementById('patternWeight').value + '%';
-            document.getElementById('otherWeightValue').textContent = document.getElementById('otherWeight').value + '%';
+            document.getElementById('freqWeightValue').textContent = Math.round(document.getElementById('freqWeight').value) + '%';
+            document.getElementById('gapWeightValue').textContent = Math.round(document.getElementById('gapWeight').value) + '%';
+            document.getElementById('patternWeightValue').textContent = Math.round(document.getElementById('patternWeight').value) + '%';
+            document.getElementById('otherWeightValue').textContent = Math.round(document.getElementById('otherWeight').value) + '%';
         }
 
         // Probability Functions
@@ -2516,8 +3077,8 @@
             
             document.getElementById('winChances').innerHTML = `
                 <p>Match all: 1 in ${totalCombinations.toLocaleString()}</p>
-                <p>Match ${config.pickCount - 1} + bonus: ~1 in ${Math.round(totalCombinations / 10).toLocaleString()}</p>
-                <p>Match ${config.pickCount - 1}: ~1 in ${Math.round(totalCombinations / 100).toLocaleString()}</p>
+                <p>Match ${config.pickCount - 1} + bonus: ~1 in ${Math.round(totalCombinations / (config.pickCount * config.bonusCount)).toLocaleString()}</p>
+                <p>Match ${config.pickCount - 1}: ~1 in ${Math.round(totalCombinations / config.pickCount).toLocaleString()}</p>
             `;
             
             document.getElementById('expectedValue').textContent = `$${expectedValue.toFixed(2)}`;
@@ -2532,12 +3093,13 @@
         }
 
         function combinations(n, k) {
-            if (k > n) return 0;
+            if (k < 0 || k > n) return 0;
             if (k === 0 || k === n) return 1;
+            if (k > n / 2) k = n - k; // Optimization
             
             let result = 1;
             for (let i = 1; i <= k; i++) {
-                result *= (n - k + i) / i;
+                result = result * (n - i + 1) / i;
             }
             
             return Math.round(result);
@@ -2667,8 +3229,12 @@
             // Combine frequency and gaps for scoring
             const scoredNumbers = Object.keys(frequency).map(num => {
                 const numInt = parseInt(num);
-                const freqScore = frequency[num] / Math.max(...Object.values(frequency));
-                const gapScore = gaps[num] / Math.max(...Object.values(gaps));
+                const maxFreq = Math.max(...Object.values(frequency));
+                const maxGap = Math.max(...Object.values(gaps));
+
+                const freqScore = maxFreq > 0 ? (frequency[num] || 0) / maxFreq : 0;
+                const gapScore = maxGap > 0 ? (gaps[num] || 0) / maxGap : 0;
+                
                 return {
                     num: numInt,
                     score: freqScore * 0.6 + gapScore * 0.4 + Math.random() * 0.1 // Add some randomness
@@ -2764,10 +3330,13 @@
             
             const scoredNumbers = Object.keys(frequency).map(num => {
                 const numInt = parseInt(num);
+                const maxFreq = Math.max(...Object.values(frequency));
+                const maxGap = Math.max(...Object.values(gaps));
+
                 return {
                     num: numInt,
-                    score: (frequency[num] / Math.max(...Object.values(frequency))) * 0.6 + 
-                           (gaps[num] / Math.max(...Object.values(gaps))) * 0.4 +
+                    score: (maxFreq > 0 ? (frequency[num] || 0) / maxFreq : 0) * 0.6 + 
+                           (maxGap > 0 ? (gaps[num] || 0) / maxGap : 0) * 0.4 +
                            Math.random() * 0.1
                 };
             });
@@ -2786,7 +3355,7 @@
                 return acc;
             }, {});
             
-            const bonus = Object.entries(bonusFrequency)
+            const predictedBonus = Object.entries(bonusFrequency)
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, config.bonusCount)
                 .map(([num]) => parseInt(num));
@@ -2901,31 +3470,62 @@
         }
 
         function clearAllData() {
-            if (confirm('Are you sure you want to reset all application data? This cannot be undone.')) {
-                localStorage.clear();
-                appState.historicalData = [];
-                appState.savedTickets = [];
-                appState.notificationCount = 0;
-                appState.currentPage = 1;
-                
-                // Reset UI
-                clearGenerator();
-                clearAnalyzer();
-                clearHistoricalData();
-                resetProbabilityCalculator();
-                
-                document.getElementById('predictionResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate predictions to see results</p>';
-                document.getElementById('strategyResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Apply a strategy to see recommendations</p>';
-                
-                // Reset settings to defaults
-                appState.darkMode = true;
-                appState.animations = true;
-                appState.notifications = true;
-                appState.defaultGame = 'powerball';
-                
-                updateUI();
-                showNotification('All application data has been reset!');
-            }
+            // Using a custom modal-like confirmation instead of browser's confirm()
+            const confirmReset = (callback) => {
+                const modalHtml = `
+                    <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 text-center">
+                            <h3 class="text-xl font-semibold mb-4">Confirm Reset</h3>
+                            <p class="mb-6">Are you sure you want to reset all application data? This cannot be undone.</p>
+                            <div class="flex justify-center gap-4">
+                                <button id="confirmCancel" class="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">Cancel</button>
+                                <button id="confirmProceed" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600 flex-1">Proceed</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                document.getElementById('confirmCancel').addEventListener('click', () => {
+                    document.getElementById('confirmModal').remove();
+                    callback(false);
+                });
+                document.getElementById('confirmProceed').addEventListener('click', () => {
+                    document.getElementById('confirmModal').remove();
+                    callback(true);
+                });
+            };
+
+            confirmReset((confirmed) => {
+                if (confirmed) {
+                    localStorage.clear();
+                    appState.historicalData = [];
+                    appState.savedTickets = [];
+                    appState.notificationCount = 0;
+                    appState.currentPage = 1;
+                    
+                    // Reset UI
+                    clearGenerator();
+                    clearAnalyzer();
+                    clearHistoricalData();
+                    resetProbabilityCalculator();
+                    clearSeedReverse(); // Clear the new section
+                    
+                    document.getElementById('predictionResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate predictions to see results</p>';
+                    document.getElementById('strategyResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Apply a strategy to see recommendations</p>';
+                    
+                    // Reset settings to defaults
+                    appState.darkMode = true;
+                    appState.animations = true;
+                    appState.notifications = true;
+                    appState.defaultGame = 'powerball';
+                    
+                    updateUI();
+                    showNotification('All application data has been reset!');
+                } else {
+                    showNotification('Reset cancelled.');
+                }
+            });
         }
 
         function exportAllData() {
@@ -3014,8 +3614,10 @@
             let html = activityDiv.innerHTML;
             html = `<p><span class="text-gray-500 dark:text-gray-400">[${now}]</span> ${message}</p>` + html;
             
-            if (html.split('<p>').length > 6) {
-                html = html.substring(0, html.lastIndexOf('<p>'));
+            // Limit to 5 recent activities
+            const paragraphs = html.split('</p>').filter(p => p.trim() !== '');
+            if (paragraphs.length > 5) {
+                html = paragraphs.slice(0, 5).join('</p>') + '</p>';
             }
             
             activityDiv.innerHTML = html;
