@@ -369,6 +369,7 @@
                         <div class="flex flex-wrap gap-2">
                             <button id="analyzeNumbers" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Analyze</button>
                             <button id="getAIInsights" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 flex-1">AI Insights ✨</button>
+                            <button id="predictFromUnused" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700 flex-1">Predict from Unused</button>
                             <button id="clearAnalyzer" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
                         </div>
                         
@@ -430,9 +431,9 @@
                             </div>
                             <!-- New section for unused numbers and pairs -->
                             <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                                <h4 class="font-medium text-sm">Unused Numbers & Pairs</h4>
+                                <h4 class="font-medium text-sm">Unused Numbers & Pairs (from input)</h4>
                                 <div id="unusedNumbersAndPairs" class="text-xs mt-1">
-                                    <p>Load historical data and analyze to see unused numbers and pairs.</p>
+                                    <p>Analyze numbers to see unused numbers and pairs relative to the game's pool.</p>
                                 </div>
                             </div>
                         </div>
@@ -457,6 +458,14 @@
                     <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                         <h4 class="font-medium text-sm">Odd/Even Distribution</h4>
                         <canvas id="oddEvenDistributionChart" class="chart-container"></canvas>
+                    </div>
+                </div>
+
+                <!-- Predictions from Unused Numbers -->
+                <div class="mt-6">
+                    <h3 class="text-xl font-medium">Predictions from Unused Numbers</h3>
+                    <div id="unusedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
+                        <p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>
                     </div>
                 </div>
             </section>
@@ -1228,7 +1237,8 @@
             
             // Analyzer Controls
             document.getElementById('analyzeNumbers').addEventListener('click', analyzeNumbers);
-            document.getElementById('getAIInsights').addEventListener('click', getAIInsights); // New AI Insights button
+            document.getElementById('getAIInsights').addEventListener('click', getAIInsights);
+            document.getElementById('predictFromUnused').addEventListener('click', predictFromUnused); // New button
             document.getElementById('clearAnalyzer').addEventListener('click', clearAnalyzer);
             document.querySelectorAll('.sample-input').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -1238,7 +1248,7 @@
 
             // Seed Reverser Controls (New)
             document.getElementById('reverseSeedBtn').addEventListener('click', reverseSeedAnalysis);
-            document.getElementById('interpretSeedProfile').addEventListener('click', interpretSeedProfile); // New AI interpretation button
+            document.getElementById('interpretSeedProfile').addEventListener('click', interpretSeedProfile);
             document.getElementById('clearSeedReverse').addEventListener('click', clearSeedReverse);
             
             // Historical Data Controls
@@ -1990,27 +2000,24 @@
             const visualAnalysisDiv = document.getElementById('visualAnalysis');
             visualAnalysisDiv.innerHTML = numbers.map(n => {
                 let className = 'number-ball';
-                // These functions rely on historicalData being loaded, so add a check
-                if (appState.historicalData.length > 0) {
-                    if (isHotNumber(n)) className += ' hot-number';
-                    if (isDueNumber(n)) className += ' due-number';
-                    // If not hot or due, consider it cold for visual representation
-                    if (!isHotNumber(n) && !isDueNumber(n) && getNumberFrequency()[n] !== undefined) className += ' cold-number';
-                }
                 return `<span class="${className}">${n}</span>`;
             }).join('');
             
-            // Detect unused numbers and pairs
-            if (appState.historicalData.length > 0) {
-                const { unusedNumbers, unusedPairs } = detectUnusedNumbersAndPairs(appState.historicalData, config.mainPool, config.pickCount);
-                const unusedNumbersDiv = document.getElementById('unusedNumbersAndPairs');
-                unusedNumbersDiv.innerHTML = `
-                    <p><strong>Unused Numbers:</strong> ${unusedNumbers.length > 0 ? unusedNumbers.map(n => `<span class="number-ball unused-number">${n}</span>`).join('') : 'None'}</p>
-                    <p><strong>Unused Pairs (${unusedPairs.length}):</strong> ${unusedPairs.length > 0 ? unusedPairs.slice(0, 10).join(', ') + (unusedPairs.length > 10 ? '...' : '') : 'None'}</p>
-                `;
-            } else {
-                document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Load historical data to detect unused numbers and pairs.</p>';
-            }
+            // Detect unused numbers and pairs from input
+            const { unusedNumbers, unusedPairs } = detectUnusedFromInput(numbers, config.mainPool);
+            const unusedNumbersDiv = document.getElementById('unusedNumbersAndPairs');
+            
+            const unusedNumbersDisplay = unusedNumbers.length > 0 
+                ? unusedNumbers.slice(0, 20).map(n => `<span class="number-ball unused-number">${n}</span>`).join('') + (unusedNumbers.length > 20 ? '...' : '') 
+                : 'None';
+            const unusedPairsDisplay = unusedPairs.length > 0 
+                ? `Analysis complete. Found ${unusedPairs.length.toLocaleString()} unused pairs.` 
+                : 'None';
+
+            unusedNumbersDiv.innerHTML = `
+                <p><strong>Unused Numbers (${unusedNumbers.length}):</strong> ${unusedNumbersDisplay}</p>
+                <p><strong>Unused Pairs (${unusedPairs.length.toLocaleString()}):</strong> ${unusedPairsDisplay}</p>
+            `;
 
             // Update charts
             updateAnalyzerCharts(numbers);
@@ -2022,6 +2029,59 @@
             `;
             
             showNotification('Analysis completed!');
+        }
+        
+        /**
+         * New: Predicts lotto tickets using unused numbers from the input field.
+         */
+        function predictFromUnused() {
+            const input = document.getElementById('numbersToAnalyze').value;
+            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+
+            if (numbers.length === 0) {
+                showNotification('Please enter numbers to analyze first!');
+                return;
+            }
+
+            const game = document.getElementById('analyzerGame').value;
+            const config = gameConfigs[game];
+
+            const { unusedNumbers } = detectUnusedFromInput(numbers, config.mainPool);
+
+            if (unusedNumbers.length < config.pickCount) {
+                showNotification('Not enough unused numbers to generate a full ticket!');
+                document.getElementById('unusedPredictionOutput').innerHTML = '<p class="text-danger">Not enough unused numbers to generate a full ticket.</p>';
+                return;
+            }
+
+            const numTickets = 5; // Generate 5 tickets by default
+            const tickets = [];
+
+            for (let i = 0; i < numTickets; i++) {
+                // Use lodash to get a random sample from the unused numbers pool
+                const mainNumbers = _.sampleSize(unusedNumbers, config.pickCount).sort((a,b) => a-b);
+                const bonusNumbers = Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1);
+                tickets.push({ numbers: mainNumbers, bonus: bonusNumbers });
+            }
+
+            // Display tickets in the new output area
+            const outputDiv = document.getElementById('unusedPredictionOutput');
+            outputDiv.innerHTML = tickets.map((ticket, index) => `
+                <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium">Prediction ${index + 1}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1 mb-1">
+                        ${ticket.numbers.map(num => `<span class="number-ball unused-number">${num}</span>`).join('')}
+                    </div>
+                    <div class="flex flex-wrap gap-1">
+                        ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            showNotification('Generated predictions from unused numbers.');
         }
 
         async function getAIInsights() {
@@ -2157,45 +2217,36 @@
             const avgGap = values.reduce((a, b) => a + b, 0) / values.length;
             return (gaps[num] || 0) > avgGap * 1.5;
         }
-
+        
         /**
-         * Detects numbers and pairs that have never appeared in the historical data.
-         * @param {Array<Object>} historicalData - Array of historical draw objects, each with a 'numbers' array.
-         * @param {number} mainPool - The maximum number in the main pool.
-         * @param {number} pickCount - The number of main numbers picked in each draw.
+         * New: Detects unused numbers and pairs based on a set of input numbers against the game's pool.
+         * @param {number[]} inputNumbers - The array of numbers provided by the user.
+         * @param {number} mainPool - The maximum number in the main pool for the selected game.
          * @returns {{unusedNumbers: number[], unusedPairs: string[]}} - An object containing arrays of unused numbers and pairs.
          */
-        function detectUnusedNumbersAndPairs(historicalData, mainPool, pickCount) {
+        function detectUnusedFromInput(inputNumbers, mainPool) {
             const allPossibleNumbers = new Set(Array.from({ length: mainPool }, (_, i) => i + 1));
-            const appearedNumbers = new Set();
-            const appearedPairs = new Set();
+            const usedNumbers = new Set(inputNumbers);
 
-            // Collect all numbers and pairs that have appeared
-            historicalData.forEach(draw => {
-                const numbersInDraw = draw.numbers;
-                numbersInDraw.forEach(num => appearedNumbers.add(num));
+            const unusedNumbers = [...allPossibleNumbers].filter(num => !usedNumbers.has(num));
 
-                // Generate pairs for the current draw
-                for (let i = 0; i < numbersInDraw.length; i++) {
-                    for (let j = i + 1; j < numbersInDraw.length; j++) {
-                        // Ensure pairs are stored consistently (e.g., "1-5" not "5-1")
-                        const pair = [numbersInDraw[i], numbersInDraw[j]].sort((a, b) => a - b).join('-');
-                        appearedPairs.add(pair);
-                    }
-                }
-            });
-
-            // Find unused numbers
-            const unusedNumbers = Array.from(allPossibleNumbers).filter(num => !appearedNumbers.has(num));
-
-            // Find unused pairs
-            const allPossiblePairs = [];
+            // Find unused pairs by comparing all possible pairs to pairs present in the input
+            const allPossiblePairs = new Set();
             for (let i = 1; i <= mainPool; i++) {
                 for (let j = i + 1; j <= mainPool; j++) {
-                    allPossiblePairs.push(`${i}-${j}`);
+                    allPossiblePairs.add(`${i}-${j}`);
                 }
             }
-            const unusedPairs = allPossiblePairs.filter(pair => !appearedPairs.has(pair));
+
+            const usedPairs = new Set();
+            const sortedInput = [...inputNumbers].sort((a,b)=>a-b);
+            for (let i = 0; i < sortedInput.length; i++) {
+                for (let j = i + 1; j < sortedInput.length; j++) {
+                    usedPairs.add(`${sortedInput[i]}-${sortedInput[j]}`);
+                }
+            }
+
+            const unusedPairs = [...allPossiblePairs].filter(pair => !usedPairs.has(pair));
 
             return { unusedNumbers, unusedPairs };
         }
@@ -2251,8 +2302,9 @@
             document.getElementById('visualAnalysis').innerHTML = '';
             document.getElementById('aiInsightsOutput').classList.add('hidden'); // Hide AI insights output
             document.getElementById('aiInsightsText').textContent = ''; // Clear AI insights text
-            document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Load historical data to detect unused numbers and pairs.</p>'; // Clear unused section
-            
+            document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Analyze numbers to see unused numbers and pairs relative to the game\'s pool.</p>';
+            document.getElementById('unusedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>';
+
             // Reset charts
             ['freqDistributionChart', 'lastDigitDistributionChart', 'sumDistributionChart', 'oddEvenDistributionChart'].forEach(id => {
                 charts[id].data.labels = [];
@@ -3545,7 +3597,7 @@
                 
             return {
                 numbers,
-                bonus,
+                bonus: predictedBonus,
                 confidence: (Math.random() * 20 + 70).toFixed(1)
             };
         }
