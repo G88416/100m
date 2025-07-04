@@ -6,6 +6,7 @@
     <title>Lotto Genius Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lodash is not strictly necessary for this update but kept as it was in the original -->
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
     <script>
         tailwind.config = {
@@ -225,11 +226,12 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium">Random Seed</label>
+                            <label class="block text-sm font-medium">Random Seed (for reproducible random numbers)</label>
                             <div class="flex gap-2">
-                                <input id="randomSeed" type="text" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="Enter seed">
+                                <input id="randomSeed" type="text" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="Enter seed or leave empty for true random">
                                 <button id="randomSeedBtn" class="p-2 bg-primary text-white rounded-lg">🎲 Random</button>
                             </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Note: This seed is for reproducible pseudo-random generation, not a literal lottery draw seed.</p>
                         </div>
                     </div>
 
@@ -477,6 +479,10 @@
                             <button id="interpretSeedProfile" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 flex-1">Interpret Profile ✨</button>
                             <button id="clearSeedReverse" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
                         </div>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                            The "Seed Profile" below represents the statistical characteristics and patterns of your input numbers. 
+                            It's not a literal random number generator seed, but a descriptive "seed" for understanding and potentially regenerating similar number sets.
+                        </p>
                     </div>
 
                     <!-- Output for Seed Reverser -->
@@ -1411,6 +1417,10 @@
         }
 
         function generateRandomSeed() {
+            // Generates a random string that can be used as a pseudo-seed for reproducible random numbers
+            // Note: Math.random() itself cannot be truly re-seeded in standard JavaScript without a library.
+            // This string would typically be used with a custom PRNG implementation or a library like 'seedrandom'.
+            // For this app, it's a placeholder for a user-defined "seed" for generation.
             document.getElementById('randomSeed').value = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         }
 
@@ -1886,8 +1896,20 @@
                 return `Numbers: ${numbers.join(', ')} | Bonus: ${bonus.join(', ')}`;
             }).join('\n');
             
-            document.execCommand('copy'); // Use execCommand for clipboard due to iframe restrictions
-            showNotification('Tickets copied to clipboard!');
+            // Create a temporary textarea to copy text
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = tickets;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                showNotification('Tickets copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                showNotification('Failed to copy tickets. Please copy manually.');
+            } finally {
+                document.body.removeChild(tempTextArea);
+            }
         }
 
         function saveTickets() {
@@ -2021,8 +2043,8 @@
             const consecutivePairs = countConsecutivePairs(numbers);
             const primes = numbers.filter(isPrime).length;
             const fibs = numbers.filter(n => isFibonacci(n)).length;
-            const stdDev = calculateStandardDeviation(numbers);
             const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
+            const stdDev = calculateStandardDeviation(numbers);
 
             let prompt = `Analyze the following lottery numbers for a ${game} game (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers): ${numbers.join(', ')}.
             Their sum is ${sum}, average is ${avg.toFixed(2)}, with ${oddCount} odd and ${evenCount} even numbers.
@@ -2098,7 +2120,11 @@
             if (numbers.length < 2) return 0;
             const sorted = [...numbers].sort((a, b) => a - b);
             const range = sorted[sorted.length - 1] - sorted[0];
-            return (range / (sorted.length - 1)) * 100; // Percentage spread over number count
+            // Normalize spread based on the range of numbers (e.g., 1-69 for Powerball)
+            // A simple approach: percentage of the total possible range covered
+            const game = document.getElementById('analyzerGame').value;
+            const mainPool = gameConfigs[game].mainPool;
+            return (range / (mainPool - 1)) * 100; 
         }
 
         function calculateLowHighRatio(numbers, mainPool) {
@@ -2217,12 +2243,15 @@
 
             document.getElementById('seedProfileResults').innerHTML = `
                 <p class="font-medium">Seed Profile Generated</p>
-                <p class="text-sm">Characteristics of the input numbers:</p>
+                <p class="text-sm">The following characteristics represent the "seed" of your input numbers for potential regeneration or analysis:</p>
+                <div class="flex flex-wrap gap-1 mt-2">
+                    ${numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
+                </div>
             `;
 
             document.getElementById('seedStats').innerHTML = `
-                <p>Numbers Count: ${numbers.length} (out of ${config.pickCount} expected)</p>
-                <p>Sum: ${sum} (Avg: ${avg.toFixed(2)})</p>
+                <p>Numbers Count: ${numbers.length} (Expected for ${game}: ${config.pickCount})</p>
+                <p>Sum: ${sum} (Average: ${avg.toFixed(2)})</p>
                 <p>Odd/Even Ratio: ${oddCount}/${evenCount}</p>
                 <p>Low/High Ratio (to ${mainPool/2}): ${lowHighRatio.toFixed(2)}</p>
                 <p>Standard Deviation: ${stdDev.toFixed(2)}</p>
@@ -2345,13 +2374,14 @@
         }
 
         function getGroupDistribution(numbers, mainPool) {
-            const groupSizes = [10, 10, 10, 10, 10, 10, 10]; // Default for up to 70
+            // Define groups dynamically based on mainPool for better adaptability
             const groups = {};
+            const groupSize = 10; // Default group size
             let currentStart = 1;
-            for (let i = 0; i < groupSizes.length; i++) {
-                const groupEnd = currentStart + groupSizes[i] - 1;
-                if (currentStart > mainPool) break;
-                const groupName = `${currentStart}-${Math.min(groupEnd, mainPool)}`;
+
+            while (currentStart <= mainPool) {
+                const groupEnd = Math.min(currentStart + groupSize - 1, mainPool);
+                const groupName = `${currentStart}-${groupEnd}`;
                 groups[groupName] = 0;
                 currentStart = groupEnd + 1;
             }
@@ -2379,7 +2409,7 @@
 
             // Sum
             const sumStatus = (seedStats.sum >= optimalStats.sumRange[0] && seedStats.sum <= optimalStats.sumRange[1]) ? 'within optimal range' : 'outside optimal range';
-            comparisons.push(`Sum (${seedStats.sum}): ${sumStatus} (${optimalStats.sumRange[0]}-${optimalStats.sumRange[1]})`);
+            comparisons.push(`Sum (${seedStats.sum}): ${sumStatus} (Optimal: ${optimalStats.sumRange[0]}-${optimalStats.sumRange[1]})`);
 
             // Odd/Even Ratio
             const oddEvenSum = seedStats.oddCount + seedStats.evenCount;
@@ -3362,7 +3392,7 @@
                 
             return {
                 numbers,
-                bonus,
+                bonus: predictedBonus,
                 confidence: (Math.random() * 20 + 70).toFixed(1)
             };
         }
