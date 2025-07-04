@@ -69,6 +69,10 @@
         .due-number {
             background-color: #F59E0B;
         }
+        /* New style for unused numbers/pairs */
+        .unused-number {
+            background-color: #6B7280; /* Gray for unused */
+        }
 
         /* Responsive adjustments for main content area */
         @media (min-width: 768px) { /* md breakpoint */
@@ -423,6 +427,13 @@
                             <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                                 <h4 class="font-medium text-sm">Advanced Metrics</h4>
                                 <div id="advancedMetrics" class="text-xs mt-1"></div>
+                            </div>
+                            <!-- New section for unused numbers and pairs -->
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <h4 class="font-medium text-sm">Unused Numbers & Pairs</h4>
+                                <div id="unusedNumbersAndPairs" class="text-xs mt-1">
+                                    <p>Load historical data and analyze to see unused numbers and pairs.</p>
+                                </div>
                             </div>
                         </div>
                         
@@ -1989,6 +2000,18 @@
                 return `<span class="${className}">${n}</span>`;
             }).join('');
             
+            // Detect unused numbers and pairs
+            if (appState.historicalData.length > 0) {
+                const { unusedNumbers, unusedPairs } = detectUnusedNumbersAndPairs(appState.historicalData, config.mainPool, config.pickCount);
+                const unusedNumbersDiv = document.getElementById('unusedNumbersAndPairs');
+                unusedNumbersDiv.innerHTML = `
+                    <p><strong>Unused Numbers:</strong> ${unusedNumbers.length > 0 ? unusedNumbers.map(n => `<span class="number-ball unused-number">${n}</span>`).join('') : 'None'}</p>
+                    <p><strong>Unused Pairs (${unusedPairs.length}):</strong> ${unusedPairs.length > 0 ? unusedPairs.slice(0, 10).join(', ') + (unusedPairs.length > 10 ? '...' : '') : 'None'}</p>
+                `;
+            } else {
+                document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Load historical data to detect unused numbers and pairs.</p>';
+            }
+
             // Update charts
             updateAnalyzerCharts(numbers);
             
@@ -2135,6 +2158,49 @@
             return (gaps[num] || 0) > avgGap * 1.5;
         }
 
+        /**
+         * Detects numbers and pairs that have never appeared in the historical data.
+         * @param {Array<Object>} historicalData - Array of historical draw objects, each with a 'numbers' array.
+         * @param {number} mainPool - The maximum number in the main pool.
+         * @param {number} pickCount - The number of main numbers picked in each draw.
+         * @returns {{unusedNumbers: number[], unusedPairs: string[]}} - An object containing arrays of unused numbers and pairs.
+         */
+        function detectUnusedNumbersAndPairs(historicalData, mainPool, pickCount) {
+            const allPossibleNumbers = new Set(Array.from({ length: mainPool }, (_, i) => i + 1));
+            const appearedNumbers = new Set();
+            const appearedPairs = new Set();
+
+            // Collect all numbers and pairs that have appeared
+            historicalData.forEach(draw => {
+                const numbersInDraw = draw.numbers;
+                numbersInDraw.forEach(num => appearedNumbers.add(num));
+
+                // Generate pairs for the current draw
+                for (let i = 0; i < numbersInDraw.length; i++) {
+                    for (let j = i + 1; j < numbersInDraw.length; j++) {
+                        // Ensure pairs are stored consistently (e.g., "1-5" not "5-1")
+                        const pair = [numbersInDraw[i], numbersInDraw[j]].sort((a, b) => a - b).join('-');
+                        appearedPairs.add(pair);
+                    }
+                }
+            });
+
+            // Find unused numbers
+            const unusedNumbers = Array.from(allPossibleNumbers).filter(num => !appearedNumbers.has(num));
+
+            // Find unused pairs
+            const allPossiblePairs = [];
+            for (let i = 1; i <= mainPool; i++) {
+                for (let j = i + 1; j <= mainPool; j++) {
+                    allPossiblePairs.push(`${i}-${j}`);
+                }
+            }
+            const unusedPairs = allPossiblePairs.filter(pair => !appearedPairs.has(pair));
+
+            return { unusedNumbers, unusedPairs };
+        }
+
+
         function updateAnalyzerCharts(numbers) {
             // Frequency Distribution
             const frequencyMap = numbers.reduce((acc, num) => {
@@ -2185,6 +2251,7 @@
             document.getElementById('visualAnalysis').innerHTML = '';
             document.getElementById('aiInsightsOutput').classList.add('hidden'); // Hide AI insights output
             document.getElementById('aiInsightsText').textContent = ''; // Clear AI insights text
+            document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Load historical data to detect unused numbers and pairs.</p>'; // Clear unused section
             
             // Reset charts
             ['freqDistributionChart', 'lastDigitDistributionChart', 'sumDistributionChart', 'oddEvenDistributionChart'].forEach(id => {
