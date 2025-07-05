@@ -493,7 +493,10 @@
                             <option value="ai">AI-Powered (from Unused)</option>
                         </select>
                     </div>
-                    <button id="predictFromUnused" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Generate Prediction from Unused</button>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="predictFromUnused" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Generate Prediction from Unused</button>
+                        <button id="regenerateFromUnused" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700">Regenerate from Unused</button>
+                    </div>
                     <div id="unusedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
                         <p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>
                         <div id="unusedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
@@ -1271,6 +1274,7 @@
             document.getElementById('analyzeNumbers').addEventListener('click', analyzeNumbers);
             document.getElementById('getAIInsights').addEventListener('click', getAIInsights);
             document.getElementById('predictFromUnused').addEventListener('click', predictFromUnused); // New button
+            document.getElementById('regenerateFromUnused').addEventListener('click', predictFromUnused); // New button for regenerate
             document.getElementById('clearAnalyzer').addEventListener('click', clearAnalyzer);
             document.querySelectorAll('.sample-input').forEach(btn => {
                 btn.addEventListener('click', (e) => {
