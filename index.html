@@ -357,9 +357,30 @@
                                 <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
                                 <option value="lotto649">Lotto 6/49</option>
                                 <option value="lotto645">Lotto 6/45</option>
+                                <option value="custom">Custom Game</option> <!-- Added Custom Game option -->
                             </select>
                         </div>
                         
+                        <!-- Custom Game Configuration for Analyzer -->
+                        <div id="customAnalyzerGameConfig" class="grid grid-cols-2 gap-2 hidden">
+                            <div>
+                                <label class="block text-sm font-medium">Main Pool</label>
+                                <input id="analyzerMainPool" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 69">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Pick Count</label>
+                                <input id="analyzerPickCount" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 5">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Bonus Pool</label>
+                                <input id="analyzerBonusPool" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 26">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Bonus Count</label>
+                                <input id="analyzerBonusCount" type="number" class="w-full p-2 border rounded-lg dark:bg-gray-700" placeholder="e.g., 1">
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium">Numbers to Analyze</label>
                             <textarea id="numbersToAnalyze" class="w-full p-2 border rounded-lg dark:bg-gray-700 h-32" placeholder="Enter numbers (e.g., 5, 12, 23, 34, 45, 6)"></textarea>
@@ -369,7 +390,6 @@
                         <div class="flex flex-wrap gap-2">
                             <button id="analyzeNumbers" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Analyze</button>
                             <button id="getAIInsights" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 flex-1">AI Insights ✨</button>
-                            <button id="predictFromUnused" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700 flex-1">Predict from Unused</button>
                             <button id="clearAnalyzer" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
                         </div>
                         
@@ -464,8 +484,19 @@
                 <!-- Predictions from Unused Numbers -->
                 <div class="mt-6">
                     <h3 class="text-xl font-medium">Predictions from Unused Numbers</h3>
+                    <div class="space-y-2 mb-4">
+                        <label class="block text-sm font-medium">Prediction Algorithm</label>
+                        <select id="unusedPredictionAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
+                            <option value="random">Random from Unused</option>
+                            <option value="frequency">Frequency-Based (from Historical)</option>
+                            <option value="gap">Gap-Based (from Historical)</option>
+                            <option value="ai">AI-Powered (from Unused)</option>
+                        </select>
+                    </div>
+                    <button id="predictFromUnused" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Generate Prediction from Unused</button>
                     <div id="unusedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
                         <p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>
+                        <div id="unusedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
                     </div>
                 </div>
             </section>
@@ -1220,6 +1251,7 @@
             // Game Configuration
             document.getElementById('lotteryGame').addEventListener('change', handleGameChange);
             document.getElementById('probabilityGame').addEventListener('change', handleProbabilityGameChange);
+            document.getElementById('analyzerGame').addEventListener('change', handleAnalyzerGameChange); // New event listener for analyzer game
             document.getElementById('randomSeedBtn').addEventListener('click', generateRandomSeed);
             document.getElementById('seedReverseGame').addEventListener('change', () => { /* No specific action needed for game change here yet */ });
             
@@ -1425,6 +1457,24 @@
                 document.getElementById('probPickCount').value = config.pickCount;
                 document.getElementById('probBonusPool').value = config.bonusPool;
                 document.getElementById('probBonusCount').value = config.bonusCount;
+            }
+        }
+
+        // New function for Analyzer Game Type change
+        function handleAnalyzerGameChange(e) {
+            const game = e.target.value;
+            const customConfig = document.getElementById('customAnalyzerGameConfig');
+            
+            if (game === 'custom') {
+                customConfig.classList.remove('hidden');
+                // Optionally pre-fill with default custom values or last used
+                const currentConfig = gameConfigs[document.getElementById('analyzerGame').value];
+                document.getElementById('analyzerMainPool').value = currentConfig.mainPool;
+                document.getElementById('analyzerPickCount').value = currentConfig.pickCount;
+                document.getElementById('analyzerBonusPool').value = currentConfig.bonusPool;
+                document.getElementById('analyzerBonusCount').value = currentConfig.bonusCount;
+            } else {
+                customConfig.classList.add('hidden');
             }
         }
 
@@ -1959,7 +2009,18 @@
             }
             
             const game = document.getElementById('analyzerGame').value;
-            const config = gameConfigs[game];
+            let config;
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('analyzerBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('analyzerBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
             
             // Basic analysis
             const sum = numbers.reduce((a, b) => a + b, 0);
@@ -2034,7 +2095,7 @@
         /**
          * New: Predicts lotto tickets using unused numbers from the input field.
          */
-        function predictFromUnused() {
+        async function predictFromUnused() {
             const input = document.getElementById('numbersToAnalyze').value;
             const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
 
@@ -2044,7 +2105,20 @@
             }
 
             const game = document.getElementById('analyzerGame').value;
-            const config = gameConfigs[game];
+            let config;
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('analyzerBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('analyzerBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
+
+            const predictionAlgorithm = document.getElementById('unusedPredictionAlgorithm').value;
 
             const { unusedNumbers } = detectUnusedFromInput(numbers, config.mainPool);
 
@@ -2057,11 +2131,65 @@
             const numTickets = 5; // Generate 5 tickets by default
             const tickets = [];
 
-            for (let i = 0; i < numTickets; i++) {
-                // Use lodash to get a random sample from the unused numbers pool
-                const mainNumbers = _.sampleSize(unusedNumbers, config.pickCount).sort((a,b) => a-b);
-                const bonusNumbers = Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1);
-                tickets.push({ numbers: mainNumbers, bonus: bonusNumbers });
+            const unusedPredictionLoading = document.getElementById('unusedPredictionLoading');
+            unusedPredictionLoading.classList.remove('hidden');
+
+            try {
+                for (let i = 0; i < numTickets; i++) {
+                    let mainNumbers = [];
+                    let bonusNumbers = Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1);
+
+                    switch (predictionAlgorithm) {
+                        case 'random':
+                            mainNumbers = _.sampleSize(unusedNumbers, config.pickCount).sort((a, b) => a - b);
+                            break;
+                        case 'frequency':
+                            if (appState.historicalData.length === 0) {
+                                showNotification('Load historical data for frequency-based prediction!');
+                                mainNumbers = _.sampleSize(unusedNumbers, config.pickCount).sort((a, b) => a - b);
+                            } else {
+                                const historicalFrequency = getNumberFrequency();
+                                // Score unused numbers by their historical frequency
+                                const scoredUnused = unusedNumbers.map(num => ({
+                                    num: num,
+                                    score: historicalFrequency[num] || 0
+                                }));
+                                mainNumbers = scoredUnused
+                                    .sort((a, b) => b.score - a.score)
+                                    .slice(0, config.pickCount)
+                                    .map(item => item.num)
+                                    .sort((a, b) => a - b);
+                            }
+                            break;
+                        case 'gap':
+                            if (appState.historicalData.length === 0) {
+                                showNotification('Load historical data for gap-based prediction!');
+                                mainNumbers = _.sampleSize(unusedNumbers, config.pickCount).sort((a, b) => a - b);
+                            } else {
+                                const historicalGaps = getGapAnalysis();
+                                // Score unused numbers by their historical gap
+                                const scoredUnused = unusedNumbers.map(num => ({
+                                    num: num,
+                                    score: historicalGaps[num] || 0
+                                }));
+                                mainNumbers = scoredUnused
+                                    .sort((a, b) => b.score - a.score) // Higher gap means more 'due'
+                                    .slice(0, config.pickCount)
+                                    .map(item => item.num)
+                                    .sort((a, b) => a - b);
+                            }
+                            break;
+                        case 'ai':
+                            mainNumbers = await generateAIUnusedPrediction(unusedNumbers, config);
+                            break;
+                    }
+                    tickets.push({ numbers: mainNumbers, bonus: bonusNumbers });
+                }
+            } catch (error) {
+                console.error("Error generating unused predictions:", error);
+                showNotification("Error generating predictions. Please try again.");
+            } finally {
+                unusedPredictionLoading.classList.add('hidden');
             }
 
             // Display tickets in the new output area
@@ -2069,7 +2197,7 @@
             outputDiv.innerHTML = tickets.map((ticket, index) => `
                 <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-medium">Prediction ${index + 1}</span>
+                        <span class="text-sm font-medium">Prediction ${index + 1} (${predictionAlgorithm.replace(/([A-Z])/g, ' $1').trim()} Algorithm)</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
                     </div>
                     <div class="flex flex-wrap gap-1 mb-1">
@@ -2082,6 +2210,51 @@
             `).join('');
 
             showNotification('Generated predictions from unused numbers.');
+        }
+
+        async function generateAIUnusedPrediction(unusedNumbers, config) {
+            const { pickCount, mainPool } = config;
+            let generatedNumbers = [];
+
+            const prompt = `From the following list of unused lottery numbers: ${unusedNumbers.join(', ')}, select ${pickCount} numbers that are most likely to be drawn for a lottery game with a main pool up to ${mainPool}. Focus on patterns that might emerge from numbers that haven't been drawn recently. Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && unusedNumbers.includes(n));
+                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+
+                    while (generatedNumbers.length < pickCount) {
+                        const randomNum = _.sample(unusedNumbers);
+                        if (!generatedNumbers.includes(randomNum)) {
+                            generatedNumbers.push(randomNum);
+                        }
+                    }
+                } else {
+                    console.error("Gemini API did not return expected content structure for AI unused prediction.");
+                    showNotification("AI unused prediction failed. Falling back to random from unused.");
+                    generatedNumbers = _.sampleSize(unusedNumbers, pickCount);
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API for AI unused prediction:", error);
+                showNotification("AI unused prediction failed due to an error. Falling back to random from unused.");
+                generatedNumbers = _.sampleSize(unusedNumbers, pickCount);
+            }
+            return generatedNumbers.sort((a, b) => a - b);
         }
 
         async function getAIInsights() {
@@ -2103,7 +2276,18 @@
             }
 
             const game = document.getElementById('analyzerGame').value;
-            const config = gameConfigs[game];
+            let config;
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('analyzerBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('analyzerBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
 
             const sum = numbers.reduce((a, b) => a + b, 0);
             const avg = sum / numbers.length;
@@ -2304,6 +2488,8 @@
             document.getElementById('aiInsightsText').textContent = ''; // Clear AI insights text
             document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Analyze numbers to see unused numbers and pairs relative to the game\'s pool.</p>';
             document.getElementById('unusedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>';
+            document.getElementById('unusedPredictionLoading').classList.add('hidden'); // Hide loading for unused prediction
+
 
             // Reset charts
             ['freqDistributionChart', 'lastDigitDistributionChart', 'sumDistributionChart', 'oddEvenDistributionChart'].forEach(id => {
@@ -2389,7 +2575,7 @@
             const evenCount = numbers.length - oddCount;
             const consecutivePairs = countConsecutivePairs(numbers);
             const primes = numbers.filter(isPrime).length;
-            const fibs = numbers.filter(n => isFibonacci(n)).length;
+            const fibs = numbers.filter(isFibonacci).length;
             const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
             const stdDev = calculateStandardDeviation(numbers);
             const digitDistribution = getDigitDistribution(numbers);
