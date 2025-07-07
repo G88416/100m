@@ -2529,7 +2529,7 @@
             const evenCount = numbers.length - oddCount;
             const consecutivePairs = countConsecutivePairs(numbers);
             const primes = numbers.filter(isPrime).length;
-            const fibs = numbers.filter(isFibonacci).length;
+            const fibs = numbers.filter(n => isFibonacci(n)).length;
             const stdDev = calculateStandardDeviation(numbers);
             const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
 
@@ -3261,7 +3261,7 @@
             const mostFrequent = Object.entries(frequency)
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 5)
-                .map(([num]) => `${num} (${frequency[num]}x)`); // Ensure frequency is shown
+                .map(([num, count]) => `${num} (${count}x)`);
             
             document.getElementById('mostFrequent').innerHTML = mostFrequent.join(', ');
             
@@ -3269,7 +3269,7 @@
             const leastFrequent = Object.entries(frequency)
                 .sort((a, b) => a[1] - b[1])
                 .slice(0, 5)
-                .map(([num]) => `${num} (${frequency[num]}x)`); // Ensure frequency is shown
+                .map(([num, count]) => `${num} (${count}x)`);
             
             document.getElementById('leastFrequent').innerHTML = leastFrequent.join(', ');
             
