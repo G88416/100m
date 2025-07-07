@@ -421,10 +421,6 @@
                             </div>
                         </div>
                         
-                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                            <h4 class="font-medium text-sm">Visual Analysis</h4>
-                            <div id="visualAnalysis" class="flex flex-wrap gap-1 mt-2"></div>
-                        </div>
                         <!-- AI Insights Output -->
                         <div id="aiInsightsOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hidden">
                             <h4 class="font-medium text-sm">AI Insights</h4>
@@ -449,9 +445,23 @@
                                 <h4 class="font-medium text-sm">Advanced Metrics</h4>
                                 <div id="advancedMetrics" class="text-xs mt-1"></div>
                             </div>
+                            <!-- New section for most used numbers from input -->
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <h4 class="font-medium text-sm">Most Used Numbers (from input)</h4>
+                                <div id="mostUsedNumbersInput" class="text-xs mt-1">
+                                    <p>Analyze numbers to see the most frequently entered numbers.</p>
+                                </div>
+                            </div>
+                            <!-- New section for least used numbers from input -->
+                            <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                <h4 class="font-medium text-sm">Least Used Numbers (from input)</h4>
+                                <div id="leastUsedNumbersInput" class="text-xs mt-1">
+                                    <p>Analyze numbers to see the least frequently entered numbers.</p>
+                                </div>
+                            </div>
                             <!-- New section for unused numbers and pairs -->
                             <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                                <h4 class="font-medium text-sm">Unused Numbers & Pairs (from input)</h4>
+                                <h4 class="font-medium text-sm">Unused Numbers & Pairs (from pool)</h4>
                                 <div id="unusedNumbersAndPairs" class="text-xs mt-1">
                                     <p>Analyze numbers to see unused numbers and pairs relative to the game's pool.</p>
                                 </div>
@@ -483,16 +493,27 @@
 
                 <!-- Predictions from Unused Numbers -->
                 <div class="mt-6">
-                    <h3 class="text-xl font-medium">Combined Prediction</h3>
+                    <h3 class="text-xl font-medium">Prediction Engine</h3>
                     <div class="space-y-2 mb-4">
-                        <label class="block text-sm font-medium">Number of Tickets to Predict</label>
-                        <input id="numPredictionTickets" type="number" min="1" max="10" value="1" class="w-full p-2 border rounded-lg dark:bg-gray-700">
+                        <label class="block text-sm font-medium">Prediction Algorithm</label>
+                        <select id="unusedPredictionAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
+                            <option value="random">Random from Unused</option>
+                            <option value="frequency">Frequency-Based (from Historical)</option>
+                            <option value="gap">Gap-Based (from Historical)</option>
+                            <option value="ai">AI-Powered (from Unused)</option>
+                        </select>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <button id="generateCombinedPredictionBtn" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Generate Combined Prediction</button>
+                        <button id="predictFromUnused" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Predict Unused Numbers</button>
+                        <button id="generateCombinedPredict" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700">Generate Combined Predict</button>
+                        <button id="regenerateFromUnused" class="p-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">Regenerate Unused</button>
                     </div>
-                    <div id="combinedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
-                        <p class="text-gray-500 dark:text-gray-400">Analyze numbers and generate combined predictions to see results here.</p>
+                    <div id="unusedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
+                        <p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>
+                        <div id="unusedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
+                    </div>
+                    <div id="combinedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2 hidden">
+                        <p class="text-gray-500 dark:text-gray-400">Generate combined predictions to see results here.</p>
                         <div id="combinedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
                     </div>
                 </div>
@@ -1172,8 +1193,7 @@
             darkMode: true,
             animations: true,
             notifications: true,
-            defaultGame: 'powerball',
-            analyzedNumbers: null // Store analyzed numbers for prediction
+            defaultGame: 'powerball'
         };
 
         // Chart Instances
@@ -1268,7 +1288,9 @@
             // Analyzer Controls
             document.getElementById('analyzeNumbers').addEventListener('click', analyzeNumbers);
             document.getElementById('getAIInsights').addEventListener('click', getAIInsights);
-            document.getElementById('generateCombinedPredictionBtn').addEventListener('click', generateCombinedPrediction); // New button for combined prediction
+            document.getElementById('predictFromUnused').addEventListener('click', predictFromUnused); // New button
+            document.getElementById('generateCombinedPredict').addEventListener('click', generateCombinedPredict); // New button for combined prediction
+            document.getElementById('regenerateFromUnused').addEventListener('click', predictFromUnused); // New button for regenerate
             document.getElementById('clearAnalyzer').addEventListener('click', clearAnalyzer);
             document.querySelectorAll('.sample-input').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -1998,24 +2020,11 @@
 
         // Analyzer Functions
         function analyzeNumbers() {
-            const input = document.getElementById('numbersToAnalyze').value.trim();
-            const rawNumbers = input.split(/[, \-]/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0);
-            const numbers = [...new Set(rawNumbers)].sort((a, b) => a - b); // Get unique sorted numbers
-
+            const input = document.getElementById('numbersToAnalyze').value;
+            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+            
             if (numbers.length === 0) {
                 showNotification('Please enter valid numbers!');
-                document.getElementById('analysisResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Enter numbers to analyze them</p>';
-                document.getElementById('basicStats').innerHTML = '';
-                document.getElementById('advancedMetrics').innerHTML = '';
-                document.getElementById('numberProps').innerHTML = '';
-                document.getElementById('patternStats').innerHTML = '';
-                document.getElementById('visualAnalysis').innerHTML = '';
-                document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Analyze numbers to see unused numbers and pairs relative to the game\'s pool.</p>';
-                document.getElementById('combinedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Analyze numbers and generate combined predictions to see results here.</p>';
-                if (charts.freqDistributionChart) charts.freqDistributionChart.destroy();
-                if (charts.lastDigitDistributionChart) charts.lastDigitDistributionChart.destroy();
-                if (charts.sumDistributionChart) charts.sumDistributionChart.destroy();
-                if (charts.oddEvenDistributionChart) charts.oddEvenDistributionChart.destroy();
                 return;
             }
             
@@ -2062,24 +2071,28 @@
                 <p>Last Digits: ${numbers.map(n => n % 10).join(', ')}</p>
             `;
             
-            // Calculate Most Used and Least Used from input
-            const mostUsed = getMostUsedNumbers(rawNumbers, Math.min(5, config.pickCount), config.mainPool);
-            const leastUsed = getLeastUsedNumbers(rawNumbers, Math.min(5, config.pickCount), config.mainPool);
-
             document.getElementById('advancedMetrics').innerHTML = `
                 <p>Standard Deviation: ${calculateStandardDeviation(numbers).toFixed(2)}</p>
                 <p>Number Spread: ${calculateSpread(numbers).toFixed(2)}%</p>
                 <p>Low/High Ratio: ${calculateLowHighRatio(numbers, config.mainPool).toFixed(2)}</p>
-                <p><strong>Most Used (from input):</strong> ${mostUsed.length > 0 ? mostUsed.join(', ') : 'N/A'}</p>
-                <p><strong>Least Used (from input):</strong> ${leastUsed.length > 0 ? leastUsed.join(', ') : 'N/A'}</p>
             `;
             
-            // Visual analysis
-            const visualAnalysisDiv = document.getElementById('visualAnalysis');
-            visualAnalysisDiv.innerHTML = numbers.map(n => {
-                let className = 'number-ball';
-                return `<span class="${className}">${n}</span>`;
-            }).join('');
+            // Calculate frequency of numbers within the input itself
+            const inputFrequency = numbers.reduce((acc, num) => {
+                acc[num] = (acc[num] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Sort by frequency for most and least used
+            const sortedByFrequency = Object.entries(inputFrequency).sort((a, b) => b[1] - a[1]);
+
+            // Most Used Numbers from Input
+            const mostUsedNumbers = sortedByFrequency.slice(0, 5).map(([num, count]) => `<span class="number-ball hot-number">${num} (${count}x)</span>`).join('');
+            document.getElementById('mostUsedNumbersInput').innerHTML = mostUsedNumbers || '<p>No numbers entered or frequency data available.</p>';
+
+            // Least Used Numbers from Input
+            const leastUsedNumbers = sortedByFrequency.slice(-5).reverse().map(([num, count]) => `<span class="number-ball cold-number">${num} (${count}x)</span>`).join('');
+            document.getElementById('leastUsedNumbersInput').innerHTML = leastUsedNumbers || '<p>No numbers entered or frequency data available.</p>';
             
             // Detect unused numbers and pairs from input
             const { unusedNumbers, unusedPairs } = detectUnusedFromInput(numbers, config.mainPool);
@@ -2093,7 +2106,7 @@
                 : 'None';
 
             unusedNumbersDiv.innerHTML = `
-                <p><strong>Unused Main Pool Numbers:</strong> ${unusedNumbersDisplay}</p>
+                <p><strong>Unused Numbers (${unusedNumbers.length}):</strong> ${unusedNumbersDisplay}</p>
                 <p><strong>Unused Pairs (${unusedPairs.length.toLocaleString()}):</strong> ${unusedPairsDisplay}</p>
             `;
 
@@ -2106,163 +2119,375 @@
                 <p class="text-sm">Analyzed ${numbers.length} numbers with average ${avg.toFixed(2)}</p>
             `;
             
-            // Store analyzed numbers for combined prediction
-            appState.analyzedNumbers = {
-                inputNumbers: rawNumbers, // Keep raw numbers for frequency
-                uniqueNumbers: numbers, // Unique sorted numbers
-                mostUsed: mostUsed,
-                leastUsed: leastUsed,
-                unused: unusedNumbers,
-                config: config
-            };
-
             showNotification('Analysis completed!');
         }
         
         /**
-         * Helper to calculate number frequencies from an array of numbers.
-         * @param {number[]} numbers - The array of numbers.
-         * @returns {Object.<number, number>} - An object where keys are numbers and values are their frequencies.
+         * New: Predicts lotto tickets using unused numbers from the input field.
          */
-        function calculateNumberFrequencies(numbers) {
-            const frequency = {};
-            numbers.forEach(num => {
-                frequency[num] = (frequency[num] || 0) + 1;
-            });
-            return frequency;
-        }
+        async function predictFromUnused() {
+            const input = document.getElementById('numbersToAnalyze').value;
+            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
 
-        /**
-         * Helper to find the most used numbers from an array.
-         * @param {number[]} numbers - The array of numbers to analyze.
-         * @param {number} count - The number of most used numbers to return.
-         * @param {number} mainPool - The maximum number in the main pool.
-         * @returns {number[]} - An array of the most used numbers.
-         */
-        function getMostUsedNumbers(numbers, count, mainPool) {
-            const frequency = calculateNumberFrequencies(numbers);
-            return Object.entries(frequency)
-                .sort((a, b) => b[1] - a[1] || a[0] - b[0]) // Sort by frequency (desc), then number (asc)
-                .slice(0, count)
-                .map(item => parseInt(item[0]));
-        }
-
-        /**
-         * Helper to find the least used numbers from an array.
-         * @param {number[]} numbers - The array of numbers to analyze.
-         * @param {number} count - The number of least used numbers to return.
-         * @param {number} mainPool - The maximum number in the main pool.
-         * @returns {number[]} - An array of the least used numbers.
-         */
-        function getLeastUsedNumbers(numbers, count, mainPool) {
-            const frequency = calculateNumberFrequencies(numbers);
-            const allPossibleNumbers = Array.from({ length: mainPool }, (_, i) => i + 1);
-            const numbersWithFrequency = allPossibleNumbers.map(num => ({
-                num: num,
-                freq: frequency[num] || 0
-            }));
-
-            return numbersWithFrequency
-                .sort((a, b) => a.freq - b.freq || a.num - b.num) // Sort by frequency (asc), then number (asc)
-                .slice(0, count)
-                .map(item => item.num);
-        }
-
-        /**
-         * New: Generates predictions based on a combination of most used, least used, and unused numbers.
-         * The user can customize how many tickets to predict.
-         */
-        async function generateCombinedPrediction() {
-            const predictionOutputDiv = document.getElementById('combinedPredictionOutput');
-            const loadingIndicator = document.getElementById('combinedPredictionLoading');
-            const numPredictionTickets = parseInt(document.getElementById('numPredictionTickets').value) || 1;
-
-            if (!appState.analyzedNumbers) {
-                showNotification('Please analyze numbers first to generate predictions!');
-                predictionOutputDiv.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Analyze numbers and generate combined predictions to see results here.</p>';
+            if (numbers.length === 0) {
+                showNotification('Please enter numbers to analyze first!');
                 return;
             }
 
-            const { mostUsed, leastUsed, unused, config } = appState.analyzedNumbers;
-            const { pickCount, mainPool, bonusPool, bonusCount } = config;
+            const game = document.getElementById('analyzerGame').value;
+            let config;
 
-            if (mostUsed.length === 0 && leastUsed.length === 0 && unused.length === 0) {
-                showNotification('Not enough data from analysis to generate a combined prediction!');
-                predictionOutputDiv.innerHTML = '<p class="text-danger">Not enough data from analysis to generate a combined prediction.</p>';
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('analyzerBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('analyzerBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
+
+            const predictionAlgorithm = document.getElementById('unusedPredictionAlgorithm').value;
+
+            const { unusedNumbers } = detectUnusedFromInput(numbers, config.mainPool);
+
+            if (unusedNumbers.length < config.pickCount) {
+                showNotification('Not enough unused numbers to generate a full ticket!');
+                document.getElementById('unusedPredictionOutput').innerHTML = '<p class="text-danger">Not enough unused numbers to generate a full ticket.</p>';
+                document.getElementById('combinedPredictionOutput').classList.add('hidden'); // Hide combined output
                 return;
             }
 
-            loadingIndicator.classList.remove('hidden');
-            predictionOutputDiv.innerHTML = ''; // Clear previous predictions
+            const numTickets = 5; // Generate 5 tickets by default
+            const tickets = [];
 
-            const generatedTickets = [];
+            const unusedPredictionLoading = document.getElementById('unusedPredictionLoading');
+            unusedPredictionLoading.classList.remove('hidden');
+            document.getElementById('unusedPredictionOutput').classList.remove('hidden'); // Ensure output is visible
+            document.getElementById('combinedPredictionOutput').classList.add('hidden'); // Hide combined output
 
             try {
-                for (let i = 0; i < numPredictionTickets; i++) {
-                    let mainNumbers = new Set();
+                for (let i = 0; i < numTickets; i++) {
+                    let mainNumbers = [];
+                    let bonusNumbers = Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1);
 
-                    // Strategy: Prioritize most used, then least used, then unused
-                    // Fill with most used numbers first
-                    for (const num of mostUsed) {
-                        if (mainNumbers.size < pickCount) {
-                            mainNumbers.add(num);
-                        } else break;
+                    switch (predictionAlgorithm) {
+                        case 'random':
+                            mainNumbers = _.sampleSize(unusedNumbers, config.pickCount);
+                            break;
+                        case 'frequency':
+                            if (appState.historicalData.length === 0) {
+                                showNotification('Load historical data for frequency-based prediction!');
+                                mainNumbers = _.sampleSize(unusedNumbers, config.pickCount);
+                            } else {
+                                const historicalFrequency = getNumberFrequency();
+                                // Score unused numbers by their historical frequency
+                                const scoredUnused = unusedNumbers.map(num => ({
+                                    num: num,
+                                    score: historicalFrequency[num] || 0
+                                }));
+                                mainNumbers = scoredUnused
+                                    .sort((a, b) => b.score - a.score)
+                                    .slice(0, config.pickCount)
+                                    .map(item => item.num);
+                            }
+                            break;
+                        case 'gap':
+                            if (appState.historicalData.length === 0) {
+                                showNotification('Load historical data for gap-based prediction!');
+                                mainNumbers = _.sampleSize(unusedNumbers, config.pickCount);
+                            } else {
+                                const historicalGaps = getGapAnalysis();
+                                // Score unused numbers by their historical gap
+                                const scoredUnused = unusedNumbers.map(num => ({
+                                    num: num,
+                                    score: historicalGaps[num] || 0
+                                }));
+                                mainNumbers = scoredUnused
+                                    .sort((a, b) => b.score - a.score) // Higher gap means more 'due'
+                                    .slice(0, config.pickCount)
+                                    .map(item => item.num);
+                            }
+                            break;
+                        case 'ai':
+                            mainNumbers = await generateAIUnusedPrediction(unusedNumbers, config);
+                            break;
                     }
+                    // Always shuffle the results
+                    mainNumbers = _.shuffle(mainNumbers);
+                    bonusNumbers = _.shuffle(bonusNumbers);
+                    tickets.push({ numbers: mainNumbers.sort((a, b) => a - b), bonus: bonusNumbers.sort((a, b) => a - b) });
+                }
+            } catch (error) {
+                console.error("Error generating unused predictions:", error);
+                showNotification("Error generating predictions. Please try again.");
+            } finally {
+                unusedPredictionLoading.classList.add('hidden');
+            }
 
-                    // Fill remaining with least used numbers
-                    for (const num of leastUsed) {
-                        if (mainNumbers.size < pickCount) {
-                            mainNumbers.add(num);
-                        } else break;
+            // Display tickets in the new output area
+            const outputDiv = document.getElementById('unusedPredictionOutput');
+            outputDiv.innerHTML = tickets.map((ticket, index) => `
+                <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium">Prediction ${index + 1} (${predictionAlgorithm.replace(/([A-Z])/g, ' $1').trim()} Algorithm)</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1 mb-1">
+                        ${ticket.numbers.map(num => `<span class="number-ball unused-number">${num}</span>`).join('')}
+                    </div>
+                    <div class="flex flex-wrap gap-1">
+                        ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            showNotification('Generated predictions from unused numbers.');
+        }
+
+        async function generateAIUnusedPrediction(unusedNumbers, config) {
+            const { pickCount, mainPool } = config;
+            let generatedNumbers = [];
+
+            const prompt = `From the following list of unused lottery numbers: ${unusedNumbers.join(', ')}, select ${pickCount} numbers that are most likely to be drawn for a lottery game with a main pool up to ${mainPool}. Focus on patterns that might emerge from numbers that haven't been drawn recently. Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && unusedNumbers.includes(n));
+                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+
+                    while (generatedNumbers.length < pickCount) {
+                        const randomNum = _.sample(unusedNumbers);
+                        if (!generatedNumbers.includes(randomNum)) {
+                            generatedNumbers.push(randomNum);
+                        }
                     }
+                } else {
+                    console.error("Gemini API did not return expected content structure for AI unused prediction.");
+                    showNotification("AI unused prediction failed. Falling back to random from unused.");
+                    generatedNumbers = _.sampleSize(unusedNumbers, pickCount);
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API for AI unused prediction:", error);
+                showNotification("AI unused prediction failed due to an error. Falling back to random from unused.");
+                generatedNumbers = _.sampleSize(unusedNumbers, pickCount);
+            }
+            return generatedNumbers; // Shuffling will happen outside this function
+        }
 
-                    // Fill any remaining spots with unused numbers
-                    for (const num of unused) {
-                        if (mainNumbers.size < pickCount) {
-                            mainNumbers.add(num);
-                        } else break;
+        async function generateCombinedPredict() {
+            const input = document.getElementById('numbersToAnalyze').value;
+            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+
+            if (numbers.length === 0) {
+                showNotification('Please enter numbers to analyze first!');
+                return;
+            }
+
+            const game = document.getElementById('analyzerGame').value;
+            let config;
+
+            if (game === 'custom') {
+                config = {
+                    mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
+                    pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5,
+                    bonusPool: parseInt(document.getElementById('analyzerBonusPool').value) || 26,
+                    bonusCount: parseInt(document.getElementById('analyzerBonusCount').value) || 1
+                };
+            } else {
+                config = gameConfigs[game];
+            }
+
+            const combinedPredictionLoading = document.getElementById('combinedPredictionLoading');
+            combinedPredictionLoading.classList.remove('hidden');
+            document.getElementById('combinedPredictionOutput').classList.remove('hidden'); // Ensure output is visible
+            document.getElementById('unusedPredictionOutput').classList.add('hidden'); // Hide unused prediction output
+
+            const numTickets = 5; // Generate 5 combined tickets
+            const tickets = [];
+
+            // Categorize numbers from input
+            const inputFrequency = numbers.reduce((acc, num) => {
+                acc[num] = (acc[num] || 0) + 1;
+                return acc;
+            }, {});
+
+            const sortedByFrequency = Object.entries(inputFrequency).sort((a, b) => b[1] - a[1]);
+            const mostUsed = sortedByFrequency.slice(0, Math.ceil(config.pickCount / 3)).map(item => item[0]);
+            const leastUsed = sortedByFrequency.slice(-Math.ceil(config.pickCount / 3)).map(item => item[0]);
+            const { unusedNumbers } = detectUnusedFromInput(numbers, config.mainPool);
+
+            // Define different algorithms for combined prediction
+            const algorithms = [
+                { name: "Weighted Random", func: generateWeightedRandomCombined },
+                { name: "Alternating Pick", func: generateAlternatingPickCombined },
+                { name: "AI-Powered Combined", func: generateAICombinedPrediction }
+            ];
+
+            try {
+                for (let i = 0; i < numTickets; i++) {
+                    const algorithmIndex = i % algorithms.length; // Cycle through algorithms
+                    const currentAlgorithm = algorithms[algorithmIndex];
+                    
+                    let mainNumbers = [];
+                    let bonusNumbers = Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1);
+
+                    switch (currentAlgorithm.name) {
+                        case "Weighted Random":
+                            mainNumbers = currentAlgorithm.func(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool);
+                            break;
+                        case "Alternating Pick":
+                            mainNumbers = currentAlgorithm.func(mostUsed, leastUsed, unusedNumbers, config.pickCount);
+                            break;
+                        case "AI-Powered Combined":
+                            mainNumbers = await currentAlgorithm.func(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool);
+                            break;
                     }
+                    
+                    // Always shuffle the results
+                    mainNumbers = _.shuffle(mainNumbers);
+                    bonusNumbers = _.shuffle(bonusNumbers);
+                    tickets.push({ numbers: mainNumbers.sort((a,b)=>a-b), bonus: bonusNumbers.sort((a,b)=>a-b), algorithm: currentAlgorithm.name });
+                }
+            } catch (error) {
+                console.error("Error generating combined predictions:", error);
+                showNotification("Error generating combined predictions. Please try again.");
+            } finally {
+                combinedPredictionLoading.classList.add('hidden');
+            }
 
-                    // If still not enough numbers (e.g., if pickCount is very high or pools are small)
-                    // Fill randomly from the entire main pool
-                    while (mainNumbers.size < pickCount) {
-                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                        mainNumbers.add(randomNum);
-                    }
+            const outputDiv = document.getElementById('combinedPredictionOutput');
+            outputDiv.innerHTML = tickets.map((ticket, index) => `
+                <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium">Combined Prediction ${index + 1} (${ticket.algorithm})</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1 mb-1">
+                        ${ticket.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
+                    </div>
+                    <div class="flex flex-wrap gap-1">
+                        ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
 
-                    const sortedMainNumbers = Array.from(mainNumbers).sort((a, b) => a - b);
+            showNotification('Generated combined predictions!');
+        }
 
-                    // Generate bonus numbers randomly from bonus pool
-                    const bonusNumbers = Array.from({ length: bonusCount }, () => Math.floor(Math.random() * bonusPool) + 1);
+        function generateWeightedRandomCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool) {
+            let combinedPool = [];
+            // Assign higher weight to mostUsed, medium to unused, lower to leastUsed
+            for (let i = 0; i < mostUsed.length; i++) combinedPool.push(mostUsed[i], mostUsed[i], mostUsed[i]); // 3x weight
+            for (let i = 0; i < unusedNumbers.length; i++) combinedPool.push(unusedNumbers[i], unusedNumbers[i]); // 2x weight
+            for (let i = 0; i < leastUsed.length; i++) combinedPool.push(leastUsed[i]); // 1x weight
 
-                    generatedTickets.push({ numbers: sortedMainNumbers, bonus: bonusNumbers });
+            // Ensure combinedPool has enough numbers, add random if needed
+            if (combinedPool.length < pickCount * 2) { // Add more random if pool is too small
+                const allNumbers = Array.from({ length: mainPool }, (_, i) => i + 1);
+                const additionalNumbersNeeded = (pickCount * 2) - combinedPool.length;
+                combinedPool = combinedPool.concat(_.sampleSize(allNumbers, additionalNumbersNeeded));
+            }
+            
+            return _.sampleSize(_.uniq(combinedPool), pickCount);
+        }
+
+        function generateAlternatingPickCombined(mostUsed, leastUsed, unusedNumbers, pickCount) {
+            let result = new Set();
+            let mostUsedIndex = 0;
+            let leastUsedIndex = 0;
+            let unusedIndex = 0;
+
+            while (result.size < pickCount) {
+                if (mostUsed.length > 0 && mostUsedIndex < mostUsed.length) {
+                    result.add(mostUsed[mostUsedIndex++]);
+                    if (result.size === pickCount) break;
+                }
+                if (leastUsed.length > 0 && leastUsedIndex < leastUsed.length) {
+                    result.add(leastUsed[leastUsedIndex++]);
+                    if (result.size === pickCount) break;
+                }
+                if (unusedNumbers.length > 0 && unusedIndex < unusedNumbers.length) {
+                    result.add(unusedNumbers[unusedIndex++]);
+                    if (result.size === pickCount) break;
                 }
 
-                // Display generated tickets
-                predictionOutputDiv.innerHTML = generatedTickets.map((ticket, index) => `
-                    <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm font-medium">Prediction Ticket ${index + 1}</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
-                        </div>
-                        <div class="flex flex-wrap gap-1 mb-1">
-                            ${ticket.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
-                        </div>
-                        <div class="flex flex-wrap gap-1">
-                            ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
-                        </div>
-                    </div>
-                `).join('');
-
-                showNotification(`Generated ${numPredictionTickets} combined prediction tickets!`);
-
-            } catch (error) {
-                console.error("Error generating combined prediction:", error);
-                showNotification("Error generating combined prediction. Please try again.");
-                predictionOutputDiv.innerHTML = '<p class="text-danger">Error generating predictions.</p>';
-            } finally {
-                loadingIndicator.classList.add('hidden');
+                // If any list exhausted, cycle through others or pick randomly from all available
+                if (mostUsedIndex >= mostUsed.length && leastUsedIndex >= leastUsed.length && unusedIndex >= unusedNumbers.length) {
+                    // Fallback: pick randomly from all numbers (mostUsed, leastUsed, unused)
+                    const remainingPool = [...mostUsed, ...leastUsed, ...unusedNumbers];
+                    while (result.size < pickCount && remainingPool.length > 0) {
+                        result.add(_.sample(remainingPool));
+                    }
+                    break;
+                }
             }
+            return Array.from(result);
+        }
+
+        async function generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool) {
+            let generatedNumbers = [];
+            const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
+            Consider the following categories of numbers from a user's input:
+            - Most Used Numbers: ${mostUsed.join(', ')}
+            - Least Used Numbers: ${leastUsed.join(', ')}
+            - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
+            
+            Combine these categories intelligently to suggest a balanced set of numbers. You can favor numbers from the 'most used' list, but also include some 'unused' numbers to diversify, and sparingly 'least used' numbers for a long-shot. Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
+                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+
+                    while (generatedNumbers.length < pickCount) {
+                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                        if (!generatedNumbers.includes(randomNum)) {
+                            generatedNumbers.push(randomNum);
+                        }
+                    }
+                } else {
+                    console.error("Gemini API did not return expected content structure for AI combined prediction.");
+                    showNotification("AI combined prediction failed. Falling back to random combination.");
+                    generatedNumbers = generateWeightedRandomCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool);
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API for AI combined prediction:", error);
+                showNotification("AI combined prediction failed due to an error. Falling back to random combination.");
+                generatedNumbers = generateWeightedRandomCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool);
+            }
+            return generatedNumbers; // Shuffling will happen outside this function
         }
 
 
@@ -2492,13 +2717,17 @@
                 document.getElementById(id).innerHTML = '';
             });
             
-            document.getElementById('visualAnalysis').innerHTML = '';
+            document.getElementById('mostUsedNumbersInput').innerHTML = '<p>Analyze numbers to see the most frequently entered numbers.</p>';
+            document.getElementById('leastUsedNumbersInput').innerHTML = '<p>Analyze numbers to see the least frequently entered numbers.</p>';
             document.getElementById('aiInsightsOutput').classList.add('hidden'); // Hide AI insights output
             document.getElementById('aiInsightsText').textContent = ''; // Clear AI insights text
             document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Analyze numbers to see unused numbers and pairs relative to the game\'s pool.</p>';
-            document.getElementById('combinedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Analyze numbers and generate combined predictions to see results here.</p>';
+            document.getElementById('unusedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>';
+            document.getElementById('unusedPredictionLoading').classList.add('hidden'); // Hide loading for unused prediction
+            document.getElementById('combinedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate combined predictions to see results here.</p>';
+            document.getElementById('combinedPredictionOutput').classList.add('hidden'); // Hide combined prediction output
             document.getElementById('combinedPredictionLoading').classList.add('hidden'); // Hide loading for combined prediction
-            appState.analyzedNumbers = null; // Clear analyzed numbers state
+
 
             // Reset charts
             ['freqDistributionChart', 'lastDigitDistributionChart', 'sumDistributionChart', 'oddEvenDistributionChart'].forEach(id => {
@@ -3672,12 +3901,12 @@
             });
             
             // Sort by score and pick top numbers
-            const predictedNumbers = scoredNumbers
+            const predictedNumbers = _.shuffle(scoredNumbers // Shuffle before slicing
                 .sort((a, b) => b.score - a.score)
                 .slice(0, config.pickCount)
                 .map(item => item.num)
-                .sort((a, b) => a - b);
-            
+                .sort((a, b) => a - b)); // Sort again for display consistency after shuffling
+
             // Generate bonus numbers
             const bonusFrequency = appState.historicalData.reduce((acc, draw) => {
                 draw.bonus.forEach(num => {
@@ -3686,10 +3915,10 @@
                 return acc;
             }, {});
             
-            const predictedBonus = Object.entries(bonusFrequency)
+            const predictedBonus = _.shuffle(Object.entries(bonusFrequency) // Shuffle before slicing
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, config.bonusCount)
-                .map(([num]) => parseInt(num));
+                .map(([num]) => parseInt(num)));
             
             // Display results
             document.getElementById('predictionResults').innerHTML = `
@@ -3771,11 +4000,11 @@
                 };
             });
             
-            const numbers = scoredNumbers
+            const numbers = _.shuffle(scoredNumbers // Shuffle before slicing
                 .sort((a, b) => b.score - a.score)
                 .slice(0, config.pickCount)
                 .map(item => item.num)
-                .sort((a, b) => a - b);
+                .sort((a, b) => a - b)); // Sort again for display consistency after shuffling
             
             // Generate bonus numbers
             const bonusFrequency = appState.historicalData.reduce((acc, draw) => {
@@ -3785,10 +4014,10 @@
                 return acc;
             }, {});
             
-            const predictedBonus = Object.entries(bonusFrequency)
+            const predictedBonus = _.shuffle(Object.entries(bonusFrequency) // Shuffle before slicing
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, config.bonusCount)
-                .map(([num]) => parseInt(num));
+                .map(([num]) => parseInt(num)));
                 
             return {
                 numbers,
@@ -3833,7 +4062,7 @@
             // Generate predictions (simplified)
             let predictions = '';
             for (let i = 1; i <= numPredictions; i++) {
-                const prediction = generatePredictionData(config);
+                const prediction = generatePredictionData(config); // This function already shuffles
                 
                 predictions += `
                     <div class="mb-4">
@@ -3903,201 +4132,4 @@
             // Using a custom modal-like confirmation instead of browser's confirm()
             const confirmReset = (callback) => {
                 const modalHtml = `
-                    <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 text-center">
-                            <h3 class="text-xl font-semibold mb-4">Confirm Reset</h3>
-                            <p class="mb-6">Are you sure you want to reset all application data? This cannot be undone.</p>
-                            <div class="flex justify-center gap-4">
-                                <button id="confirmCancel" class="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">Cancel</button>
-                                <button id="confirmProceed" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600 flex-1">Proceed</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-                document.getElementById('confirmCancel').addEventListener('click', () => {
-                    document.getElementById('confirmModal').remove();
-                    callback(false);
-                });
-                document.getElementById('confirmProceed').addEventListener('click', () => {
-                    document.getElementById('confirmModal').remove();
-                    callback(true);
-                });
-            };
-
-            confirmReset((confirmed) => {
-                if (confirmed) {
-                    localStorage.clear();
-                    appState.historicalData = [];
-                    appState.savedTickets = [];
-                    appState.notificationCount = 0;
-                    appState.currentPage = 1;
-                    appState.analyzedNumbers = null; // Clear analyzed numbers state
-                    
-                    // Reset UI
-                    clearGenerator();
-                    clearAnalyzer();
-                    clearHistoricalData();
-                    resetProbabilityCalculator();
-                    clearSeedReverse(); // Clear the new section
-                    
-                    document.getElementById('predictionResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate predictions to see results</p>';
-                    document.getElementById('strategyResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Apply a strategy to see recommendations</p>';
-                    
-                    // Reset settings to defaults
-                    appState.darkMode = true;
-                    appState.animations = true;
-                    appState.notifications = true;
-                    appState.defaultGame = 'powerball';
-                    
-                    updateUI();
-                    showNotification('All application data has been reset!');
-                } else {
-                    showNotification('Reset cancelled.');
-                }
-            });
-        }
-
-        function exportAllData() {
-            const data = {
-                settings: {
-                    darkMode: appState.darkMode,
-                    animations: appState.animations,
-                    notifications: appState.notifications,
-                    defaultGame: appState.defaultGame
-                },
-                historicalData: appState.historicalData,
-                savedTickets: appState.savedTickets
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            downloadBlob(blob, 'lotto_genius_backup.json');
-            showNotification('All application data exported!');
-        }
-
-        function importData(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const data = JSON.parse(event.target.result);
-                    
-                    if (data.settings) {
-                        appState.darkMode = data.settings.darkMode ?? true;
-                        appState.animations = data.settings.animations ?? true;
-                        appState.notifications = data.settings.notifications ?? true;
-                        appState.defaultGame = data.settings.defaultGame ?? 'powerball';
-                    }
-                    
-                    if (data.historicalData) {
-                        appState.historicalData = data.historicalData;
-                        displayHistoricalData();
-                        updateHistoricalCharts();
-                    }
-                    
-                    if (data.savedTickets) {
-                        appState.savedTickets = data.savedTickets;
-                    }
-                    
-                    updateUI();
-                    showNotification('Application data imported successfully!');
-                } catch (err) {
-                    showNotification('Error importing data: Invalid file format');
-                }
-            };
-            
-            reader.readAsText(file);
-            e.target.value = ''; // Reset file input
-        }
-
-        function saveSettings() {
-            localStorage.setItem('lottoGeniusSettings', JSON.stringify({
-                darkMode: appState.darkMode,
-                animations: appState.animations,
-                notifications: appState.notifications,
-                defaultGame: appState.defaultGame
-            }));
-        }
-
-        function loadSettings() {
-            const savedSettings = localStorage.getItem('lottoGeniusSettings');
-            if (savedSettings) {
-                try {
-                    const settings = JSON.parse(savedSettings);
-                    appState.darkMode = settings.darkMode ?? true;
-                    appState.animations = settings.animations ?? true;
-                    appState.notifications = settings.notifications ?? true;
-                    appState.defaultGame = settings.defaultGame ?? 'powerball';
-                } catch (err) {
-                    console.error('Error loading settings:', err);
-                }
-            }
-        }
-
-        // Utility Functions
-        function updateRecentActivity(message) {
-            const activityDiv = document.getElementById('recentActivity');
-            const now = new Date().toLocaleTimeString();
-            
-            let html = activityDiv.innerHTML;
-            html = `<p><span class="text-gray-500 dark:text-gray-400">[${now}]</span> ${message}</p>` + html;
-            
-            // Limit to 5 recent activities
-            const paragraphs = html.split('</p>').filter(p => p.trim() !== '');
-            if (paragraphs.length > 5) {
-                html = paragraphs.slice(0, 5).join('</p>') + '</p>';
-            }
-            
-            activityDiv.innerHTML = html;
-        }
-
-        function updateStatsOverview(tickets) {
-            if (tickets.length === 0) {
-                document.getElementById('statsOverview').innerHTML = '<p>Generate numbers to see statistics</p>';
-                return;
-            }
-            
-            const numbers = tickets.flatMap(t => t.numbers);
-            const sum = numbers.reduce((a, b) => a + b, 0);
-            const avg = sum / numbers.length;
-            const oddCount = numbers.filter(n => n % 2 === 1).length;
-            const evenCount = numbers.length - oddCount;
-            
-            document.getElementById('statsOverview').innerHTML = `
-                <p>Numbers Generated: ${numbers.length}</p>
-                <p>Average Number: ${avg.toFixed(1)}</p>
-                <p>Odd/Even: ${oddCount}/${evenCount}</p>
-            `;
-        }
-
-        function handleQuickAction(e) {
-            const action = e.target.dataset.action;
-            
-            switch (action) {
-                case 'quickPick':
-                    quickPick();
-                    break;
-                case 'analyzeLast':
-                    if (appState.historicalData.length > 0) {
-                        const lastDraw = appState.historicalData[appState.historicalData.length - 1];
-                        document.getElementById('numbersToAnalyze').value = lastDraw.numbers.join(', ');
-                        analyzeNumbers();
-                    } else {
-                        showNotification('No historical data to analyze!');
-                    }
-                    break;
-                case 'checkOdds':
-                    // Scroll to probability section
-                    document.getElementById('probability').scrollIntoView({ behavior: 'smooth' });
-                    break;
-            }
-        }
-
-        // Initialize the application when the DOM is loaded
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
-</body>
-</html>
+                    <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-cen
