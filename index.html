@@ -491,30 +491,33 @@
                     </div>
                 </div>
 
-                <!-- Predictions from Unused Numbers -->
+                <!-- Prediction Engine (Advanced) -->
                 <div class="mt-6">
-                    <h3 class="text-xl font-medium">Prediction Engine</h3>
-                    <div class="space-y-2 mb-4">
-                        <label class="block text-sm font-medium">Prediction Algorithm</label>
-                        <select id="unusedPredictionAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
-                            <option value="random">Random from Unused</option>
-                            <option value="frequency">Frequency-Based (from Historical)</option>
-                            <option value="gap">Gap-Based (from Historical)</option>
-                            <option value="ai">AI-Powered (from Unused)</option>
-                        </select>
+                    <h3 class="text-xl font-medium">Prediction Engine (Advanced)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium">Prediction Algorithm</label>
+                            <select id="advancedPredictionAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
+                                <option value="powerfulCombined">Powerful Combined Algorithm</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium">Advance Filter</label>
+                            <select id="advanceFilter" class="w-full p-2 border rounded-lg dark:bg-gray-700">
+                                <option value="balanced">Balanced (Default)</option>
+                                <option value="favorUnused">Favor Unused</option>
+                                <option value="favorMostUsed">Favor Most Used</option>
+                                <option value="favorLeastUsed">Favor Least Used</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <button id="predictFromUnused" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Predict Unused Numbers</button>
-                        <button id="generateCombinedPredict" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700">Generate Combined Predict</button>
-                        <button id="regenerateFromUnused" class="p-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">Regenerate Unused</button>
+                        <button id="generateAdvancedPrediction" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Generate Advanced Prediction</button>
+                        <button id="clearAdvancedPrediction" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear Predictions</button>
                     </div>
-                    <div id="unusedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
-                        <p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>
-                        <div id="unusedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
-                    </div>
-                    <div id="combinedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2 hidden">
-                        <p class="text-gray-500 dark:text-gray-400">Generate combined predictions to see results here.</p>
-                        <div id="combinedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
+                    <div id="advancedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
+                        <p class="text-gray-500 dark:text-gray-400">Generate advanced predictions to see results here.</p>
+                        <div id="advancedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
                     </div>
                 </div>
             </section>
@@ -1288,10 +1291,9 @@
             // Analyzer Controls
             document.getElementById('analyzeNumbers').addEventListener('click', analyzeNumbers);
             document.getElementById('getAIInsights').addEventListener('click', getAIInsights);
-            document.getElementById('predictFromUnused').addEventListener('click', predictFromUnused); // New button
-            document.getElementById('generateCombinedPredict').addEventListener('click', generateCombinedPredict); // New button for combined prediction
-            document.getElementById('regenerateFromUnused').addEventListener('click', predictFromUnused); // New button for regenerate
-            document.getElementById('clearAnalyzer').addEventListener('click', clearAnalyzer);
+            // Updated event listeners for the new prediction engine
+            document.getElementById('generateAdvancedPrediction').addEventListener('click', generateAdvancedPrediction);
+            document.getElementById('clearAdvancedPrediction').addEventListener('click', clearAdvancedPrediction);
             document.querySelectorAll('.sample-input').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.getElementById('numbersToAnalyze').value = e.target.dataset.sample;
@@ -2123,14 +2125,15 @@
         }
         
         /**
-         * New: Predicts lotto tickets using unused numbers from the input field.
+         * New: Generates advanced predictions based on unused numbers from pool, most used from input, and least used from input,
+         * with an additional filter for bias.
          */
-        async function predictFromUnused() {
+        async function generateAdvancedPrediction() {
             const input = document.getElementById('numbersToAnalyze').value;
             const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
 
             if (numbers.length === 0) {
-                showNotification('Please enter numbers to analyze first!');
+                showNotification('Please enter numbers to analyze first to generate predictions!');
                 return;
             }
 
@@ -2148,235 +2151,75 @@
                 config = gameConfigs[game];
             }
 
-            const predictionAlgorithm = document.getElementById('unusedPredictionAlgorithm').value;
+            const advanceFilter = document.getElementById('advanceFilter').value;
+            const numPredictions = 40; // Generate 40 predictions
 
-            const { unusedNumbers } = detectUnusedFromInput(numbers, config.mainPool);
+            const advancedPredictionLoading = document.getElementById('advancedPredictionLoading');
+            advancedPredictionLoading.classList.remove('hidden');
+            document.getElementById('advancedPredictionOutput').classList.remove('hidden'); // Ensure output is visible
 
-            if (unusedNumbers.length < config.pickCount) {
-                showNotification('Not enough unused numbers to generate a full ticket!');
-                document.getElementById('unusedPredictionOutput').innerHTML = '<p class="text-danger">Not enough unused numbers to generate a full ticket.</p>';
-                document.getElementById('combinedPredictionOutput').classList.add('hidden'); // Hide combined output
-                return;
-            }
-
-            const numPredictions = 40; // Changed from 5 to 40
-            const tickets = [];
-
-            const unusedPredictionLoading = document.getElementById('unusedPredictionLoading');
-            unusedPredictionLoading.classList.remove('hidden');
-            document.getElementById('unusedPredictionOutput').classList.remove('hidden'); // Ensure output is visible
-            document.getElementById('combinedPredictionOutput').classList.add('hidden'); // Hide combined output
-
-            try {
-                for (let i = 0; i < numPredictions; i++) {
-                    let mainNumbers = [];
-                    let bonusNumbers = Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1);
-
-                    switch (predictionAlgorithm) {
-                        case 'random':
-                            mainNumbers = _.sampleSize(unusedNumbers, config.pickCount);
-                            break;
-                        case 'frequency':
-                            if (appState.historicalData.length === 0) {
-                                showNotification('Load historical data for frequency-based prediction!');
-                                mainNumbers = _.sampleSize(unusedNumbers, config.pickCount);
-                            } else {
-                                const historicalFrequency = getNumberFrequency();
-                                // Score unused numbers by their historical frequency
-                                const scoredUnused = unusedNumbers.map(num => ({
-                                    num: num,
-                                    score: historicalFrequency[num] || 0
-                                }));
-                                mainNumbers = scoredUnused
-                                    .sort((a, b) => b.score - a.score)
-                                    .slice(0, config.pickCount)
-                                    .map(item => item.num);
-                            }
-                            break;
-                        case 'gap':
-                            if (appState.historicalData.length === 0) {
-                                showNotification('Load historical data for gap-based prediction!');
-                                mainNumbers = _.sampleSize(unusedNumbers, config.pickCount);
-                            } else {
-                                const historicalGaps = getGapAnalysis();
-                                // Score unused numbers by their historical gap
-                                const scoredUnused = unusedNumbers.map(num => ({
-                                    num: num,
-                                    score: historicalGaps[num] || 0
-                                }));
-                                mainNumbers = scoredUnused
-                                    .sort((a, b) => b.score - a.score) // Higher gap means more 'due'
-                                    .slice(0, config.pickCount)
-                                    .map(item => item.num);
-                            }
-                            break;
-                        case 'ai':
-                            mainNumbers = await generateAIUnusedPrediction(unusedNumbers, config);
-                            break;
-                    }
-                    // Always shuffle the results
-                    mainNumbers = _.shuffle(mainNumbers);
-                    bonusNumbers = _.shuffle(bonusNumbers);
-                    tickets.push({ numbers: mainNumbers.sort((a, b) => a - b), bonus: bonusNumbers.sort((a, b) => a - b) });
-                }
-            } catch (error) {
-                console.error("Error generating unused predictions:", error);
-                showNotification("Error generating predictions. Please try again.");
-            } finally {
-                unusedPredictionLoading.classList.add('hidden');
-            }
-
-            // Display tickets in the new output area
-            const outputDiv = document.getElementById('unusedPredictionOutput');
-            outputDiv.innerHTML = tickets.map((ticket, index) => `
-                <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-medium">Prediction ${index + 1} (${predictionAlgorithm.replace(/([A-Z])/g, ' $1').trim()} Algorithm)</span>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
-                    </div>
-                    <div class="flex flex-wrap gap-1 mb-1">
-                        ${ticket.numbers.map(num => `<span class="number-ball unused-number">${num}</span>`).join('')}
-                    </div>
-                    <div class="flex flex-wrap gap-1">
-                        ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-
-            showNotification('Generated predictions from unused numbers.');
-        }
-
-        async function generateAIUnusedPrediction(unusedNumbers, config) {
-            const { pickCount, mainPool } = config;
-            let generatedNumbers = [];
-
-            const prompt = `From the following list of unused lottery numbers: ${unusedNumbers.join(', ')}, select ${pickCount} numbers that are most likely to be drawn for a lottery game with a main pool up to ${mainPool}. Focus on patterns that might emerge from numbers that haven't been drawn recently. Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
-
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && unusedNumbers.includes(n));
-                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
-
-                    while (generatedNumbers.length < pickCount) {
-                        const randomNum = _.sample(unusedNumbers);
-                        if (!generatedNumbers.includes(randomNum)) {
-                            generatedNumbers.push(randomNum);
-                        }
-                    }
-                } else {
-                    console.error("Gemini API did not return expected content structure for AI unused prediction.");
-                    showNotification("AI unused prediction failed. Falling back to random from unused.");
-                    generatedNumbers = _.sampleSize(unusedNumbers, pickCount);
-                }
-            } catch (error) {
-                console.error("Error calling Gemini API for AI unused prediction:", error);
-                showNotification("AI unused prediction failed due to an error. Falling back to random from unused.");
-                generatedNumbers = _.sampleSize(unusedNumbers, pickCount);
-            }
-            return generatedNumbers; // Shuffling will happen outside this function
-        }
-
-        async function generateCombinedPredict() {
-            const input = document.getElementById('numbersToAnalyze').value;
-            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
-
-            if (numbers.length === 0) {
-                showNotification('Please enter numbers to analyze first!');
-                return;
-            }
-
-            const game = document.getElementById('analyzerGame').value;
-            let config;
-
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5,
-                    bonusPool: parseInt(document.getElementById('analyzerBonusPool').value) || 26,
-                    bonusCount: parseInt(document.getElementById('analyzerBonusCount').value) || 1
-                };
-            } else {
-                config = gameConfigs[game];
-            }
-
-            const combinedPredictionLoading = document.getElementById('combinedPredictionLoading');
-            combinedPredictionLoading.classList.remove('hidden');
-            document.getElementById('combinedPredictionOutput').classList.remove('hidden'); // Ensure output is visible
-            document.getElementById('unusedPredictionOutput').classList.add('hidden'); // Hide unused prediction output
-
-            const numPredictions = 40; // Changed from 5 to 40
             const tickets = [];
 
             // Categorize numbers from input
-            const inputFrequency = numbers.reduce((acc, num) => {
+            const inputFrequencyMap = numbers.reduce((acc, num) => {
                 acc[num] = (acc[num] || 0) + 1;
                 return acc;
             }, {});
 
-            const sortedByFrequency = Object.entries(inputFrequency).sort((a, b) => b[1] - a[1]);
-            const mostUsed = sortedByFrequency.slice(0, Math.ceil(config.pickCount / 3)).map(item => item[0]);
-            const leastUsed = sortedByFrequency.slice(-Math.ceil(config.pickCount / 3)).map(item => item[0]);
+            const sortedByFrequency = Object.entries(inputFrequencyMap).sort((a, b) => b[1] - a[1]);
+            const mostUsed = sortedByFrequency.map(item => item[0]);
+            const leastUsed = sortedByFrequency.slice().reverse().map(item => item[0]); // Reverse for least used
             const { unusedNumbers } = detectUnusedFromInput(numbers, config.mainPool);
-
-            // Define different algorithms for combined prediction
-            const algorithms = [
-                { name: "Weighted Random", func: generateWeightedRandomCombined },
-                { name: "Alternating Pick", func: generateAlternatingPickCombined },
-                { name: "AI-Powered Combined", func: generateAICombinedPrediction }
-            ];
 
             try {
                 for (let i = 0; i < numPredictions; i++) {
-                    const algorithmIndex = i % algorithms.length; // Cycle through algorithms
-                    const currentAlgorithm = algorithms[algorithmIndex];
-                    
                     let mainNumbers = [];
                     let bonusNumbers = Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1);
 
-                    switch (currentAlgorithm.name) {
-                        case "Weighted Random":
-                            mainNumbers = currentAlgorithm.func(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool);
+                    switch (advanceFilter) {
+                        case 'balanced':
+                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool);
                             break;
-                        case "Alternating Pick":
-                            mainNumbers = currentAlgorithm.func(mostUsed, leastUsed, unusedNumbers, config.pickCount);
+                        case 'favorUnused':
+                            mainNumbers = await generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, config.pickCount, config.mainPool);
                             break;
-                        case "AI-Powered Combined":
-                            mainNumbers = await currentAlgorithm.func(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool);
+                        case 'favorMostUsed':
+                            mainNumbers = await generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, config.pickCount, config.mainPool);
+                            break;
+                        case 'favorLeastUsed':
+                            mainNumbers = await generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, config.pickCount, config.mainPool);
+                            break;
+                        default:
+                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool);
                             break;
                     }
                     
-                    // Always shuffle the results
+                    // Ensure uniqueness and correct pickCount
+                    mainNumbers = [...new Set(mainNumbers)].slice(0, config.pickCount);
+                    while (mainNumbers.length < config.pickCount) {
+                        const randomNum = Math.floor(Math.random() * config.mainPool) + 1;
+                        if (!mainNumbers.includes(randomNum)) {
+                            mainNumbers.push(randomNum);
+                        }
+                    }
+
+                    // Always shuffle the results for randomness in presentation
                     mainNumbers = _.shuffle(mainNumbers);
                     bonusNumbers = _.shuffle(bonusNumbers);
-                    tickets.push({ numbers: mainNumbers.sort((a,b)=>a-b), bonus: bonusNumbers.sort((a,b)=>a-b), algorithm: currentAlgorithm.name });
+                    tickets.push({ numbers: mainNumbers.sort((a, b) => a - b), bonus: bonusNumbers.sort((a, b) => a - b), filter: advanceFilter });
                 }
             } catch (error) {
-                console.error("Error generating combined predictions:", error);
-                showNotification("Error generating combined predictions. Please try again.");
+                console.error("Error generating advanced predictions:", error);
+                showNotification("Error generating predictions. Please try again.");
             } finally {
-                combinedPredictionLoading.classList.add('hidden');
+                advancedPredictionLoading.classList.add('hidden');
             }
 
-            const outputDiv = document.getElementById('combinedPredictionOutput');
+            const outputDiv = document.getElementById('advancedPredictionOutput');
             outputDiv.innerHTML = tickets.map((ticket, index) => `
                 <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-medium">Combined Prediction ${index + 1} (${ticket.algorithm})</span>
+                        <span class="text-sm font-medium">Prediction ${index + 1} (Filter: ${ticket.filter.replace(/([A-Z])/g, ' $1').trim()})</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
                     </div>
                     <div class="flex flex-wrap gap-1 mb-1">
@@ -2388,57 +2231,7 @@
                 </div>
             `).join('');
 
-            showNotification('Generated combined predictions!');
-        }
-
-        function generateWeightedRandomCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool) {
-            let combinedPool = [];
-            // Assign higher weight to mostUsed, medium to unused, lower to leastUsed
-            for (let i = 0; i < mostUsed.length; i++) combinedPool.push(mostUsed[i], mostUsed[i], mostUsed[i]); // 3x weight
-            for (let i = 0; i < unusedNumbers.length; i++) combinedPool.push(unusedNumbers[i], unusedNumbers[i]); // 2x weight
-            for (let i = 0; i < leastUsed.length; i++) combinedPool.push(leastUsed[i]); // 1x weight
-
-            // Ensure combinedPool has enough numbers, add random if needed
-            if (combinedPool.length < pickCount * 2) { // Add more random if pool is too small
-                const allNumbers = Array.from({ length: mainPool }, (_, i) => i + 1);
-                const additionalNumbersNeeded = (pickCount * 2) - combinedPool.length;
-                combinedPool = combinedPool.concat(_.sampleSize(allNumbers, additionalNumbersNeeded));
-            }
-            
-            return _.sampleSize(_.uniq(combinedPool), pickCount);
-        }
-
-        function generateAlternatingPickCombined(mostUsed, leastUsed, unusedNumbers, pickCount) {
-            let result = new Set();
-            let mostUsedIndex = 0;
-            let leastUsedIndex = 0;
-            let unusedIndex = 0;
-
-            while (result.size < pickCount) {
-                if (mostUsed.length > 0 && mostUsedIndex < mostUsed.length) {
-                    result.add(mostUsed[mostUsedIndex++]);
-                    if (result.size === pickCount) break;
-                }
-                if (leastUsed.length > 0 && leastUsedIndex < leastUsed.length) {
-                    result.add(leastUsed[leastUsedIndex++]);
-                    if (result.size === pickCount) break;
-                }
-                if (unusedNumbers.length > 0 && unusedIndex < unusedNumbers.length) {
-                    result.add(unusedNumbers[unusedIndex++]);
-                    if (result.size === pickCount) break;
-                }
-
-                // If any list exhausted, cycle through others or pick randomly from all available
-                if (mostUsedIndex >= mostUsed.length && leastUsedIndex >= leastUsed.length && unusedIndex >= unusedNumbers.length) {
-                    // Fallback: pick randomly from all numbers (mostUsed, leastUsed, unused)
-                    const remainingPool = [...mostUsed, ...leastUsed, ...unusedNumbers];
-                    while (result.size < pickCount && remainingPool.length > 0) {
-                        result.add(_.sample(remainingPool));
-                    }
-                    break;
-                }
-            }
-            return Array.from(result);
+            showNotification('Generated advanced predictions!');
         }
 
         async function generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool) {
@@ -2480,14 +2273,190 @@
                 } else {
                     console.error("Gemini API did not return expected content structure for AI combined prediction.");
                     showNotification("AI combined prediction failed. Falling back to random combination.");
-                    generatedNumbers = generateWeightedRandomCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool);
+                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'balanced');
                 }
             } catch (error) {
                 console.error("Error calling Gemini API for AI combined prediction:", error);
                 showNotification("AI combined prediction failed due to an error. Falling back to random combination.");
-                generatedNumbers = generateWeightedRandomCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool);
+                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'balanced');
             }
-            return generatedNumbers; // Shuffling will happen outside this function
+            return generatedNumbers;
+        }
+
+        async function generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, pickCount, mainPool) {
+            let generatedNumbers = [];
+            const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
+            Prioritize numbers from the 'unused numbers' list, but also consider numbers from 'most used' and 'least used' lists to create a diverse set.
+            - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
+            - Most Used Numbers: ${mostUsed.join(', ')}
+            - Least Used Numbers: ${leastUsed.join(', ')}
+            Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
+                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+                    while (generatedNumbers.length < pickCount) {
+                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                        if (!generatedNumbers.includes(randomNum)) {
+                            generatedNumbers.push(randomNum);
+                        }
+                    }
+                } else {
+                    console.error("Gemini API did not return expected content structure for AI favor unused prediction.");
+                    showNotification("AI favor unused prediction failed. Falling back to random combination.");
+                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorUnused');
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API for AI favor unused prediction:", error);
+                showNotification("AI favor unused prediction failed due to an error. Falling back to random combination.");
+                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorUnused');
+            }
+            return generatedNumbers;
+        }
+
+        async function generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, pickCount, mainPool) {
+            let generatedNumbers = [];
+            const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
+            Prioritize numbers from the 'most used' list, but also consider numbers from 'unused' and 'least used' lists to create a diverse set.
+            - Most Used Numbers: ${mostUsed.join(', ')}
+            - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
+            - Least Used Numbers: ${leastUsed.join(', ')}
+            Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
+                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+                    while (generatedNumbers.length < pickCount) {
+                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                        if (!generatedNumbers.includes(randomNum)) {
+                            generatedNumbers.push(randomNum);
+                        }
+                    }
+                } else {
+                    console.error("Gemini API did not return expected content structure for AI favor most used prediction.");
+                    showNotification("AI favor most used prediction failed. Falling back to random combination.");
+                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorMostUsed');
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API for AI favor most used prediction:", error);
+                showNotification("AI favor most used prediction failed due to an error. Falling back to random combination.");
+                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorMostUsed');
+            }
+            return generatedNumbers;
+        }
+
+        async function generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, pickCount, mainPool) {
+            let generatedNumbers = [];
+            const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
+            Prioritize numbers from the 'least used' list, but also consider numbers from 'most used' and 'unused' lists to create a diverse set.
+            - Least Used Numbers: ${leastUsed.join(', ')}
+            - Most Used Numbers: ${mostUsed.join(', ')}
+            - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
+            Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
+                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+                    while (generatedNumbers.length < pickCount) {
+                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                        if (!generatedNumbers.includes(randomNum)) {
+                            generatedNumbers.push(randomNum);
+                        }
+                    }
+                } else {
+                    console.error("Gemini API did not return expected content structure for AI favor least used prediction.");
+                    showNotification("AI favor least used prediction failed. Falling back to random combination.");
+                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorLeastUsed');
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API for AI favor least used prediction:", error);
+                showNotification("AI favor least used prediction failed due to an error. Falling back to random combination.");
+                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorLeastUsed');
+            }
+            return generatedNumbers;
+        }
+
+        // Fallback function for combined prediction if AI fails
+        function generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, filter) {
+            let pool = [];
+            const allNumbers = Array.from({ length: mainPool }, (_, i) => i + 1);
+
+            switch (filter) {
+                case 'balanced':
+                    // Mix of all three categories
+                    pool = [...mostUsed, ...unusedNumbers, ...leastUsed];
+                    break;
+                case 'favorUnused':
+                    // More unused, some most used, few least used
+                    pool = [...unusedNumbers, ...unusedNumbers, ...mostUsed, ...leastUsed];
+                    break;
+                case 'favorMostUsed':
+                    // More most used, some unused, few least used
+                    pool = [...mostUsed, ...mostUsed, ...unusedNumbers, ...leastUsed];
+                    break;
+                case 'favorLeastUsed':
+                    // More least used, some unused, few most used
+                    pool = [...leastUsed, ...leastUsed, ...unusedNumbers, ...mostUsed];
+                    break;
+            }
+
+            // Ensure the pool has enough unique numbers, add from all possible numbers if needed
+            let uniquePool = [...new Set(pool)];
+            if (uniquePool.length < pickCount) {
+                const missingCount = pickCount - uniquePool.length;
+                const additionalNumbers = _.sampleSize(allNumbers.filter(n => !uniquePool.includes(n)), missingCount);
+                uniquePool = [...uniquePool, ...additionalNumbers];
+            }
+            
+            return _.sampleSize(uniquePool, pickCount);
         }
 
 
@@ -2722,11 +2691,10 @@
             document.getElementById('aiInsightsOutput').classList.add('hidden'); // Hide AI insights output
             document.getElementById('aiInsightsText').textContent = ''; // Clear AI insights text
             document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Analyze numbers to see unused numbers and pairs relative to the game\'s pool.</p>';
-            document.getElementById('unusedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>';
-            document.getElementById('unusedPredictionLoading').classList.add('hidden'); // Hide loading for unused prediction
-            document.getElementById('combinedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate combined predictions to see results here.</p>';
-            document.getElementById('combinedPredictionOutput').classList.add('hidden'); // Hide combined prediction output
-            document.getElementById('combinedPredictionLoading').classList.add('hidden'); // Hide loading for combined prediction
+            
+            // Clear new advanced prediction output
+            document.getElementById('advancedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate advanced predictions to see results here.</p>';
+            document.getElementById('advancedPredictionLoading').classList.add('hidden');
 
 
             // Reset charts
@@ -2737,6 +2705,13 @@
             });
             
             showNotification('Analyzer cleared!');
+        }
+
+        // Clear Advanced Prediction function
+        function clearAdvancedPrediction() {
+            document.getElementById('advancedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate advanced predictions to see results here.</p>';
+            document.getElementById('advancedPredictionLoading').classList.add('hidden');
+            showNotification('Advanced predictions cleared!');
         }
 
         // Seed Reverser Functions (New)
@@ -3042,8 +3017,8 @@
 
             // Odd/Even Ratio
             const oddEvenSum = seedStats.oddCount + seedStats.evenCount;
-            const oddRatio = (seedStats.oddCount / oddEvenSum).toFixed(2);
-            const evenRatio = (seedStats.evenCount / oddEvenSum).toFixed(2);
+            const oddRatio = (oddEvenSum > 0) ? (seedStats.oddCount / oddEvenSum).toFixed(2) : 'N/A';
+            const evenRatio = (oddEvenSum > 0) ? (seedStats.evenCount / oddEvenSum).toFixed(2) : 'N/A';
             const optimalOdd = optimalStats.oddEvenRatio[0];
             const optimalEven = optimalStats.oddEvenRatio[1];
             const oddEvenStatus = (seedStats.oddCount >= optimalOdd - 1 && seedStats.oddCount <= optimalOdd + 1 &&
