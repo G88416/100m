@@ -4132,4 +4132,200 @@
             // Using a custom modal-like confirmation instead of browser's confirm()
             const confirmReset = (callback) => {
                 const modalHtml = `
-                    <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-cen
+                    <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 text-center">
+                            <h3 class="text-xl font-semibold mb-4">Confirm Reset</h3>
+                            <p class="mb-6">Are you sure you want to reset all application data? This cannot be undone.</p>
+                            <div class="flex justify-center gap-4">
+                                <button id="confirmCancel" class="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">Cancel</button>
+                                <button id="confirmProceed" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600 flex-1">Proceed</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                document.getElementById('confirmCancel').addEventListener('click', () => {
+                    document.getElementById('confirmModal').remove();
+                    callback(false);
+                });
+                document.getElementById('confirmProceed').addEventListener('click', () => {
+                    document.getElementById('confirmModal').remove();
+                    callback(true);
+                });
+            };
+
+            confirmReset((confirmed) => {
+                if (confirmed) {
+                    localStorage.clear();
+                    appState.historicalData = [];
+                    appState.savedTickets = [];
+                    appState.notificationCount = 0;
+                    appState.currentPage = 1;
+                    
+                    // Reset UI
+                    clearGenerator();
+                    clearAnalyzer();
+                    clearHistoricalData();
+                    resetProbabilityCalculator();
+                    clearSeedReverse(); // Clear the new section
+                    
+                    document.getElementById('predictionResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate predictions to see results</p>';
+                    document.getElementById('strategyResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Apply a strategy to see recommendations</p>';
+                    
+                    // Reset settings to defaults
+                    appState.darkMode = true;
+                    appState.animations = true;
+                    appState.notifications = true;
+                    appState.defaultGame = 'powerball';
+                    
+                    updateUI();
+                    showNotification('All application data has been reset!');
+                } else {
+                    showNotification('Reset cancelled.');
+                }
+            });
+        }
+
+        function exportAllData() {
+            const data = {
+                settings: {
+                    darkMode: appState.darkMode,
+                    animations: appState.animations,
+                    notifications: appState.notifications,
+                    defaultGame: appState.defaultGame
+                },
+                historicalData: appState.historicalData,
+                savedTickets: appState.savedTickets
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            downloadBlob(blob, 'lotto_genius_backup.json');
+            showNotification('All application data exported!');
+        }
+
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    
+                    if (data.settings) {
+                        appState.darkMode = data.settings.darkMode ?? true;
+                        appState.animations = data.settings.animations ?? true;
+                        appState.notifications = data.settings.notifications ?? true;
+                        appState.defaultGame = data.settings.defaultGame ?? 'powerball';
+                    }
+                    
+                    if (data.historicalData) {
+                        appState.historicalData = data.historicalData;
+                        displayHistoricalData();
+                        updateHistoricalCharts();
+                    }
+                    
+                    if (data.savedTickets) {
+                        appState.savedTickets = data.savedTickets;
+                    }
+                    
+                    updateUI();
+                    showNotification('Application data imported successfully!');
+                } catch (err) {
+                    showNotification('Error importing data: Invalid file format');
+                }
+            };
+            
+            reader.readAsText(file);
+            e.target.value = ''; // Reset file input
+        }
+
+        function saveSettings() {
+            localStorage.setItem('lottoGeniusSettings', JSON.stringify({
+                darkMode: appState.darkMode,
+                animations: appState.animations,
+                notifications: appState.notifications,
+                defaultGame: appState.defaultGame
+            }));
+        }
+
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('lottoGeniusSettings');
+            if (savedSettings) {
+                try {
+                    const settings = JSON.parse(savedSettings);
+                    appState.darkMode = settings.darkMode ?? true;
+                    appState.animations = settings.animations ?? true;
+                    appState.notifications = settings.notifications ?? true;
+                    appState.defaultGame = settings.defaultGame ?? 'powerball';
+                } catch (err) {
+                    console.error('Error loading settings:', err);
+                }
+            }
+        }
+
+        // Utility Functions
+        function updateRecentActivity(message) {
+            const activityDiv = document.getElementById('recentActivity');
+            const now = new Date().toLocaleTimeString();
+            
+            let html = activityDiv.innerHTML;
+            html = `<p><span class="text-gray-500 dark:text-gray-400">[${now}]</span> ${message}</p>` + html;
+            
+            // Limit to 5 recent activities
+            const paragraphs = html.split('</p>').filter(p => p.trim() !== '');
+            if (paragraphs.length > 5) {
+                html = paragraphs.slice(0, 5).join('</p>') + '</p>';
+            }
+            
+            activityDiv.innerHTML = html;
+        }
+
+        function updateStatsOverview(tickets) {
+            if (tickets.length === 0) {
+                document.getElementById('statsOverview').innerHTML = '<p>Generate numbers to see statistics</p>';
+                return;
+            }
+            
+            const numbers = tickets.flatMap(t => t.numbers);
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const avg = sum / numbers.length;
+            const oddCount = numbers.filter(n => n % 2 === 1).length;
+            const evenCount = numbers.length - oddCount;
+            
+            document.getElementById('statsOverview').innerHTML = `
+                <p>Numbers Generated: ${numbers.length}</p>
+                <p>Average Number: ${avg.toFixed(1)}</p>
+                <p>Odd/Even: ${oddCount}/${evenCount}</p>
+            `;
+        }
+
+        function handleQuickAction(e) {
+            const action = e.target.dataset.action;
+            
+            switch (action) {
+                case 'quickPick':
+                    quickPick();
+                    break;
+                case 'analyzeLast':
+                    if (appState.historicalData.length > 0) {
+                        const lastDraw = appState.historicalData[appState.historicalData.length - 1];
+                        document.getElementById('numbersToAnalyze').value = lastDraw.numbers.join(', ');
+                        analyzeNumbers();
+                    } else {
+                        showNotification('No historical data to analyze!');
+                    }
+                    break;
+                case 'checkOdds':
+                    // Scroll to probability section
+                    document.getElementById('probability').scrollIntoView({ behavior: 'smooth' });
+                    break;
+            }
+        }
+
+        // Initialize the application when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
