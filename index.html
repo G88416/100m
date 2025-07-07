@@ -483,23 +483,17 @@
 
                 <!-- Predictions from Unused Numbers -->
                 <div class="mt-6">
-                    <h3 class="text-xl font-medium">Predictions from Unused Numbers</h3>
+                    <h3 class="text-xl font-medium">Combined Prediction</h3>
                     <div class="space-y-2 mb-4">
-                        <label class="block text-sm font-medium">Prediction Algorithm</label>
-                        <select id="unusedPredictionAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
-                            <option value="random">Random from Unused</option>
-                            <option value="frequency">Frequency-Based (from Historical)</option>
-                            <option value="gap">Gap-Based (from Historical)</option>
-                            <option value="ai">AI-Powered (from Unused)</option>
-                        </select>
+                        <label class="block text-sm font-medium">Number of Tickets to Predict</label>
+                        <input id="numPredictionTickets" type="number" min="1" max="10" value="1" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <button id="predictFromUnused" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Generate Prediction from Unused</button>
-                        <button id="regenerateFromUnused" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700">Regenerate from Unused</button>
+                        <button id="generateCombinedPredictionBtn" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Generate Combined Prediction</button>
                     </div>
-                    <div id="unusedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
-                        <p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>
-                        <div id="unusedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
+                    <div id="combinedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
+                        <p class="text-gray-500 dark:text-gray-400">Analyze numbers and generate combined predictions to see results here.</p>
+                        <div id="combinedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
                     </div>
                 </div>
             </section>
@@ -1178,7 +1172,8 @@
             darkMode: true,
             animations: true,
             notifications: true,
-            defaultGame: 'powerball'
+            defaultGame: 'powerball',
+            analyzedNumbers: null // Store analyzed numbers for prediction
         };
 
         // Chart Instances
@@ -1273,8 +1268,7 @@
             // Analyzer Controls
             document.getElementById('analyzeNumbers').addEventListener('click', analyzeNumbers);
             document.getElementById('getAIInsights').addEventListener('click', getAIInsights);
-            document.getElementById('predictFromUnused').addEventListener('click', predictFromUnused); // New button
-            document.getElementById('regenerateFromUnused').addEventListener('click', predictFromUnused); // New button for regenerate
+            document.getElementById('generateCombinedPredictionBtn').addEventListener('click', generateCombinedPrediction); // New button for combined prediction
             document.getElementById('clearAnalyzer').addEventListener('click', clearAnalyzer);
             document.querySelectorAll('.sample-input').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -2004,11 +1998,24 @@
 
         // Analyzer Functions
         function analyzeNumbers() {
-            const input = document.getElementById('numbersToAnalyze').value;
-            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
-            
+            const input = document.getElementById('numbersToAnalyze').value.trim();
+            const rawNumbers = input.split(/[, \-]/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0);
+            const numbers = [...new Set(rawNumbers)].sort((a, b) => a - b); // Get unique sorted numbers
+
             if (numbers.length === 0) {
                 showNotification('Please enter valid numbers!');
+                document.getElementById('analysisResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Enter numbers to analyze them</p>';
+                document.getElementById('basicStats').innerHTML = '';
+                document.getElementById('advancedMetrics').innerHTML = '';
+                document.getElementById('numberProps').innerHTML = '';
+                document.getElementById('patternStats').innerHTML = '';
+                document.getElementById('visualAnalysis').innerHTML = '';
+                document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Analyze numbers to see unused numbers and pairs relative to the game\'s pool.</p>';
+                document.getElementById('combinedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Analyze numbers and generate combined predictions to see results here.</p>';
+                if (charts.freqDistributionChart) charts.freqDistributionChart.destroy();
+                if (charts.lastDigitDistributionChart) charts.lastDigitDistributionChart.destroy();
+                if (charts.sumDistributionChart) charts.sumDistributionChart.destroy();
+                if (charts.oddEvenDistributionChart) charts.oddEvenDistributionChart.destroy();
                 return;
             }
             
@@ -2055,10 +2062,16 @@
                 <p>Last Digits: ${numbers.map(n => n % 10).join(', ')}</p>
             `;
             
+            // Calculate Most Used and Least Used from input
+            const mostUsed = getMostUsedNumbers(rawNumbers, Math.min(5, config.pickCount), config.mainPool);
+            const leastUsed = getLeastUsedNumbers(rawNumbers, Math.min(5, config.pickCount), config.mainPool);
+
             document.getElementById('advancedMetrics').innerHTML = `
                 <p>Standard Deviation: ${calculateStandardDeviation(numbers).toFixed(2)}</p>
                 <p>Number Spread: ${calculateSpread(numbers).toFixed(2)}%</p>
                 <p>Low/High Ratio: ${calculateLowHighRatio(numbers, config.mainPool).toFixed(2)}</p>
+                <p><strong>Most Used (from input):</strong> ${mostUsed.length > 0 ? mostUsed.join(', ') : 'N/A'}</p>
+                <p><strong>Least Used (from input):</strong> ${leastUsed.length > 0 ? leastUsed.join(', ') : 'N/A'}</p>
             `;
             
             // Visual analysis
@@ -2080,7 +2093,7 @@
                 : 'None';
 
             unusedNumbersDiv.innerHTML = `
-                <p><strong>Unused Numbers (${unusedNumbers.length}):</strong> ${unusedNumbersDisplay}</p>
+                <p><strong>Unused Main Pool Numbers:</strong> ${unusedNumbersDisplay}</p>
                 <p><strong>Unused Pairs (${unusedPairs.length.toLocaleString()}):</strong> ${unusedPairsDisplay}</p>
             `;
 
@@ -2093,173 +2106,165 @@
                 <p class="text-sm">Analyzed ${numbers.length} numbers with average ${avg.toFixed(2)}</p>
             `;
             
+            // Store analyzed numbers for combined prediction
+            appState.analyzedNumbers = {
+                inputNumbers: rawNumbers, // Keep raw numbers for frequency
+                uniqueNumbers: numbers, // Unique sorted numbers
+                mostUsed: mostUsed,
+                leastUsed: leastUsed,
+                unused: unusedNumbers,
+                config: config
+            };
+
             showNotification('Analysis completed!');
         }
         
         /**
-         * New: Predicts lotto tickets using unused numbers from the input field.
+         * Helper to calculate number frequencies from an array of numbers.
+         * @param {number[]} numbers - The array of numbers.
+         * @returns {Object.<number, number>} - An object where keys are numbers and values are their frequencies.
          */
-        async function predictFromUnused() {
-            const input = document.getElementById('numbersToAnalyze').value;
-            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+        function calculateNumberFrequencies(numbers) {
+            const frequency = {};
+            numbers.forEach(num => {
+                frequency[num] = (frequency[num] || 0) + 1;
+            });
+            return frequency;
+        }
 
-            if (numbers.length === 0) {
-                showNotification('Please enter numbers to analyze first!');
+        /**
+         * Helper to find the most used numbers from an array.
+         * @param {number[]} numbers - The array of numbers to analyze.
+         * @param {number} count - The number of most used numbers to return.
+         * @param {number} mainPool - The maximum number in the main pool.
+         * @returns {number[]} - An array of the most used numbers.
+         */
+        function getMostUsedNumbers(numbers, count, mainPool) {
+            const frequency = calculateNumberFrequencies(numbers);
+            return Object.entries(frequency)
+                .sort((a, b) => b[1] - a[1] || a[0] - b[0]) // Sort by frequency (desc), then number (asc)
+                .slice(0, count)
+                .map(item => parseInt(item[0]));
+        }
+
+        /**
+         * Helper to find the least used numbers from an array.
+         * @param {number[]} numbers - The array of numbers to analyze.
+         * @param {number} count - The number of least used numbers to return.
+         * @param {number} mainPool - The maximum number in the main pool.
+         * @returns {number[]} - An array of the least used numbers.
+         */
+        function getLeastUsedNumbers(numbers, count, mainPool) {
+            const frequency = calculateNumberFrequencies(numbers);
+            const allPossibleNumbers = Array.from({ length: mainPool }, (_, i) => i + 1);
+            const numbersWithFrequency = allPossibleNumbers.map(num => ({
+                num: num,
+                freq: frequency[num] || 0
+            }));
+
+            return numbersWithFrequency
+                .sort((a, b) => a.freq - b.freq || a.num - b.num) // Sort by frequency (asc), then number (asc)
+                .slice(0, count)
+                .map(item => item.num);
+        }
+
+        /**
+         * New: Generates predictions based on a combination of most used, least used, and unused numbers.
+         * The user can customize how many tickets to predict.
+         */
+        async function generateCombinedPrediction() {
+            const predictionOutputDiv = document.getElementById('combinedPredictionOutput');
+            const loadingIndicator = document.getElementById('combinedPredictionLoading');
+            const numPredictionTickets = parseInt(document.getElementById('numPredictionTickets').value) || 1;
+
+            if (!appState.analyzedNumbers) {
+                showNotification('Please analyze numbers first to generate predictions!');
+                predictionOutputDiv.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Analyze numbers and generate combined predictions to see results here.</p>';
                 return;
             }
 
-            const game = document.getElementById('analyzerGame').value;
-            let config;
+            const { mostUsed, leastUsed, unused, config } = appState.analyzedNumbers;
+            const { pickCount, mainPool, bonusPool, bonusCount } = config;
 
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5,
-                    bonusPool: parseInt(document.getElementById('analyzerBonusPool').value) || 26,
-                    bonusCount: parseInt(document.getElementById('analyzerBonusCount').value) || 1
-                };
-            } else {
-                config = gameConfigs[game];
-            }
-
-            const predictionAlgorithm = document.getElementById('unusedPredictionAlgorithm').value;
-
-            const { unusedNumbers } = detectUnusedFromInput(numbers, config.mainPool);
-
-            if (unusedNumbers.length < config.pickCount) {
-                showNotification('Not enough unused numbers to generate a full ticket!');
-                document.getElementById('unusedPredictionOutput').innerHTML = '<p class="text-danger">Not enough unused numbers to generate a full ticket.</p>';
+            if (mostUsed.length === 0 && leastUsed.length === 0 && unused.length === 0) {
+                showNotification('Not enough data from analysis to generate a combined prediction!');
+                predictionOutputDiv.innerHTML = '<p class="text-danger">Not enough data from analysis to generate a combined prediction.</p>';
                 return;
             }
 
-            const numTickets = 5; // Generate 5 tickets by default
-            const tickets = [];
+            loadingIndicator.classList.remove('hidden');
+            predictionOutputDiv.innerHTML = ''; // Clear previous predictions
 
-            const unusedPredictionLoading = document.getElementById('unusedPredictionLoading');
-            unusedPredictionLoading.classList.remove('hidden');
+            const generatedTickets = [];
 
             try {
-                for (let i = 0; i < numTickets; i++) {
-                    let mainNumbers = [];
-                    let bonusNumbers = Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1);
+                for (let i = 0; i < numPredictionTickets; i++) {
+                    let mainNumbers = new Set();
 
-                    switch (predictionAlgorithm) {
-                        case 'random':
-                            mainNumbers = _.sampleSize(unusedNumbers, config.pickCount).sort((a, b) => a - b);
-                            break;
-                        case 'frequency':
-                            if (appState.historicalData.length === 0) {
-                                showNotification('Load historical data for frequency-based prediction!');
-                                mainNumbers = _.sampleSize(unusedNumbers, config.pickCount).sort((a, b) => a - b);
-                            } else {
-                                const historicalFrequency = getNumberFrequency();
-                                // Score unused numbers by their historical frequency
-                                const scoredUnused = unusedNumbers.map(num => ({
-                                    num: num,
-                                    score: historicalFrequency[num] || 0
-                                }));
-                                mainNumbers = scoredUnused
-                                    .sort((a, b) => b.score - a.score)
-                                    .slice(0, config.pickCount)
-                                    .map(item => item.num)
-                                    .sort((a, b) => a - b);
-                            }
-                            break;
-                        case 'gap':
-                            if (appState.historicalData.length === 0) {
-                                showNotification('Load historical data for gap-based prediction!');
-                                mainNumbers = _.sampleSize(unusedNumbers, config.pickCount).sort((a, b) => a - b);
-                            } else {
-                                const historicalGaps = getGapAnalysis();
-                                // Score unused numbers by their historical gap
-                                const scoredUnused = unusedNumbers.map(num => ({
-                                    num: num,
-                                    score: historicalGaps[num] || 0
-                                }));
-                                mainNumbers = scoredUnused
-                                    .sort((a, b) => b.score - a.score) // Higher gap means more 'due'
-                                    .slice(0, config.pickCount)
-                                    .map(item => item.num)
-                                    .sort((a, b) => a - b);
-                            }
-                            break;
-                        case 'ai':
-                            mainNumbers = await generateAIUnusedPrediction(unusedNumbers, config);
-                            break;
+                    // Strategy: Prioritize most used, then least used, then unused
+                    // Fill with most used numbers first
+                    for (const num of mostUsed) {
+                        if (mainNumbers.size < pickCount) {
+                            mainNumbers.add(num);
+                        } else break;
                     }
-                    tickets.push({ numbers: mainNumbers, bonus: bonusNumbers });
+
+                    // Fill remaining with least used numbers
+                    for (const num of leastUsed) {
+                        if (mainNumbers.size < pickCount) {
+                            mainNumbers.add(num);
+                        } else break;
+                    }
+
+                    // Fill any remaining spots with unused numbers
+                    for (const num of unused) {
+                        if (mainNumbers.size < pickCount) {
+                            mainNumbers.add(num);
+                        } else break;
+                    }
+
+                    // If still not enough numbers (e.g., if pickCount is very high or pools are small)
+                    // Fill randomly from the entire main pool
+                    while (mainNumbers.size < pickCount) {
+                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                        mainNumbers.add(randomNum);
+                    }
+
+                    const sortedMainNumbers = Array.from(mainNumbers).sort((a, b) => a - b);
+
+                    // Generate bonus numbers randomly from bonus pool
+                    const bonusNumbers = Array.from({ length: bonusCount }, () => Math.floor(Math.random() * bonusPool) + 1);
+
+                    generatedTickets.push({ numbers: sortedMainNumbers, bonus: bonusNumbers });
                 }
+
+                // Display generated tickets
+                predictionOutputDiv.innerHTML = generatedTickets.map((ticket, index) => `
+                    <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-medium">Prediction Ticket ${index + 1}</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1 mb-1">
+                            ${ticket.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+                showNotification(`Generated ${numPredictionTickets} combined prediction tickets!`);
+
             } catch (error) {
-                console.error("Error generating unused predictions:", error);
-                showNotification("Error generating predictions. Please try again.");
+                console.error("Error generating combined prediction:", error);
+                showNotification("Error generating combined prediction. Please try again.");
+                predictionOutputDiv.innerHTML = '<p class="text-danger">Error generating predictions.</p>';
             } finally {
-                unusedPredictionLoading.classList.add('hidden');
+                loadingIndicator.classList.add('hidden');
             }
-
-            // Display tickets in the new output area
-            const outputDiv = document.getElementById('unusedPredictionOutput');
-            outputDiv.innerHTML = tickets.map((ticket, index) => `
-                <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-medium">Prediction ${index + 1} (${predictionAlgorithm.replace(/([A-Z])/g, ' $1').trim()} Algorithm)</span>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
-                    </div>
-                    <div class="flex flex-wrap gap-1 mb-1">
-                        ${ticket.numbers.map(num => `<span class="number-ball unused-number">${num}</span>`).join('')}
-                    </div>
-                    <div class="flex flex-wrap gap-1">
-                        ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-
-            showNotification('Generated predictions from unused numbers.');
         }
 
-        async function generateAIUnusedPrediction(unusedNumbers, config) {
-            const { pickCount, mainPool } = config;
-            let generatedNumbers = [];
-
-            const prompt = `From the following list of unused lottery numbers: ${unusedNumbers.join(', ')}, select ${pickCount} numbers that are most likely to be drawn for a lottery game with a main pool up to ${mainPool}. Focus on patterns that might emerge from numbers that haven't been drawn recently. Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
-
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && unusedNumbers.includes(n));
-                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
-
-                    while (generatedNumbers.length < pickCount) {
-                        const randomNum = _.sample(unusedNumbers);
-                        if (!generatedNumbers.includes(randomNum)) {
-                            generatedNumbers.push(randomNum);
-                        }
-                    }
-                } else {
-                    console.error("Gemini API did not return expected content structure for AI unused prediction.");
-                    showNotification("AI unused prediction failed. Falling back to random from unused.");
-                    generatedNumbers = _.sampleSize(unusedNumbers, pickCount);
-                }
-            } catch (error) {
-                console.error("Error calling Gemini API for AI unused prediction:", error);
-                showNotification("AI unused prediction failed due to an error. Falling back to random from unused.");
-                generatedNumbers = _.sampleSize(unusedNumbers, pickCount);
-            }
-            return generatedNumbers.sort((a, b) => a - b);
-        }
 
         async function getAIInsights() {
             const input = document.getElementById('numbersToAnalyze').value;
@@ -2491,9 +2496,9 @@
             document.getElementById('aiInsightsOutput').classList.add('hidden'); // Hide AI insights output
             document.getElementById('aiInsightsText').textContent = ''; // Clear AI insights text
             document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Analyze numbers to see unused numbers and pairs relative to the game\'s pool.</p>';
-            document.getElementById('unusedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Predict from unused numbers to see results here.</p>';
-            document.getElementById('unusedPredictionLoading').classList.add('hidden'); // Hide loading for unused prediction
-
+            document.getElementById('combinedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Analyze numbers and generate combined predictions to see results here.</p>';
+            document.getElementById('combinedPredictionLoading').classList.add('hidden'); // Hide loading for combined prediction
+            appState.analyzedNumbers = null; // Clear analyzed numbers state
 
             // Reset charts
             ['freqDistributionChart', 'lastDigitDistributionChart', 'sumDistributionChart', 'oddEvenDistributionChart'].forEach(id => {
@@ -3928,6 +3933,7 @@
                     appState.savedTickets = [];
                     appState.notificationCount = 0;
                     appState.currentPage = 1;
+                    appState.analyzedNumbers = null; // Clear analyzed numbers state
                     
                     // Reset UI
                     clearGenerator();
