@@ -1130,7 +1130,7 @@
                     
                     <div>
                         <label class="block text-sm font-medium">Number of Predictions</label>
-                        <input id="numPredictions" type="number" min="1" max="20" class="w-full p-2 border rounded-lg dark:bg-gray-700" value="5">
+                        <input id="numPredictions" type="number" min="1" max="40" class="w-full p-2 border rounded-lg dark:bg-gray-700" value="5">
                     </div>
                     
                     <div class="flex flex-wrap gap-2">
@@ -2086,12 +2086,12 @@
             // Sort by frequency for most and least used
             const sortedByFrequency = Object.entries(inputFrequency).sort((a, b) => b[1] - a[1]);
 
-            // Most Used Numbers from Input
-            const mostUsedNumbers = sortedByFrequency.slice(0, 5).map(([num, count]) => `<span class="number-ball hot-number">${num} (${count}x)</span>`).join('');
+            // Most Used Numbers from Input (now 12 results)
+            const mostUsedNumbers = sortedByFrequency.slice(0, 12).map(([num, count]) => `<span class="number-ball hot-number">${num} (${count}x)</span>`).join('');
             document.getElementById('mostUsedNumbersInput').innerHTML = mostUsedNumbers || '<p>No numbers entered or frequency data available.</p>';
 
-            // Least Used Numbers from Input
-            const leastUsedNumbers = sortedByFrequency.slice(-5).reverse().map(([num, count]) => `<span class="number-ball cold-number">${num} (${count}x)</span>`).join('');
+            // Least Used Numbers from Input (now 15 results)
+            const leastUsedNumbers = sortedByFrequency.slice(-15).reverse().map(([num, count]) => `<span class="number-ball cold-number">${num} (${count}x)</span>`).join('');
             document.getElementById('leastUsedNumbersInput').innerHTML = leastUsedNumbers || '<p>No numbers entered or frequency data available.</p>';
             
             // Detect unused numbers and pairs from input
@@ -2159,7 +2159,7 @@
                 return;
             }
 
-            const numTickets = 5; // Generate 5 tickets by default
+            const numPredictions = 40; // Changed from 5 to 40
             const tickets = [];
 
             const unusedPredictionLoading = document.getElementById('unusedPredictionLoading');
@@ -2168,7 +2168,7 @@
             document.getElementById('combinedPredictionOutput').classList.add('hidden'); // Hide combined output
 
             try {
-                for (let i = 0; i < numTickets; i++) {
+                for (let i = 0; i < numPredictions; i++) {
                     let mainNumbers = [];
                     let bonusNumbers = Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1);
 
@@ -2319,7 +2319,7 @@
             document.getElementById('combinedPredictionOutput').classList.remove('hidden'); // Ensure output is visible
             document.getElementById('unusedPredictionOutput').classList.add('hidden'); // Hide unused prediction output
 
-            const numTickets = 5; // Generate 5 combined tickets
+            const numPredictions = 40; // Changed from 5 to 40
             const tickets = [];
 
             // Categorize numbers from input
@@ -2341,7 +2341,7 @@
             ];
 
             try {
-                for (let i = 0; i < numTickets; i++) {
+                for (let i = 0; i < numPredictions; i++) {
                     const algorithmIndex = i % algorithms.length; // Cycle through algorithms
                     const currentAlgorithm = algorithms[algorithmIndex];
                     
@@ -3951,9 +3951,9 @@
             const game = document.getElementById('historicalGame').value;
             const config = gameConfigs[game];
             
-            // Generate predictions for next 5 draws
+            // Generate predictions for next 40 draws (changed from 5 to 40)
             let forecast = '';
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 40; i++) {
                 // This is a simplified version - in a real app, this would use more sophisticated forecasting
                 const prediction = generatePredictionData(config);
                 
@@ -3971,7 +3971,7 @@
             
             // Display results
             document.getElementById('predictionResults').innerHTML = `
-                <p class="font-medium">Next 5 Draws Forecast</p>
+                <p class="font-medium">Next 40 Draws Forecast</p>
                 <p class="text-sm">Predicted numbers for upcoming draws</p>
                 ${forecast}
             `;
@@ -3979,7 +3979,7 @@
             document.getElementById('predictedNumbers').innerHTML = '';
             document.getElementById('confidenceScores').innerHTML = '';
             
-            showNotification('5-draw forecast generated successfully!');
+            showNotification('40-draw forecast generated successfully!');
         }
 
         function generatePredictionData(config) {
