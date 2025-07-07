@@ -499,6 +499,8 @@
                             <label class="block text-sm font-medium">Prediction Algorithm</label>
                             <select id="advancedPredictionAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="powerfulCombined">Powerful Combined Algorithm</option>
+                                <option value="fisherYatesEnhanced">Fisher-Yates Enhanced</option>
+                                <option value="cryptoSecureEnhanced">Cryptographically Secure Enhanced</option>
                             </select>
                         </div>
                         <div class="space-y-2">
@@ -2152,6 +2154,7 @@
             }
 
             const advanceFilter = document.getElementById('advanceFilter').value;
+            const predictionAlgorithm = document.getElementById('advancedPredictionAlgorithm').value; // Get selected prediction algorithm
             const numPredictions = 40; // Generate 40 predictions
 
             const advancedPredictionLoading = document.getElementById('advancedPredictionLoading');
@@ -2178,19 +2181,19 @@
 
                     switch (advanceFilter) {
                         case 'balanced':
-                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool);
+                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool, predictionAlgorithm);
                             break;
                         case 'favorUnused':
-                            mainNumbers = await generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, config.pickCount, config.mainPool);
+                            mainNumbers = await generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, config.pickCount, config.mainPool, predictionAlgorithm);
                             break;
                         case 'favorMostUsed':
-                            mainNumbers = await generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, config.pickCount, config.mainPool);
+                            mainNumbers = await generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, config.pickCount, config.mainPool, predictionAlgorithm);
                             break;
                         case 'favorLeastUsed':
-                            mainNumbers = await generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, config.pickCount, config.mainPool);
+                            mainNumbers = await generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, config.pickCount, config.mainPool, predictionAlgorithm);
                             break;
                         default:
-                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool);
+                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, config.pickCount, config.mainPool, predictionAlgorithm);
                             break;
                     }
                     
@@ -2206,7 +2209,7 @@
                     // Always shuffle the results for randomness in presentation
                     mainNumbers = _.shuffle(mainNumbers);
                     bonusNumbers = _.shuffle(bonusNumbers);
-                    tickets.push({ numbers: mainNumbers.sort((a, b) => a - b), bonus: bonusNumbers.sort((a, b) => a - b), filter: advanceFilter });
+                    tickets.push({ numbers: mainNumbers.sort((a, b) => a - b), bonus: bonusNumbers.sort((a, b) => a - b), filter: advanceFilter, algorithm: predictionAlgorithm });
                 }
             } catch (error) {
                 console.error("Error generating advanced predictions:", error);
@@ -2219,7 +2222,7 @@
             outputDiv.innerHTML = tickets.map((ticket, index) => `
                 <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-medium">Prediction ${index + 1} (Filter: ${ticket.filter.replace(/([A-Z])/g, ' $1').trim()})</span>
+                        <span class="text-sm font-medium">Prediction ${index + 1} (Filter: ${ticket.filter.replace(/([A-Z])/g, ' $1').trim()}, Algo: ${ticket.algorithm.replace(/([A-Z])/g, ' $1').trim()})</span>
                         <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
                     </div>
                     <div class="flex flex-wrap gap-1 mb-1">
@@ -2234,15 +2237,22 @@
             showNotification('Generated advanced predictions!');
         }
 
-        async function generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool) {
+        async function generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, predictionAlgorithm) {
             let generatedNumbers = [];
+            let algorithmHint = '';
+            if (predictionAlgorithm === 'fisherYatesEnhanced') {
+                algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
+            } else if (predictionAlgorithm === 'cryptoSecureEnhanced') {
+                algorithmHint = ' Ensure the selection process is as unpredictable and secure as possible, mimicking cryptographically secure random number generation.';
+            }
+
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
             Consider the following categories of numbers from a user's input:
             - Most Used Numbers: ${mostUsed.join(', ')}
             - Least Used Numbers: ${leastUsed.join(', ')}
             - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
             
-            Combine these categories intelligently to suggest a balanced set of numbers. You can favor numbers from the 'most used' list, but also include some 'unused' numbers to diversify, and sparingly 'least used' numbers for a long-shot. Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
+            Combine these categories intelligently to suggest a balanced set of numbers.${algorithmHint} Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
 
             let chatHistory = [];
             chatHistory.push({ role: "user", parts: [{ text: prompt }] });
@@ -2273,20 +2283,27 @@
                 } else {
                     console.error("Gemini API did not return expected content structure for AI combined prediction.");
                     showNotification("AI combined prediction failed. Falling back to random combination.");
-                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'balanced');
+                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'balanced', predictionAlgorithm);
                 }
             } catch (error) {
                 console.error("Error calling Gemini API for AI combined prediction:", error);
                 showNotification("AI combined prediction failed due to an error. Falling back to random combination.");
-                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'balanced');
+                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'balanced', predictionAlgorithm);
             }
             return generatedNumbers;
         }
 
-        async function generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, pickCount, mainPool) {
+        async function generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, pickCount, mainPool, predictionAlgorithm) {
             let generatedNumbers = [];
+            let algorithmHint = '';
+            if (predictionAlgorithm === 'fisherYatesEnhanced') {
+                algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
+            } else if (predictionAlgorithm === 'cryptoSecureEnhanced') {
+                algorithmHint = ' Ensure the selection process is as unpredictable and secure as possible, mimicking cryptographically secure random number generation.';
+            }
+
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
-            Prioritize numbers from the 'unused numbers' list, but also consider numbers from 'most used' and 'least used' lists to create a diverse set.
+            Prioritize numbers from the 'unused numbers' list, but also consider numbers from 'most used' and 'least used' lists to create a diverse set.${algorithmHint}
             - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
             - Most Used Numbers: ${mostUsed.join(', ')}
             - Least Used Numbers: ${leastUsed.join(', ')}
@@ -2320,20 +2337,27 @@
                 } else {
                     console.error("Gemini API did not return expected content structure for AI favor unused prediction.");
                     showNotification("AI favor unused prediction failed. Falling back to random combination.");
-                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorUnused');
+                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorUnused', predictionAlgorithm);
                 }
             } catch (error) {
                 console.error("Error calling Gemini API for AI favor unused prediction:", error);
                 showNotification("AI favor unused prediction failed due to an error. Falling back to random combination.");
-                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorUnused');
+                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorUnused', predictionAlgorithm);
             }
             return generatedNumbers;
         }
 
-        async function generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, pickCount, mainPool) {
+        async function generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, pickCount, mainPool, predictionAlgorithm) {
             let generatedNumbers = [];
+            let algorithmHint = '';
+            if (predictionAlgorithm === 'fisherYatesEnhanced') {
+                algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
+            } else if (predictionAlgorithm === 'cryptoSecureEnhanced') {
+                algorithmHint = ' Ensure the selection process is as unpredictable and secure as possible, mimicking cryptographically secure random number generation.';
+            }
+
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
-            Prioritize numbers from the 'most used' list, but also consider numbers from 'unused' and 'least used' lists to create a diverse set.
+            Prioritize numbers from the 'most used' list, but also consider numbers from 'unused' and 'least used' lists to create a diverse set.${algorithmHint}
             - Most Used Numbers: ${mostUsed.join(', ')}
             - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
             - Least Used Numbers: ${leastUsed.join(', ')}
@@ -2367,20 +2391,27 @@
                 } else {
                     console.error("Gemini API did not return expected content structure for AI favor most used prediction.");
                     showNotification("AI favor most used prediction failed. Falling back to random combination.");
-                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorMostUsed');
+                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorMostUsed', predictionAlgorithm);
                 }
             } catch (error) {
                 console.error("Error calling Gemini API for AI favor most used prediction:", error);
                 showNotification("AI favor most used prediction failed due to an error. Falling back to random combination.");
-                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorMostUsed');
+                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorMostUsed', predictionAlgorithm);
             }
             return generatedNumbers;
         }
 
-        async function generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, pickCount, mainPool) {
+        async function generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, pickCount, mainPool, predictionAlgorithm) {
             let generatedNumbers = [];
+            let algorithmHint = '';
+            if (predictionAlgorithm === 'fisherYatesEnhanced') {
+                algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
+            } else if (predictionAlgorithm === 'cryptoSecureEnhanced') {
+                algorithmHint = ' Ensure the selection process is as unpredictable and secure as possible, mimicking cryptographically secure random number generation.';
+            }
+
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
-            Prioritize numbers from the 'least used' list, but also consider numbers from 'most used' and 'unused' lists to create a diverse set.
+            Prioritize numbers from the 'least used' list, but also consider numbers from 'most used' and 'unused' lists to create a diverse set.${algorithmHint}
             - Least Used Numbers: ${leastUsed.join(', ')}
             - Most Used Numbers: ${mostUsed.join(', ')}
             - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
@@ -2414,18 +2445,18 @@
                 } else {
                     console.error("Gemini API did not return expected content structure for AI favor least used prediction.");
                     showNotification("AI favor least used prediction failed. Falling back to random combination.");
-                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorLeastUsed');
+                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorLeastUsed', predictionAlgorithm);
                 }
             } catch (error) {
                 console.error("Error calling Gemini API for AI favor least used prediction:", error);
                 showNotification("AI favor least used prediction failed due to an error. Falling back to random combination.");
-                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorLeastUsed');
+                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorLeastUsed', predictionAlgorithm);
             }
             return generatedNumbers;
         }
 
         // Fallback function for combined prediction if AI fails
-        function generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, filter) {
+        function generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, filter, predictionAlgorithm) {
             let pool = [];
             const allNumbers = Array.from({ length: mainPool }, (_, i) => i + 1);
 
@@ -2452,11 +2483,28 @@
             let uniquePool = [...new Set(pool)];
             if (uniquePool.length < pickCount) {
                 const missingCount = pickCount - uniquePool.length;
-                const additionalNumbers = _.sampleSize(allNumbers.filter(n => !uniquePool.includes(n)), missingCount);
-                uniquePool = [...uniquePool, ...additionalNumbers];
+                const additionalNumbers = allNumbers.filter(n => !uniquePool.includes(n));
+                
+                // Apply Fisher-Yates or Crypto-secure like shuffle for fallback if requested
+                if (predictionAlgorithm === 'fisherYatesEnhanced' || predictionAlgorithm === 'cryptoSecureEnhanced') {
+                    // Use Fisher-Yates for shuffling the additional numbers
+                    for (let i = additionalNumbers.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [additionalNumbers[i], additionalNumbers[j]] = [additionalNumbers[j], additionalNumbers[i]];
+                    }
+                }
+                uniquePool = [...uniquePool, ...additionalNumbers.slice(0, missingCount)];
             }
             
-            return _.sampleSize(uniquePool, pickCount);
+            // Final shuffle for the result to ensure randomness, especially for enhanced algorithms
+            if (predictionAlgorithm === 'fisherYatesEnhanced' || predictionAlgorithm === 'cryptoSecureEnhanced') {
+                for (let i = uniquePool.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [uniquePool[i], uniquePool[j]] = [uniquePool[j], uniquePool[i]];
+                }
+            }
+
+            return uniquePool.slice(0, pickCount);
         }
 
 
