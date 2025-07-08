@@ -498,8 +498,7 @@
                         <div class="space-y-2">
                             <label class="block text-sm font-medium">Prediction Algorithm</label>
                             <select id="advancedPredictionAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
-                                <option value="powerfulCombined">Powerful Combined Algorithm</option>
-                                <option value="fisherYatesEnhanced">Fisher-Yates Enhanced</option>
+                                <option value="fisherYatesEnhanced">Fisher-Yates Shuffle</option>
                                 <option value="cryptoSecureEnhanced">Cryptographically Secure Enhanced</option>
                             </select>
                         </div>
@@ -514,7 +513,8 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <button id="generateAdvancedPrediction" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Generate Advanced Prediction</button>
+                        <button id="predictAdvanced" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700">Predict</button>
+                        <button id="regenerateAdvancedPrediction" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700">Regenerate Prediction</button>
                         <button id="clearAdvancedPrediction" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear Predictions</button>
                     </div>
                     <div id="advancedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
@@ -1198,7 +1198,8 @@
             darkMode: true,
             animations: true,
             notifications: true,
-            defaultGame: 'powerball'
+            defaultGame: 'powerball',
+            lastPredictionConfig: null // Store last prediction configuration
         };
 
         // Chart Instances
@@ -1294,7 +1295,8 @@
             document.getElementById('analyzeNumbers').addEventListener('click', analyzeNumbers);
             document.getElementById('getAIInsights').addEventListener('click', getAIInsights);
             // Updated event listeners for the new prediction engine
-            document.getElementById('generateAdvancedPrediction').addEventListener('click', generateAdvancedPrediction);
+            document.getElementById('predictAdvanced').addEventListener('click', generateAdvancedPrediction);
+            document.getElementById('regenerateAdvancedPrediction').addEventListener('click', regenerateAdvancedPrediction);
             document.getElementById('clearAdvancedPrediction').addEventListener('click', clearAdvancedPrediction);
             document.querySelectorAll('.sample-input').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -2157,6 +2159,14 @@
             const predictionAlgorithm = document.getElementById('advancedPredictionAlgorithm').value; // Get selected prediction algorithm
             const numPredictions = 40; // Generate 40 predictions
 
+            appState.lastPredictionConfig = {
+                inputNumbers: numbers,
+                gameConfig: config,
+                advanceFilter: advanceFilter,
+                predictionAlgorithm: predictionAlgorithm,
+                numPredictions: numPredictions
+            };
+
             const advancedPredictionLoading = document.getElementById('advancedPredictionLoading');
             advancedPredictionLoading.classList.remove('hidden');
             document.getElementById('advancedPredictionOutput').classList.remove('hidden'); // Ensure output is visible
@@ -2235,6 +2245,91 @@
             `).join('');
 
             showNotification('Generated advanced predictions!');
+        }
+
+        async function regenerateAdvancedPrediction() {
+            if (!appState.lastPredictionConfig) {
+                showNotification('No previous prediction to regenerate. Please generate a prediction first.');
+                return;
+            }
+
+            const { inputNumbers, gameConfig, advanceFilter, predictionAlgorithm, numPredictions } = appState.lastPredictionConfig;
+
+            const advancedPredictionLoading = document.getElementById('advancedPredictionLoading');
+            advancedPredictionLoading.classList.remove('hidden');
+            document.getElementById('advancedPredictionOutput').classList.remove('hidden');
+
+            const tickets = [];
+
+            const inputFrequencyMap = inputNumbers.reduce((acc, num) => {
+                acc[num] = (acc[num] || 0) + 1;
+                return acc;
+            }, {});
+
+            const sortedByFrequency = Object.entries(inputFrequencyMap).sort((a, b) => b[1] - a[1]);
+            const mostUsed = sortedByFrequency.map(item => item[0]);
+            const leastUsed = sortedByFrequency.slice().reverse().map(item => item[0]);
+            const { unusedNumbers } = detectUnusedFromInput(inputNumbers, gameConfig.mainPool);
+
+            try {
+                for (let i = 0; i < numPredictions; i++) {
+                    let mainNumbers = [];
+                    let bonusNumbers = Array.from({ length: gameConfig.bonusCount }, () => Math.floor(Math.random() * gameConfig.bonusPool) + 1);
+
+                    switch (advanceFilter) {
+                        case 'balanced':
+                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
+                            break;
+                        case 'favorUnused':
+                            mainNumbers = await generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
+                            break;
+                        case 'favorMostUsed':
+                            mainNumbers = await generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
+                            break;
+                        case 'favorLeastUsed':
+                            mainNumbers = await generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
+                            break;
+                        default:
+                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
+                            break;
+                    }
+                    
+                    mainNumbers = [...new Set(mainNumbers)].slice(0, gameConfig.pickCount);
+                    while (mainNumbers.length < gameConfig.pickCount) {
+                        const randomNum = Math.floor(Math.random() * gameConfig.mainPool) + 1;
+                        if (!mainNumbers.includes(randomNum)) {
+                            mainNumbers.push(randomNum);
+                        }
+                    }
+
+                    mainNumbers = _.shuffle(mainNumbers);
+                    bonusNumbers = _.shuffle(bonusNumbers);
+                    tickets.push({ numbers: mainNumbers.sort((a, b) => a - b), bonus: bonusNumbers.sort((a, b) => a - b), filter: advanceFilter, algorithm: predictionAlgorithm });
+                }
+            } catch (error) {
+                console.error("Error regenerating advanced predictions:", error);
+                showNotification("Error regenerating predictions. Please try again.");
+            } finally {
+                advancedPredictionLoading.classList.add('hidden');
+            }
+
+            const outputDiv = document.getElementById('advancedPredictionOutput');
+            outputDiv.innerHTML = tickets.map((ticket, index) => `
+                <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium">Prediction ${index + 1} (Filter: ${ticket.filter.replace(/([A-Z])/g, ' $1').trim()}, Algo: ${ticket.algorithm.replace(/([A-Z])/g, ' $1').trim()})</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1 mb-1">
+                        ${ticket.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
+                    </div>
+                    <div class="flex flex-wrap gap-1">
+                        ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            showNotification('Regenerated advanced predictions!');
         }
 
         async function generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, predictionAlgorithm) {
@@ -2759,6 +2854,7 @@
         function clearAdvancedPrediction() {
             document.getElementById('advancedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate advanced predictions to see results here.</p>';
             document.getElementById('advancedPredictionLoading').classList.add('hidden');
+            appState.lastPredictionConfig = null; // Clear the last prediction config
             showNotification('Advanced predictions cleared!');
         }
 
@@ -4185,6 +4281,7 @@
                     appState.savedTickets = [];
                     appState.notificationCount = 0;
                     appState.currentPage = 1;
+                    appState.lastPredictionConfig = null; // Clear last prediction config
                     
                     // Reset UI
                     clearGenerator();
