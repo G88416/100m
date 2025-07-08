@@ -129,7 +129,7 @@
                 <li><a href="#dashboard" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">📊 Dashboard</a></li>
                 <li><a href="#generator" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🎰 Smart Generator</a></li>
                 <li><a href="#analyzer" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🔍 Advanced Analyzer</a></li>
-                <li><a href="#seed-reverser" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🔄 Seed Reverser</a></li>
+                <li><a href="#reverse-engineer" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🔄 Reverse Engineer</a></li>
                 <li><a href="#historical" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">📈 Historical Data</a></li>
                 <li><a href="#strategies" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🧠 AI Strategies</a></li>
                 <li><a href="#probability" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">📉 Probability Lab</a></li>
@@ -524,16 +524,16 @@
                 </div>
             </section>
 
-            <!-- Seed Reverser Section (New) -->
-            <section id="seed-reverser" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4">Advance Lotto Seed Reverser</h2>
+            <!-- Reverse Engineer Section -->
+            <section id="reverse-engineer" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Advanced Lotto Reverse Engineer</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Input for Seed Reverser -->
+                    <!-- Input Section -->
                     <div class="space-y-4">
-                        <h3 class="text-xl font-medium">Input Numbers for Profile</h3>
+                        <h3 class="text-xl font-medium">Input Numbers</h3>
                         <div>
-                            <label class="block text-sm font-medium">Lottery Game</label>
-                            <select id="seedReverseGame" class="w-full p-2 border rounded-lg dark:bg-gray-700">
+                            <label class="block text-sm font-medium">Game Type</label>
+                            <select id="reverseGame" class="w-full p-2 border rounded-lg dark:bg-gray-700">
                                 <option value="powerball">Powerball (5/69 + 1/26)</option>
                                 <option value="megamillions">Mega Millions (5/70 + 1/25)</option>
                                 <option value="euromillions">EuroMillions (5/50 + 2/12)</option>
@@ -541,55 +541,73 @@
                                 <option value="lotto645">Lotto 6/45</option>
                             </select>
                         </div>
+                        
                         <div>
-                            <label class="block text-sm font-medium">Seed Determination Algorithm</label>
-                            <select id="seedAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
-                                <option value="statisticalMatching">Statistical Matching</option>
-                                <option value="patternRecognition">Pattern Recognition</option>
-                                <option value="historicalProximity">Historical Proximity</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium">Numbers to Reverse Analyze</label>
+                            <label class="block text-sm font-medium">Numbers to Reverse Engineer</label>
                             <textarea id="numbersToReverse" class="w-full p-2 border rounded-lg dark:bg-gray-700 h-32" placeholder="Enter numbers (e.g., 5, 12, 23, 34, 45, 6)"></textarea>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Formats: 5,12,23,34,45,6 or 5 12 23 34 45 6</p>
                         </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium">Analysis Method</label>
+                            <select id="reverseMethod" class="w-full p-2 border rounded-lg dark:bg-gray-700">
+                                <option value="statistical">Statistical Analysis</option>
+                                <option value="pattern">Pattern Recognition</option>
+                                <option value="ai">AI-Powered Reverse Engineering ✨</option>
+                            </select>
+                        </div>
+                        
                         <div class="flex flex-wrap gap-2">
-                            <button id="reverseSeedBtn" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Generate Seed Profile</button>
-                            <button id="interpretSeedProfile" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 flex-1">Interpret Profile ✨</button>
-                            <button id="clearSeedReverse" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
+                            <button id="reverseEngineerBtn" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Reverse Engineer</button>
+                            <button id="clearReverse" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
                         </div>
                     </div>
-
-                    <!-- Output for Seed Reverser -->
+                    
+                    <!-- Results Section -->
                     <div class="space-y-4">
-                        <h3 class="text-xl font-medium">Generated Seed Profile</h3>
-                        <div id="seedProfileResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                            <p class="text-gray-500 dark:text-gray-400">Enter numbers and generate profile</p>
+                        <h3 class="text-xl font-medium">Reverse Engineering Results</h3>
+                        <div id="reverseResults" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-32">
+                            <p class="text-gray-500 dark:text-gray-400">Enter numbers and analyze to see results</p>
                         </div>
-                        <div class="grid grid-cols-1 gap-2">
+                        
+                        <div class="grid grid-cols-2 gap-2">
                             <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                                <h4 class="font-medium text-sm">Statistical Characteristics</h4>
-                                <div id="seedStats" class="text-xs mt-1"></div>
+                                <h4 class="font-medium text-sm">Statistical Profile</h4>
+                                <div id="reverseStats" class="text-xs mt-1"></div>
                             </div>
                             <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                                <h4 class="font-medium text-sm">Pattern Indicators</h4>
-                                <div id="seedPatterns" class="text-xs mt-1"></div>
+                                <h4 class="font-medium text-sm">Pattern Analysis</h4>
+                                <div id="reversePatterns" class="text-xs mt-1"></div>
                             </div>
                         </div>
-                         <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                            <h4 class="font-medium text-sm">Comparison to Optimal/Historical</h4>
-                            <div id="seedComparison" class="text-xs mt-1"></div>
+                        
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                            <h4 class="font-medium text-sm">Potential Seed Values</h4>
+                            <div id="reverseSeeds" class="text-xs mt-1">
+                                <p>Analyze numbers to see potential seed values</p>
+                            </div>
                         </div>
+
+                        <!-- New AI-powered sections -->
+                        <div id="optimalCharacteristics" class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hidden">
+                            <h4 class="font-medium text-sm">Optimal Game Characteristics ✨</h4>
+                            <div id="optimalCharacteristicsText" class="text-xs mt-1"></div>
+                            <div id="optimalCharacteristicsLoading" class="loading-indicator hidden mx-auto mt-2"></div>
+                        </div>
+
+                        <div id="seedComparison" class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hidden">
+                            <h4 class="font-medium text-sm">Seed Comparison to Optimal ✨</h4>
+                            <div id="seedComparisonText" class="text-xs mt-1"></div>
+                            <div id="seedComparisonLoading" class="loading-indicator hidden mx-auto mt-2"></div>
+                        </div>
+                        
                         <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                             <h4 class="font-medium text-sm">Visual Representation</h4>
-                            <canvas id="seedVisualsChart" class="chart-container"></canvas>
+                            <canvas id="reverseChart" class="chart-container"></canvas>
                         </div>
-                        <!-- AI Interpretation Output -->
-                        <div id="seedInterpretationOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg hidden">
-                            <h4 class="font-medium text-sm">AI Interpretation</h4>
-                            <div id="seedInterpretationText" class="text-xs mt-1"></div>
-                            <div id="seedInterpretationLoading" class="loading-indicator hidden mx-auto mt-2"></div>
+                        <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                            <h4 class="font-medium text-sm">Seed Number Distribution</h4>
+                            <canvas id="seedVisualsChart" class="chart-container"></canvas>
                         </div>
                     </div>
                 </div>
@@ -958,7 +976,7 @@
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-secondary">
                         <h3 class="text-xl font-medium">Multiple Draw Forecast</h3>
                         <p class="text-sm mt-2">Get predictions for several upcoming draws with confidence scores for each number.</p>
-                        <button id="forecastDraws" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 mt-4 w-full">Forecast Next 5 Draws</button>
+                        <button id="forecastDraws" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700 mt-4 w-full">Forecast Next 40 Draws</button>
                     </div>
                     
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-accent">
@@ -1230,6 +1248,7 @@
                 { id: 'gapAnalysisChart', type: 'bar', label: 'Gap Analysis' },
                 { id: 'probDistributionChart', type: 'bar', label: 'Probability Distribution' },
                 { id: 'predictionVizChart', type: 'bar', label: 'Prediction Confidence' },
+                { id: 'reverseChart', type: 'bar', label: 'Reverse Engineered Numbers' }, // New chart for reverse engineer
                 { id: 'seedVisualsChart', type: 'bar', label: 'Seed Number Distribution' } // New chart for seed reverser
             ];
 
@@ -1277,7 +1296,7 @@
             document.getElementById('probabilityGame').addEventListener('change', handleProbabilityGameChange);
             document.getElementById('analyzerGame').addEventListener('change', handleAnalyzerGameChange); // New event listener for analyzer game
             document.getElementById('randomSeedBtn').addEventListener('click', generateRandomSeed);
-            document.getElementById('seedReverseGame').addEventListener('change', () => { /* No specific action needed for game change here yet */ });
+            document.getElementById('reverseGame').addEventListener('change', () => { /* No specific action needed for game change here yet */ });
             
             // Generator Controls
             document.getElementById('generateSmart').addEventListener('click', generateSmartNumbers);
@@ -1304,10 +1323,9 @@
                 });
             });
 
-            // Seed Reverser Controls (New)
-            document.getElementById('reverseSeedBtn').addEventListener('click', reverseSeedAnalysis);
-            document.getElementById('interpretSeedProfile').addEventListener('click', interpretSeedProfile);
-            document.getElementById('clearSeedReverse').addEventListener('click', clearSeedReverse);
+            // Reverse Engineer Controls
+            document.getElementById('reverseEngineerBtn').addEventListener('click', reverseEngineerNumbers);
+            document.getElementById('clearReverse').addEventListener('click', clearReverseEngineer);
             
             // Historical Data Controls
             document.getElementById('dataSource').addEventListener('change', handleDataSourceChange);
@@ -2858,74 +2876,21 @@
             showNotification('Advanced predictions cleared!');
         }
 
-        // Seed Reverser Functions (New)
-        function reverseSeedAnalysis() {
+        // Reverse Engineering Functions
+        async function reverseEngineerNumbers() {
             const input = document.getElementById('numbersToReverse').value;
             const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
-
+            
             if (numbers.length === 0) {
-                showNotification('Please enter valid numbers for seed reversal!');
+                showNotification('Please enter valid numbers to reverse engineer!');
                 return;
             }
-
-            const game = document.getElementById('seedReverseGame').value;
+            
+            const game = document.getElementById('reverseGame').value;
             const config = gameConfigs[game];
-            const mainPool = config.mainPool;
-            const seedAlgorithm = document.getElementById('seedAlgorithm').value;
-
-            let seedProfile = {};
-            let comparisonResult = '';
-
-            switch (seedAlgorithm) {
-                case 'statisticalMatching':
-                    seedProfile = getStatisticalSeedProfile(numbers, config);
-                    comparisonResult = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config));
-                    break;
-                case 'patternRecognition':
-                    seedProfile = getPatternRecognitionSeedProfile(numbers, config);
-                    comparisonResult = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config)); // Still compare to optimal for context
-                    break;
-                case 'historicalProximity':
-                    if (appState.historicalData.length === 0) {
-                        showNotification('Load historical data to use Historical Proximity algorithm!');
-                        return;
-                    }
-                    seedProfile = getHistoricalProximitySeedProfile(numbers, appState.historicalData, config);
-                    comparisonResult = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config)); // Still compare to optimal for context
-                    break;
-            }
-
-            document.getElementById('seedProfileResults').innerHTML = `
-                <p class="font-medium">Seed Profile Generated (${seedAlgorithm.replace(/([A-Z])/g, ' $1').trim()} Algorithm)</p>
-                <p class="text-sm">Characteristics of the input numbers:</p>
-            `;
-
-            document.getElementById('seedStats').innerHTML = `
-                <p>Numbers Count: ${numbers.length} (out of ${config.pickCount} expected)</p>
-                <p>Sum: ${seedProfile.sum} (Avg: ${seedProfile.avg.toFixed(2)})</p>
-                <p>Odd/Even Ratio: ${seedProfile.oddCount}/${seedProfile.evenCount}</p>
-                <p>Low/High Ratio (to ${mainPool/2}): ${seedProfile.lowHighRatio.toFixed(2)}</p>
-                <p>Standard Deviation: ${seedProfile.stdDev.toFixed(2)}</p>
-            `;
-
-            document.getElementById('seedPatterns').innerHTML = `
-                <p>Consecutive Pairs: ${seedProfile.consecutivePairs}</p>
-                <p>Prime Numbers: ${seedProfile.primes}</p>
-                <p>Fibonacci Numbers: ${seedProfile.fibs}</p>
-                <p>Gaps: ${seedProfile.gaps.join(', ')}</p>
-                <p>Last Digit Freq: ${JSON.stringify(seedProfile.digitDistribution)}</p>
-                <p>Group Freq: ${JSON.stringify(seedProfile.groupDistribution)}</p>
-            `;
-
-            document.getElementById('seedComparison').innerHTML = comparisonResult;
-
-            // Update visual representation chart
-            updateSeedVisualsChart(numbers);
-
-            showNotification('Seed profile generated successfully!');
-        }
-
-        function getStatisticalSeedProfile(numbers, config) {
+            const method = document.getElementById('reverseMethod').value;
+            
+            // Basic statistical analysis
             const sum = numbers.reduce((a, b) => a + b, 0);
             const avg = sum / numbers.length;
             const oddCount = numbers.filter(n => n % 2 === 1).length;
@@ -2933,156 +2898,177 @@
             const consecutivePairs = countConsecutivePairs(numbers);
             const primes = numbers.filter(isPrime).length;
             const fibs = numbers.filter(isFibonacci).length;
-            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
             const stdDev = calculateStandardDeviation(numbers);
-            const digitDistribution = getDigitDistribution(numbers);
-            const groupDistribution = getGroupDistribution(numbers, config.mainPool);
-            const gaps = calculateGaps(numbers);
-
-            return {
-                sum, avg, oddCount, evenCount, consecutivePairs, primes, fibs,
-                lowHighRatio, stdDev, digitDistribution, groupDistribution, gaps
-            };
-        }
-
-        function getPatternRecognitionSeedProfile(numbers, config) {
-            const profile = getStatisticalSeedProfile(numbers, config); // Start with statistical base
-
-            // Enhance with pattern-specific metrics
-            profile.commonPairs = getCommonPairs(numbers);
-            profile.commonTriplets = getCommonTriplets(numbers);
-            profile.sequenceLength = getLongestSequence(numbers);
-            profile.digitSum = numbers.map(n => String(n).split('').reduce((a, c) => a + parseInt(c), 0));
-
-            return profile;
-        }
-
-        function getHistoricalProximitySeedProfile(inputNumbers, historicalData, config) {
-            let bestMatch = null;
-            let minDifference = Infinity;
-
-            historicalData.forEach(draw => {
-                const drawNumbers = draw.numbers;
-                // Simple difference metric (e.g., sum of absolute differences)
-                let difference = 0;
-                for (let i = 0; i < Math.min(inputNumbers.length, drawNumbers.length); i++) {
-                    difference += Math.abs(inputNumbers[i] - drawNumbers[i]);
-                }
-                // Add penalty for different lengths if pickCount is fixed
-                if (inputNumbers.length !== drawNumbers.length) {
-                    difference += Math.abs(inputNumbers.length - drawNumbers.length) * (config.mainPool / 2); // Heuristic penalty
-                }
-
-                if (difference < minDifference) {
-                    minDifference = difference;
-                    bestMatch = drawNumbers;
-                }
-            });
-
-            if (bestMatch) {
-                // Return statistical profile of the best matching historical draw
-                return getStatisticalSeedProfile(bestMatch, config);
-            } else {
-                // Fallback to statistical profile of input numbers if no historical data or match
-                return getStatisticalSeedProfile(inputNumbers, config);
+            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
+            
+            document.getElementById('reverseStats').innerHTML = `
+                <p>Count: ${numbers.length}</p>
+                <p>Sum: ${sum}</p>
+                <p>Average: ${avg.toFixed(2)}</p>
+                <p>Odd/Even: ${oddCount}/${evenCount}</p>
+                <p>Std Dev: ${stdDev.toFixed(2)}</p>
+            `;
+            
+            document.getElementById('reversePatterns').innerHTML = `
+                <p>Consecutive Pairs: ${consecutivePairs}</p>
+                <p>Primes: ${primes}</p>
+                <p>Fibonacci: ${fibs}</p>
+                <p>Low/High Ratio: ${lowHighRatio.toFixed(2)}</p>
+            `;
+            
+            // Generate potential seed values based on analysis
+            let potentialSeeds = [];
+            if (method === 'statistical') {
+                potentialSeeds = generateStatisticalSeeds(numbers, config);
+                document.getElementById('optimalCharacteristics').classList.add('hidden');
+                document.getElementById('seedComparison').classList.add('hidden');
+            } else if (method === 'pattern') {
+                potentialSeeds = generatePatternSeeds(numbers, config);
+                document.getElementById('optimalCharacteristics').classList.add('hidden');
+                document.getElementById('seedComparison').classList.add('hidden');
+            } else if (method === 'ai') {
+                // AI-powered analysis for optimal characteristics and comparison
+                document.getElementById('optimalCharacteristics').classList.remove('hidden');
+                document.getElementById('seedComparison').classList.remove('hidden');
+                await getOptimalGameCharacteristics(numbers, config);
+                await compareSeedToOptimal(numbers, config);
+                // AI seed generation is handled separately within generateAISeeds
+                await generateAISeeds(numbers, config);
+                potentialSeeds = []; // AI seeds are displayed by generateAISeeds
             }
+            
+            displayPotentialSeeds(potentialSeeds);
+            updateReverseChart(numbers);
+            updateSeedVisualsChart(numbers); // Update the new chart
+            
+            document.getElementById('reverseResults').innerHTML = `
+                <p class="font-medium">Reverse Engineering Complete (${method})</p>
+                <p class="text-sm">Analyzed ${numbers.length} numbers with average ${avg.toFixed(2)}</p>
+            `;
+            
+            showNotification('Reverse engineering completed!');
         }
 
-        function getCommonPairs(numbers) {
-            const pairs = {};
-            const sortedNumbers = [...numbers].sort((a,b) => a-b);
-            for (let i = 0; i < sortedNumbers.length; i++) {
-                for (let j = i + 1; j < sortedNumbers.length; j++) {
-                    const pair = `${sortedNumbers[i]}-${sortedNumbers[j]}`;
-                    pairs[pair] = (pairs[pair] || 0) + 1;
-                }
+        function generateStatisticalSeeds(numbers, config) {
+            // Simple seed generation based on statistical properties
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const avg = sum / numbers.length;
+            const oddCount = numbers.filter(n => n % 2 === 1).length;
+            
+            // Generate seeds based on various number properties
+            const seeds = [
+                sum,
+                Math.round(avg * 100),
+                oddCount * 1000 + numbers.length,
+                parseInt(numbers.map(n => n % 10).join('')), // Last digits
+                parseInt(numbers.join('').slice(0, 10)), // First 10 digits of concatenated numbers
+                numbers.reduce((a, b) => a ^ b, 0) * 1000 // XOR of all numbers
+            ].filter(seed => seed > 0);
+            
+            return [...new Set(seeds)]; // Return unique seeds
+        }
+
+        function generatePatternSeeds(numbers, config) {
+            // More sophisticated seed generation based on patterns
+            const sorted = [...numbers].sort((a, b) => a - b);
+            const gaps = [];
+            for (let i = 1; i < sorted.length; i++) {
+                gaps.push(sorted[i] - sorted[i - 1]);
             }
-            // Return top 3 common pairs
-            return Object.entries(pairs).sort((a,b) => b[1] - a[1]).slice(0,3).map(p => p[0]);
-        }
-
-        function getCommonTriplets(numbers) {
-            const triplets = {};
-            const sortedNumbers = [...numbers].sort((a,b) => a-b);
-            for (let i = 0; i < sortedNumbers.length; i++) {
-                for (let j = i + 1; j < sortedNumbers.length; j++) {
-                    for (let k = j + 1; k < sortedNumbers.length; k++) {
-                        const triplet = `${sortedNumbers[i]}-${sortedNumbers[j]}-${sortedNumbers[k]}`;
-                        triplets[triplet] = (triplets[triplet] || 0) + 1;
+            
+            const seeds = [
+                // Based on gaps between numbers
+                parseInt(gaps.join('')),
+                // Based on prime factors
+                parseInt(numbers.map(n => {
+                    let factors = 0;
+                    for (let i = 2; i <= n; i++) {
+                        if (n % i === 0) factors++;
                     }
-                }
-            }
-            // Return top 2 common triplets
-            return Object.entries(triplets).sort((a,b) => b[1] - a[1]).slice(0,2).map(t => t[0]);
+                    return factors;
+                }).join('')),
+                // Based on digit sums
+                parseInt(numbers.map(n => String(n).split('').reduce((a, c) => a + parseInt(c), 0)).join('')),
+                // Based on position in number range
+                Math.round(numbers.reduce((a, b) => a + (b / config.mainPool), 0) * 10000)
+            ].filter(seed => seed > 0);
+            
+            return [...new Set(seeds)];
         }
 
-        function getLongestSequence(numbers) {
-            if (numbers.length === 0) return 0;
-            const sortedNumbers = [...numbers].sort((a,b) => a-b);
-            let maxLength = 1;
-            let currentLength = 1;
-            for (let i = 1; i < sortedNumbers.length; i++) {
-                if (sortedNumbers[i] - sortedNumbers[i-1] === 1) {
-                    currentLength++;
+        async function generateAISeeds(numbers, config) {
+            const reverseResults = document.getElementById('reverseResults');
+            reverseResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Analyzing with AI... <span class="loading-indicator"></span></p>';
+            
+            try {
+                const prompt = `Given these lottery numbers: ${numbers.join(', ')}, analyze them to suggest possible seed values or patterns that might generate similar numbers. Consider:
+                - Statistical properties (sum, average, distribution)
+                - Number patterns (consecutive, gaps, sequences)
+                - Mathematical properties (primes, Fibonacci, digit sums)
+                - Any other relevant characteristics
+                
+                Provide 5-10 potential seed values or patterns that could generate similar numbers, with brief explanations. Format as a numbered list.`;
+                
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const analysis = result.candidates[0].content.parts[0].text;
+                    reverseResults.innerHTML = `
+                        <p class="font-medium">AI Reverse Engineering Results</p>
+                        <div class="text-sm mt-2">${analysis.replace(/\n/g, '<br>')}</div>
+                    `;
                 } else {
-                    currentLength = 1;
+                    reverseResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400">AI analysis failed. Try another method.</p>';
                 }
-                maxLength = Math.max(maxLength, currentLength);
+            } catch (error) {
+                console.error("Error calling Gemini API for reverse engineering:", error);
+                reverseResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Error during AI analysis. Try again later.</p>';
             }
-            return maxLength;
+            
+            // Still show basic stats
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const avg = sum / numbers.length;
+            document.getElementById('reverseStats').innerHTML = `
+                <p>Count: ${numbers.length}</p>
+                <p>Sum: ${sum}</p>
+                <p>Average: ${avg.toFixed(2)}</p>
+            `;
+            
+            updateReverseChart(numbers);
         }
 
-        async function interpretSeedProfile() {
-            const input = document.getElementById('numbersToReverse').value;
-            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+        async function getOptimalGameCharacteristics(numbers, config) {
+            const optimalCharacteristicsDiv = document.getElementById('optimalCharacteristics');
+            const optimalCharacteristicsText = document.getElementById('optimalCharacteristicsText');
+            const optimalCharacteristicsLoading = document.getElementById('optimalCharacteristicsLoading');
 
-            const seedInterpretationOutput = document.getElementById('seedInterpretationOutput');
-            const seedInterpretationText = document.getElementById('seedInterpretationText');
-            const seedInterpretationLoading = document.getElementById('seedInterpretationLoading');
+            optimalCharacteristicsDiv.classList.remove('hidden');
+            optimalCharacteristicsText.innerHTML = '';
+            optimalCharacteristicsLoading.classList.remove('hidden');
 
-            seedInterpretationOutput.classList.remove('hidden');
-            seedInterpretationText.innerHTML = '';
-            seedInterpretationLoading.classList.remove('hidden');
+            const prompt = `Given the lottery game configuration (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers) and the following input numbers: ${numbers.join(', ')}.
+            Based on common lottery strategies and statistical balance, describe the "optimal" characteristics for a set of ${config.pickCount} numbers for this game.
+            Consider aspects like:
+            - Ideal sum range
+            - Balanced odd/even ratio
+            - Maximum number of consecutive numbers
+            - Ideal count of prime numbers
+            - Ideal count of Fibonacci numbers
+            - Balanced distribution across number groups (e.g., 1-10, 11-20, etc.)
 
-            if (numbers.length === 0) {
-                seedInterpretationText.textContent = 'Please generate a seed profile first to get AI interpretation.';
-                seedInterpretationLoading.classList.add('hidden');
-                return;
-            }
-
-            const game = document.getElementById('seedReverseGame').value;
-            const config = gameConfigs[game];
-            const seedAlgorithm = document.getElementById('seedAlgorithm').value;
-
-            let seedProfile = {};
-            let comparisonText = '';
-
-            switch (seedAlgorithm) {
-                case 'statisticalMatching':
-                    seedProfile = getStatisticalSeedProfile(numbers, config);
-                    comparisonText = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config), true);
-                    break;
-                case 'patternRecognition':
-                    seedProfile = getPatternRecognitionSeedProfile(numbers, config);
-                    comparisonText = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config), true);
-                    break;
-                case 'historicalProximity':
-                    if (appState.historicalData.length === 0) {
-                        seedInterpretationText.textContent = 'Historical data is required for Historical Proximity interpretation.';
-                        seedInterpretationLoading.classList.add('hidden');
-                        return;
-                    }
-                    seedProfile = getHistoricalProximitySeedProfile(numbers, appState.historicalData, config);
-                    comparisonText = compareSeedToOptimal(seedProfile, getOptimalGameCharacteristics(config), true);
-                    break;
-            }
-
-            let prompt = `Interpret the following statistical and pattern profile for a set of lottery numbers from a ${game} game (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers), generated using the "${seedAlgorithm.replace(/([A-Z])/g, ' $1').trim()}" algorithm:
-            Numbers: ${numbers.join(', ')}
-            Profile: ${JSON.stringify(seedProfile)}
-            Comparison to Optimal/Historical Patterns: ${comparisonText}
-
-            Provide a concise, human-readable interpretation of what this "seed profile" suggests about the numbers. For example, comment on their balance, predictability, any unusual characteristics, and how they compare to typical winning patterns for this lottery game. Suggest if this "seed" is well-balanced or has specific biases. Highlight insights specific to the chosen algorithm if applicable.`;
+            Provide a concise description of these optimal characteristics.`;
 
             let chatHistory = [];
             chatHistory.push({ role: "user", parts: [{ text: prompt }] });
@@ -3100,104 +3086,98 @@
                 if (result.candidates && result.candidates.length > 0 &&
                     result.candidates[0].content && result.candidates[0].content.parts &&
                     result.candidates[0].content.parts.length > 0) {
-                    seedInterpretationText.textContent = result.candidates[0].content.parts[0].text;
+                    optimalCharacteristicsText.textContent = result.candidates[0].content.parts[0].text;
                 } else {
-                    seedInterpretationText.textContent = 'Could not retrieve AI interpretation.';
-                    console.error("Gemini API did not return expected content structure for interpretation.");
+                    optimalCharacteristicsText.textContent = 'Could not retrieve optimal characteristics.';
+                    console.error("Gemini API did not return expected content structure for optimal characteristics.");
                 }
             } catch (error) {
-                seedInterpretationText.textContent = 'Error fetching AI interpretation.';
-                console.error("Error calling Gemini API for AI interpretation:", error);
+                optimalCharacteristicsText.textContent = 'Error fetching optimal characteristics.';
+                console.error("Error calling Gemini API for optimal characteristics:", error);
             } finally {
-                seedInterpretationLoading.classList.add('hidden');
+                optimalCharacteristicsLoading.classList.add('hidden');
             }
-            showNotification('AI Interpretation generated!');
         }
 
-        function getDigitDistribution(numbers) {
-            const distribution = Array(10).fill(0); // 0-9
-            numbers.forEach(num => {
-                distribution[num % 10]++;
-            });
-            return distribution;
-        }
+        async function compareSeedToOptimal(numbers, config) {
+            const seedComparisonDiv = document.getElementById('seedComparison');
+            const seedComparisonText = document.getElementById('seedComparisonText');
+            const seedComparisonLoading = document.getElementById('seedComparisonLoading');
 
-        function getGroupDistribution(numbers, mainPool) {
-            const groupSizes = [10, 10, 10, 10, 10, 10, 10]; // Default for up to 70
-            const groups = {};
-            let currentStart = 1;
-            for (let i = 0; i < groupSizes.length; i++) {
-                const groupEnd = currentStart + groupSizes[i] - 1;
-                if (currentStart > mainPool) break;
-                const groupName = `${currentStart}-${Math.min(groupEnd, mainPool)}`;
-                groups[groupName] = 0;
-                currentStart = groupEnd + 1;
-            }
+            seedComparisonDiv.classList.remove('hidden');
+            seedComparisonText.innerHTML = '';
+            seedComparisonLoading.classList.remove('hidden');
 
-            numbers.forEach(num => {
-                for (const groupName in groups) {
-                    const [start, end] = groupName.split('-').map(Number);
-                    if (num >= start && num <= end) {
-                        groups[groupName]++;
-                        break;
-                    }
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const oddCount = numbers.filter(n => n % 2 === 1).length;
+            const evenCount = numbers.length - oddCount;
+            const consecutivePairs = countConsecutivePairs(numbers);
+            const primes = numbers.filter(isPrime).length;
+            const fibs = numbers.filter(isFibonacci).length;
+
+            const prompt = `Given the following lottery numbers: ${numbers.join(', ')}.
+            Their sum is ${sum}, odd numbers: ${oddCount}, even numbers: ${evenCount}, consecutive pairs: ${consecutivePairs}, prime numbers: ${primes}, Fibonacci numbers: ${fibs}.
+            Considering a lottery game with a main pool up to ${config.mainPool} and picking ${config.pickCount} numbers, how do these numbers compare to statistically "optimal" or "balanced" lottery numbers for this game type?
+            Highlight strengths and weaknesses based on common lottery number analysis.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    seedComparisonText.textContent = result.candidates[0].content.parts[0].text;
+                } else {
+                    seedComparisonText.textContent = 'Could not retrieve comparison to optimal.';
+                    console.error("Gemini API did not return expected content structure for comparison.");
                 }
-            });
-            return groups;
+            } catch (error) {
+                seedComparisonText.textContent = 'Error fetching comparison to optimal.';
+                console.error("Error calling Gemini API for comparison:", error);
+            } finally {
+                seedComparisonLoading.classList.add('hidden');
+            }
         }
 
-        function getOptimalGameCharacteristics(config) {
-            // This is simplified. In a real app, this would come from extensive historical analysis.
-            // For now, it uses predefined optimal ranges in gameConfigs.
-            return config.optimal;
-        }
 
-        function compareSeedToOptimal(seedStats, optimalStats, rawText = false) {
-            let comparisons = [];
-
-            // Sum
-            const sumStatus = (seedStats.sum >= optimalStats.sumRange[0] && seedStats.sum <= optimalStats.sumRange[1]) ? 'within optimal range' : 'outside optimal range';
-            comparisons.push(`Sum (${seedStats.sum}): ${sumStatus} (Optimal: ${optimalStats.sumRange[0]}-${optimalStats.sumRange[1]})`);
-
-            // Odd/Even Ratio
-            const oddEvenSum = seedStats.oddCount + seedStats.evenCount;
-            const oddRatio = (oddEvenSum > 0) ? (seedStats.oddCount / oddEvenSum).toFixed(2) : 'N/A';
-            const evenRatio = (oddEvenSum > 0) ? (seedStats.evenCount / oddEvenSum).toFixed(2) : 'N/A';
-            const optimalOdd = optimalStats.oddEvenRatio[0];
-            const optimalEven = optimalStats.oddEvenRatio[1];
-            const oddEvenStatus = (seedStats.oddCount >= optimalOdd - 1 && seedStats.oddCount <= optimalOdd + 1 &&
-                                   seedStats.evenCount >= optimalEven - 1 && seedStats.evenCount <= optimalEven + 1) ? 'well-balanced' : 'imbalanced';
-            comparisons.push(`Odd/Even (${seedStats.oddCount}/${seedStats.evenCount}): ${oddEvenStatus} (Optimal: ${optimalOdd}/${optimalEven})`);
-
-            // Consecutive Pairs
-            const consecutiveStatus = (seedStats.consecutivePairs <= optimalStats.consecutiveMax) ? 'within acceptable limit' : 'too many consecutive pairs';
-            comparisons.push(`Consecutive Pairs (${seedStats.consecutivePairs}): ${consecutiveStatus} (Max Optimal: ${optimalStats.consecutiveMax})`);
-
-            // Prime Numbers
-            const primeStatus = (seedStats.primes >= optimalStats.primeCount[0] && seedStats.primes <= optimalStats.primeCount[1]) ? 'within optimal range' : 'outside optimal range';
-            comparisons.push(`Prime Numbers (${seedStats.primes}): ${primeStatus} (Optimal: ${optimalStats.primeCount[0]}-${optimalStats.primeCount[1]})`);
+        function displayPotentialSeeds(seeds) {
+            const seedsDiv = document.getElementById('reverseSeeds');
+            if (seeds.length === 0) {
+                seedsDiv.innerHTML = '<p>No potential seeds identified</p>';
+                return;
+            }
             
-            // Fibonacci Numbers
-            const fibStatus = (seedStats.fibs >= optimalStats.fibCount[0] && seedStats.fibs <= optimalStats.fibCount[1]) ? 'within optimal range' : 'outside optimal range';
-            comparisons.push(`Fibonacci Numbers (${seedStats.fibs}): ${fibStatus} (Optimal: ${optimalStats.fibCount[0]}-${optimalStats.fibCount[1]})`);
+            seedsDiv.innerHTML = `
+                <p>Potential seed values identified:</p>
+                <div class="flex flex-wrap gap-1 mt-2">
+                    ${seeds.map(seed => `<span class="number-ball">${seed}</span>`).join('')}
+                </div>
+                <p class="mt-2 text-xs">Try these as seeds in the generator</p>
+            `;
+        }
 
-            // Group Distribution (simplified check)
-            let groupStatus = 'balanced across groups';
-            for (const groupName in seedStats.groupDistribution) {
-                const count = seedStats.groupDistribution[groupName];
-                const optimalRange = optimalStats.groupDistribution[groupName];
-                if (optimalRange && (count < optimalRange[0] || count > optimalRange[1])) {
-                    groupStatus = 'imbalanced in some groups';
-                    break;
-                }
-            }
-            comparisons.push(`Group Distribution: ${groupStatus}`);
-
-            if (rawText) {
-                return comparisons.join('; ');
-            } else {
-                return comparisons.map(c => `<p>${c}</p>`).join('');
-            }
+        function updateReverseChart(numbers) {
+            const frequencyMap = numbers.reduce((acc, num) => {
+                acc[num] = (acc[num] || 0) + 1;
+                return acc;
+            }, {});
+            
+            const labels = Object.keys(frequencyMap).sort((a, b) => a - b);
+            const data = labels.map(label => frequencyMap[label]);
+            
+            charts.reverseChart.data.labels = labels;
+            charts.reverseChart.data.datasets[0].data = data;
+            charts.reverseChart.update();
         }
 
         function updateSeedVisualsChart(numbers) {
@@ -3208,29 +3188,36 @@
             
             const labels = Object.keys(frequencyMap).sort((a, b) => a - b);
             const data = labels.map(label => frequencyMap[label]);
-
+            
             charts.seedVisualsChart.data.labels = labels;
             charts.seedVisualsChart.data.datasets[0].data = data;
-            charts.seedVisualsChart.data.datasets[0].label = 'Frequency of Input Numbers';
-            charts.seedVisualsChart.data.datasets[0].backgroundColor = '#10B981'; // Accent color for seed visuals
             charts.seedVisualsChart.update();
         }
 
-        function clearSeedReverse() {
+        function clearReverseEngineer() {
             document.getElementById('numbersToReverse').value = '';
-            document.getElementById('seedProfileResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Enter numbers and generate profile</p>';
-            document.getElementById('seedStats').innerHTML = '';
-            document.getElementById('seedPatterns').innerHTML = '';
-            document.getElementById('seedComparison').innerHTML = ''; // Clear new comparison section
-            document.getElementById('seedInterpretationOutput').classList.add('hidden'); // Hide AI interpretation output
-            document.getElementById('seedInterpretationText').textContent = ''; // Clear AI interpretation text
+            document.getElementById('reverseResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Enter numbers and analyze to see results</p>';
+            document.getElementById('reverseStats').innerHTML = '';
+            document.getElementById('reversePatterns').innerHTML = '';
+            document.getElementById('reverseSeeds').innerHTML = '<p>Analyze numbers to see potential seed values</p>';
             
-            // Clear seed visuals chart
+            document.getElementById('optimalCharacteristics').classList.add('hidden');
+            document.getElementById('optimalCharacteristicsText').innerHTML = '';
+            document.getElementById('optimalCharacteristicsLoading').classList.add('hidden');
+
+            document.getElementById('seedComparison').classList.add('hidden');
+            document.getElementById('seedComparisonText').innerHTML = '';
+            document.getElementById('seedComparisonLoading').classList.add('hidden');
+
+            charts.reverseChart.data.labels = [];
+            charts.reverseChart.data.datasets[0].data = [];
+            charts.reverseChart.update();
+
             charts.seedVisualsChart.data.labels = [];
             charts.seedVisualsChart.data.datasets[0].data = [];
             charts.seedVisualsChart.update();
-
-            showNotification('Seed Reverser cleared!');
+            
+            showNotification('Reverse engineer cleared!');
         }
 
 
@@ -4288,7 +4275,7 @@
                     clearAnalyzer();
                     clearHistoricalData();
                     resetProbabilityCalculator();
-                    clearSeedReverse(); // Clear the new section
+                    clearReverseEngineer(); // Clear the new section
                     
                     document.getElementById('predictionResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate predictions to see results</p>';
                     document.getElementById('strategyResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Apply a strategy to see recommendations</p>';
