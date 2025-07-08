@@ -498,8 +498,9 @@
                         <div class="space-y-2">
                             <label class="block text-sm font-medium">Prediction Algorithm</label>
                             <select id="advancedPredictionAlgorithm" class="w-full p-2 border rounded-lg dark:bg-gray-700">
-                                <option value="fisherYatesEnhanced">Fisher-Yates Shuffle</option>
+                                <option value="fisherYatesEnhanced">Fisher-Yates Shuffle Enhanced</option>
                                 <option value="cryptoSecureEnhanced">Cryptographically Secure Enhanced</option>
+                                <option value="primeFilter">Prime Filter</option> <!-- New Prime Filter Option -->
                             </select>
                         </div>
                         <div class="space-y-2">
@@ -2357,6 +2358,8 @@
                 algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
             } else if (predictionAlgorithm === 'cryptoSecureEnhanced') {
                 algorithmHint = ' Ensure the selection process is as unpredictable and secure as possible, mimicking cryptographically secure random number generation.';
+            } else if (predictionAlgorithm === 'primeFilter') {
+                algorithmHint = ' Prioritize prime numbers in the selection.';
             }
 
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
@@ -2387,6 +2390,36 @@
                     const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
                     generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
 
+                    // Apply prime filter if selected
+                    if (predictionAlgorithm === 'primeFilter') {
+                        const primesInPool = getPrimesUpTo(mainPool);
+                        let primeNumbers = generatedNumbers.filter(isPrime);
+                        let nonPrimeNumbers = generatedNumbers.filter(n => !isPrime(n));
+
+                        // Ensure we have enough primes if the filter is active
+                        while (primeNumbers.length < pickCount && primesInPool.length > 0) {
+                            const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
+                            if (!primeNumbers.includes(randomPrime) && !generatedNumbers.includes(randomPrime)) {
+                                primeNumbers.push(randomPrime);
+                                generatedNumbers.push(randomPrime); // Add to overall generated for uniqueness check
+                            }
+                        }
+                        generatedNumbers = primeNumbers.slice(0, pickCount);
+                        // If still not enough, fill with non-primes
+                        while (generatedNumbers.length < pickCount) {
+                            const randomNonPrime = nonPrimeNumbers[Math.floor(Math.random() * nonPrimeNumbers.length)];
+                            if (randomNonPrime && !generatedNumbers.includes(randomNonPrime)) {
+                                generatedNumbers.push(randomNonPrime);
+                            } else {
+                                // Fallback to any random number if non-primes are exhausted or not enough
+                                const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                                if (!generatedNumbers.includes(randomNum)) {
+                                    generatedNumbers.push(randomNum);
+                                }
+                            }
+                        }
+                    }
+
                     while (generatedNumbers.length < pickCount) {
                         const randomNum = Math.floor(Math.random() * mainPool) + 1;
                         if (!generatedNumbers.includes(randomNum)) {
@@ -2413,6 +2446,8 @@
                 algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
             } else if (predictionAlgorithm === 'cryptoSecureEnhanced') {
                 algorithmHint = ' Ensure the selection process is as unpredictable and secure as possible, mimicking cryptographically secure random number generation.';
+            } else if (predictionAlgorithm === 'primeFilter') {
+                algorithmHint = ' Prioritize prime numbers in the selection.';
             }
 
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
@@ -2441,6 +2476,34 @@
                     const text = result.candidates[0].content.parts[0].text;
                     const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
                     generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+
+                    // Apply prime filter if selected
+                    if (predictionAlgorithm === 'primeFilter') {
+                        const primesInPool = getPrimesUpTo(mainPool);
+                        let primeNumbers = generatedNumbers.filter(isPrime);
+                        let nonPrimeNumbers = generatedNumbers.filter(n => !isPrime(n));
+
+                        while (primeNumbers.length < pickCount && primesInPool.length > 0) {
+                            const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
+                            if (!primeNumbers.includes(randomPrime) && !generatedNumbers.includes(randomPrime)) {
+                                primeNumbers.push(randomPrime);
+                                generatedNumbers.push(randomPrime);
+                            }
+                        }
+                        generatedNumbers = primeNumbers.slice(0, pickCount);
+                        while (generatedNumbers.length < pickCount) {
+                            const randomNonPrime = nonPrimeNumbers[Math.floor(Math.random() * nonPrimeNumbers.length)];
+                            if (randomNonPrime && !generatedNumbers.includes(randomNonPrime)) {
+                                generatedNumbers.push(randomNonPrime);
+                            } else {
+                                const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                                if (!generatedNumbers.includes(randomNum)) {
+                                    generatedNumbers.push(randomNum);
+                                }
+                            }
+                        }
+                    }
+
                     while (generatedNumbers.length < pickCount) {
                         const randomNum = Math.floor(Math.random() * mainPool) + 1;
                         if (!generatedNumbers.includes(randomNum)) {
@@ -2467,6 +2530,8 @@
                 algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
             } else if (predictionAlgorithm === 'cryptoSecureEnhanced') {
                 algorithmHint = ' Ensure the selection process is as unpredictable and secure as possible, mimicking cryptographically secure random number generation.';
+            } else if (predictionAlgorithm === 'primeFilter') {
+                algorithmHint = ' Prioritize prime numbers in the selection.';
             }
 
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
@@ -2495,6 +2560,34 @@
                     const text = result.candidates[0].content.parts[0].text;
                     const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
                     generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+
+                    // Apply prime filter if selected
+                    if (predictionAlgorithm === 'primeFilter') {
+                        const primesInPool = getPrimesUpTo(mainPool);
+                        let primeNumbers = generatedNumbers.filter(isPrime);
+                        let nonPrimeNumbers = generatedNumbers.filter(n => !isPrime(n));
+
+                        while (primeNumbers.length < pickCount && primesInPool.length > 0) {
+                            const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
+                            if (!primeNumbers.includes(randomPrime) && !generatedNumbers.includes(randomPrime)) {
+                                primeNumbers.push(randomPrime);
+                                generatedNumbers.push(randomPrime);
+                            }
+                        }
+                        generatedNumbers = primeNumbers.slice(0, pickCount);
+                        while (generatedNumbers.length < pickCount) {
+                            const randomNonPrime = nonPrimeNumbers[Math.floor(Math.random() * nonPrimeNumbers.length)];
+                            if (randomNonPrime && !generatedNumbers.includes(randomNonPrime)) {
+                                generatedNumbers.push(randomNonPrime);
+                            } else {
+                                const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                                if (!generatedNumbers.includes(randomNum)) {
+                                    generatedNumbers.push(randomNum);
+                                }
+                            }
+                        }
+                    }
+
                     while (generatedNumbers.length < pickCount) {
                         const randomNum = Math.floor(Math.random() * mainPool) + 1;
                         if (!generatedNumbers.includes(randomNum)) {
@@ -2521,6 +2614,8 @@
                 algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
             } else if (predictionAlgorithm === 'cryptoSecureEnhanced') {
                 algorithmHint = ' Ensure the selection process is as unpredictable and secure as possible, mimicking cryptographically secure random number generation.';
+            } else if (predictionAlgorithm === 'primeFilter') {
+                algorithmHint = ' Prioritize prime numbers in the selection.';
             }
 
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
@@ -2549,6 +2644,34 @@
                     const text = result.candidates[0].content.parts[0].text;
                     const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
                     generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
+
+                    // Apply prime filter if selected
+                    if (predictionAlgorithm === 'primeFilter') {
+                        const primesInPool = getPrimesUpTo(mainPool);
+                        let primeNumbers = generatedNumbers.filter(isPrime);
+                        let nonPrimeNumbers = generatedNumbers.filter(n => !isPrime(n));
+
+                        while (primeNumbers.length < pickCount && primesInPool.length > 0) {
+                            const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
+                            if (!primeNumbers.includes(randomPrime) && !generatedNumbers.includes(randomPrime)) {
+                                primeNumbers.push(randomPrime);
+                                generatedNumbers.push(randomPrime);
+                            }
+                        }
+                        generatedNumbers = primeNumbers.slice(0, pickCount);
+                        while (generatedNumbers.length < pickCount) {
+                            const randomNonPrime = nonPrimeNumbers[Math.floor(Math.random() * nonPrimeNumbers.length)];
+                            if (randomNonPrime && !generatedNumbers.includes(randomNonPrime)) {
+                                generatedNumbers.push(randomNonPrime);
+                            } else {
+                                const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                                if (!generatedNumbers.includes(randomNum)) {
+                                    generatedNumbers.push(randomNum);
+                                }
+                            }
+                        }
+                    }
+
                     while (generatedNumbers.length < pickCount) {
                         const randomNum = Math.floor(Math.random() * mainPool) + 1;
                         if (!generatedNumbers.includes(randomNum)) {
@@ -2590,6 +2713,19 @@
                     // More least used, some unused, few most used
                     pool = [...leastUsed, ...leastUsed, ...unusedNumbers, ...mostUsed];
                     break;
+            }
+
+            // Apply prime filter if selected
+            if (predictionAlgorithm === 'primeFilter') {
+                const primesInPool = getPrimesUpTo(mainPool);
+                pool = pool.filter(num => primesInPool.includes(num));
+                // If filtering by prime numbers resulted in too few numbers, add more primes
+                while (pool.length < pickCount && primesInPool.length > 0) {
+                    const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
+                    if (!pool.includes(randomPrime)) {
+                        pool.push(randomPrime);
+                    }
+                }
             }
 
             // Ensure the pool has enough unique numbers, add from all possible numbers if needed
