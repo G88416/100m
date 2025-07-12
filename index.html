@@ -129,6 +129,7 @@
                 <li><a href="#dashboard" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">📊 Dashboard</a></li>
                 <li><a href="#generator" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🎰 Smart Generator</a></li>
                 <li><a href="#analyzer" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🔍 Advanced Analyzer</a></li>
+                <li><a href="#combinatorics" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🔬 Combinatorics Lab</a></li>
                 <li><a href="#reverse-engineer" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🔄 Reverse Engineer</a></li>
                 <li><a href="#historical" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">📈 Historical Data</a></li>
                 <li><a href="#strategies" class="flex items-center p-2 text-primary hover:bg-primary hover:text-white rounded">🧠 AI Strategies</a></li>
@@ -521,6 +522,66 @@
                     <div id="advancedPredictionOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 mt-2">
                         <p class="text-gray-500 dark:text-gray-400">Generate advanced predictions to see results here.</p>
                         <div id="advancedPredictionLoading" class="loading-indicator hidden mx-auto mt-2"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Combinatorics Lab Section -->
+            <section id="combinatorics" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Combinatorics Lab</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Common Pairs Generator -->
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-semibold text-primary">Common Pairs Generator</h3>
+                        <div>
+                            <label class="block text-sm font-medium">Draw Data Input</label>
+                            <textarea id="pairsDataInput" class="w-full p-2 border rounded-lg dark:bg-gray-700 h-40" placeholder="Enter historical draws, one per line (e.g., 5 12 23 34 45 6)"></textarea>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Tip: Use data from the 'Historical Data' tab for best results.</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="block text-sm font-medium">Min Frequency</label>
+                            <input id="minPairFrequency" type="number" class="w-24 p-2 border rounded-lg dark:bg-gray-700" value="2">
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="findCommonPairs" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 flex-1">Find Common Pairs</button>
+                            <button id="useHistoricalForPairs" class="p-2 bg-secondary text-white rounded-lg hover:bg-purple-700">Use Loaded Data</button>
+                            <button id="clearPairs" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-medium mb-2">Most Common Pairs</h4>
+                            <div id="commonPairsOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20">
+                                <p class="text-gray-500 dark:text-gray-400">Find pairs to see results.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Combinations Generator -->
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-semibold text-accent">Combinations Generator</h3>
+                        <div>
+                            <label class="block text-sm font-medium">Your Numbers</label>
+                            <textarea id="comboNumbersInput" class="w-full p-2 border rounded-lg dark:bg-gray-700 h-24" placeholder="Enter a set of numbers to combine (e.g., 1, 2, 3, 4, 5, 6, 7)"></textarea>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="block text-sm font-medium">Combination Size (r)</label>
+                            <input id="combinationSize" type="number" class="w-24 p-2 border rounded-lg dark:bg-gray-700" value="3">
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button id="generateCombinations" class="p-2 bg-accent text-white rounded-lg hover:bg-green-700 flex-1">Generate Combinations</button>
+                            <button id="clearCombinations" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600">Clear</button>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-lg font-medium">Generated Combinations (<span id="combinationCount">0</span>)</h4>
+                                <div class="flex gap-2">
+                                    <button id="exportCombinationsTxt" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">TXT</button>
+                                    <button id="copyCombinations" class="p-2 bg-primary text-white rounded-lg hover:bg-blue-700 text-sm">Copy</button>
+                                </div>
+                            </div>
+                            <div id="combinationsOutput" class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg min-h-20 max-h-60 overflow-y-auto">
+                                <p class="text-gray-500 dark:text-gray-400">Generate combinations to see results.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1106,7 +1167,7 @@
                 <div class="mt-6">
                     <h3 class="text-xl font-medium mb-2">About Lotto Genius Pro</h3>
                     <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                        <p class="text-sm">Version: 2.0.0</p>
+                        <p class="text-sm">Version: 2.1.0</p>
                         <p class="text-sm mt-1">Developed by: Lotto Genius Team</p>
                         <p class="text-sm mt-1">License: MIT</p>
                         <p class="text-sm mt-1">Disclaimer: This application is for entertainment purposes only. There is no guarantee that using this system will result in winning lottery numbers. Please play responsibly.</p>
@@ -1254,34 +1315,36 @@
             ];
 
             chartConfigs.forEach(config => {
-                const ctx = document.getElementById(config.id).getContext('2d');
-                charts[config.id] = new Chart(ctx, {
-                    type: config.type,
-                    data: {
-                        labels: [],
-                        datasets: [{
-                            label: config.label,
-                            data: [],
-                            backgroundColor: config.type === 'pie' ? 
-                                ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444'] : 
-                                '#3B82F6',
-                            borderColor: '#3B82F6',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            }
+                const ctx = document.getElementById(config.id)?.getContext('2d');
+                if (ctx) {
+                    charts[config.id] = new Chart(ctx, {
+                        type: config.type,
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                label: config.label,
+                                data: [],
+                                backgroundColor: config.type === 'pie' ? 
+                                    ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444'] : 
+                                    '#3B82F6',
+                                borderColor: '#3B82F6',
+                                borderWidth: 1
+                            }]
                         },
-                        scales: config.type !== 'pie' ? {
-                            y: { beginAtZero: true }
-                        } : {}
-                    }
-                });
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                }
+                            },
+                            scales: config.type !== 'pie' ? {
+                                y: { beginAtZero: true }
+                            } : {}
+                        }
+                    });
+                }
             });
         }
 
@@ -1313,8 +1376,8 @@
             
             // Analyzer Controls
             document.getElementById('analyzeNumbers').addEventListener('click', analyzeNumbers);
+            document.getElementById('clearAnalyzer').addEventListener('click', clearAnalyzer);
             document.getElementById('getAIInsights').addEventListener('click', getAIInsights);
-            // Updated event listeners for the new prediction engine
             document.getElementById('predictAdvanced').addEventListener('click', generateAdvancedPrediction);
             document.getElementById('regenerateAdvancedPrediction').addEventListener('click', regenerateAdvancedPrediction);
             document.getElementById('clearAdvancedPrediction').addEventListener('click', clearAdvancedPrediction);
@@ -1323,6 +1386,15 @@
                     document.getElementById('numbersToAnalyze').value = e.target.dataset.sample;
                 });
             });
+
+            // Combinatorics Lab Controls
+            document.getElementById('findCommonPairs').addEventListener('click', findCommonPairs);
+            document.getElementById('useHistoricalForPairs').addEventListener('click', useHistoricalDataForPairs);
+            document.getElementById('clearPairs').addEventListener('click', clearPairsGenerator);
+            document.getElementById('generateCombinations').addEventListener('click', generateCombinations);
+            document.getElementById('clearCombinations').addEventListener('click', clearCombinationsGenerator);
+            document.getElementById('exportCombinationsTxt').addEventListener('click', exportCombinationsTxt);
+            document.getElementById('copyCombinations').addEventListener('click', copyAllCombinations);
 
             // Reverse Engineer Controls
             document.getElementById('reverseEngineerBtn').addEventListener('click', reverseEngineerNumbers);
@@ -1387,7 +1459,6 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('sidebar-hidden');
-            // Adjust main content margin based on sidebar visibility
             const mainContent = document.querySelector('.main-content-area');
             if (sidebar.classList.contains('sidebar-hidden')) {
                 mainContent.classList.remove('md:ml-64');
@@ -1399,7 +1470,6 @@
         }
 
         function showNotifications() {
-            // In a real app, this would show a list of notifications
             showNotification('You have ' + appState.notificationCount + ' notifications');
         }
 
@@ -1408,8 +1478,7 @@
             
             const notification = document.getElementById('successNotification');
             notification.textContent = message;
-            notification.classList.remove('hidden');
-            notification.classList.remove('translate-y-4', 'opacity-0');
+            notification.classList.remove('hidden', 'translate-y-4', 'opacity-0');
             notification.classList.add('translate-y-0', 'opacity-100');
             
             setTimeout(() => {
@@ -1418,7 +1487,6 @@
                 setTimeout(() => notification.classList.add('hidden'), 300);
             }, 3000);
             
-            // Update notification badge
             appState.notificationCount++;
             updateNotificationBadge();
         }
@@ -1442,30 +1510,26 @@
         }
 
         function updateUI() {
-            // Update theme
             if (appState.darkMode) {
                 document.body.classList.add('dark');
             } else {
                 document.body.classList.remove('dark');
             }
             
-            // Update settings toggles
             document.getElementById('darkModeToggle').checked = appState.darkMode;
             document.getElementById('notificationsToggle').checked = appState.notifications;
             document.getElementById('animationsToggle').checked = appState.animations;
             document.getElementById('defaultGame').value = appState.defaultGame;
             
-            // Update notification badge
             updateNotificationBadge();
 
-            // Ensure sidebar state is correct on load based on screen size
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.querySelector('.main-content-area');
-            if (window.innerWidth < 768) { // If mobile
+            if (window.innerWidth < 768) {
                 sidebar.classList.add('sidebar-hidden');
                 mainContent.classList.remove('md:ml-64');
                 mainContent.classList.add('ml-0');
-            } else { // If desktop
+            } else {
                 sidebar.classList.remove('sidebar-hidden');
                 mainContent.classList.add('md:ml-64');
                 mainContent.classList.remove('ml-0');
@@ -1505,14 +1569,12 @@
             }
         }
 
-        // New function for Analyzer Game Type change
         function handleAnalyzerGameChange(e) {
             const game = e.target.value;
             const customConfig = document.getElementById('customAnalyzerGameConfig');
             
             if (game === 'custom') {
                 customConfig.classList.remove('hidden');
-                // Optionally pre-fill with default custom values or last used
                 const currentConfig = gameConfigs[document.getElementById('analyzerGame').value];
                 document.getElementById('analyzerMainPool').value = currentConfig.mainPool;
                 document.getElementById('analyzerPickCount').value = currentConfig.pickCount;
@@ -1543,7 +1605,6 @@
             const { mainPool, pickCount, bonusPool, bonusCount } = config;
             let numbers = [];
 
-            // Different generation methods
             switch (method) {
                 case 'standard':
                 case 'quick':
@@ -1613,37 +1674,35 @@
                     
                 case 'statistical':
                 case 'ai':
-                    numbers = await generateUsingAI(config, options); // Await the AI generation
+                    numbers = await generateUsingAI(config, options);
                     break;
                     
                 default:
                     numbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
             }
 
-            // Sort numbers
-            numbers.sort((a, b) => a - b);
+            numbers = [...new Set(numbers)].sort((a, b) => a - b);
+            
+            while (numbers.length < pickCount) {
+                const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                if (!numbers.includes(randomNum)) {
+                    numbers.push(randomNum);
+                }
+                numbers.sort((a, b) => a - b);
+            }
 
-            // Apply filters
             if (options.sumFilter && options.sumFilter !== 'any') {
                 const sum = numbers.reduce((a, b) => a + b, 0);
                 const avg = mainPool / 2 * pickCount;
                 
                 let isValid = true;
                 switch (options.sumFilter) {
-                    case 'low':
-                        isValid = sum < avg * 0.8;
-                        break;
-                    case 'medium':
-                        isValid = sum >= avg * 0.8 && sum <= avg * 1.2;
-                        break;
-                    case 'high':
-                        isValid = sum > avg * 1.2;
-                        break;
+                    case 'low': isValid = sum < avg * 0.8; break;
+                    case 'medium': isValid = sum >= avg * 0.8 && sum <= avg * 1.2; break;
+                    case 'high': isValid = sum > avg * 1.2; break;
                 }
                 
-                if (!isValid) {
-                    return generateNumbers(config, method, options);
-                }
+                if (!isValid) return generateNumbers(config, method, options);
             }
             
             if (options.consecutiveFilter && options.consecutiveFilter !== 'any') {
@@ -1651,23 +1710,14 @@
                 let isValid = true;
                 
                 switch (options.consecutiveFilter) {
-                    case 'none':
-                        isValid = consecutivePairs === 0;
-                        break;
-                    case 'max1':
-                        isValid = consecutivePairs <= 1;
-                        break;
-                    case 'max2':
-                        isValid = consecutivePairs <= 2;
-                        break;
+                    case 'none': isValid = consecutivePairs === 0; break;
+                    case 'max1': isValid = consecutivePairs <= 1; break;
+                    case 'max2': isValid = consecutivePairs <= 2; break;
                 }
                 
-                if (!isValid) {
-                    return generateNumbers(config, method, options);
-                }
+                if (!isValid) return generateNumbers(config, method, options);
             }
 
-            // Generate bonus numbers
             const bonus = Array.from({ length: bonusCount }, () => Math.floor(Math.random() * bonusPool) + 1);
             
             return { numbers, bonus };
@@ -1714,13 +1764,10 @@
                     result.candidates[0].content && result.candidates[0].content.parts &&
                     result.candidates[0].content.parts.length > 0) {
                     const text = result.candidates[0].content.parts[0].text;
-                    // Attempt to parse the numbers from the AI's response
                     const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
                     
-                    // Filter for uniqueness and ensure correct count
                     generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
 
-                    // Fallback if AI doesn't return enough numbers or valid numbers
                     while (generatedNumbers.length < pickCount) {
                         const randomNum = Math.floor(Math.random() * mainPool) + 1;
                         if (!generatedNumbers.includes(randomNum)) {
@@ -1748,10 +1795,7 @@
             for (let i = 2; i <= max; i++) {
                 let isPrime = true;
                 for (let j = 2, sqrt = Math.sqrt(i); j <= sqrt; j++) {
-                    if (i % j === 0) {
-                        isPrime = false;
-                        break;
-                    }
+                    if (i % j === 0) { isPrime = false; break; }
                 }
                 if (isPrime) primes.push(i);
             }
@@ -1768,8 +1812,9 @@
 
         function countConsecutivePairs(numbers) {
             let pairs = 0;
-            for (let i = 1; i < numbers.length; i++) {
-                if (numbers[i] - numbers[i - 1] === 1) pairs++;
+            const sorted = [...numbers].sort((a, b) => a - b);
+            for (let i = 1; i < sorted.length; i++) {
+                if (sorted[i] - sorted[i - 1] === 1) pairs++;
             }
             return pairs;
         }
@@ -1780,11 +1825,7 @@
             const baseNumbers = Array.from({ length: pickCount + 2 }, () => Math.floor(Math.random() * mainPool) + 1);
             
             for (let i = 0; i < numTickets; i++) {
-                const ticket = baseNumbers
-                    .slice(0, pickCount)
-                    .map(n => (n + i) % mainPool + 1)
-                    .sort((a, b) => a - b);
-                    
+                const ticket = [...new Set(baseNumbers.map(n => (n + i) % mainPool + 1))].slice(0, pickCount).sort((a, b) => a - b);
                 const bonus = Array.from({ length: bonusCount }, () => Math.floor(Math.random() * bonusPool) + 1);
                 wheel.push({ numbers: ticket, bonus });
             }
@@ -1815,7 +1856,6 @@
             const numTickets = parseInt(document.getElementById('numTickets').value) || 1;
             const tickets = [];
             
-            // Show loading indicator for smart generation
             const generateSmartBtn = document.getElementById('generateSmart');
             let loadingIndicator = generateSmartBtn.querySelector('.loading-indicator');
             if (!loadingIndicator) {
@@ -1830,7 +1870,7 @@
                 tickets.push(ticket);
             }
 
-            loadingIndicator.classList.add('hidden'); // Hide loading indicator
+            loadingIndicator.classList.add('hidden');
 
             displayTickets(tickets);
             updateGeneratorCharts(tickets);
@@ -1898,21 +1938,16 @@
 
         function updateGeneratorCharts(tickets) {
             if (tickets.length === 0) {
-                // Reset charts if no tickets
-                charts.numberFrequencyChart.data.labels = [];
-                charts.numberFrequencyChart.data.datasets[0].data = [];
-                charts.sumAnalysisChart.data.labels = [];
-                charts.sumAnalysisChart.data.datasets[0].data = [];
-                charts.patternAnalysisChart.data.labels = [];
-                charts.patternAnalysisChart.data.datasets[0].data = [];
-                
-                charts.numberFrequencyChart.update();
-                charts.sumAnalysisChart.update();
-                charts.patternAnalysisChart.update();
+                ['numberFrequencyChart', 'sumAnalysisChart', 'patternAnalysisChart'].forEach(id => {
+                    if (charts[id]) {
+                        charts[id].data.labels = [];
+                        charts[id].data.datasets[0].data = [];
+                        charts[id].update();
+                    }
+                });
                 return;
             }
             
-            // Number Frequency Chart
             const numbers = tickets.flatMap(t => t.numbers);
             const frequencyMap = numbers.reduce((acc, num) => {
                 acc[num] = (acc[num] || 0) + 1;
@@ -1922,37 +1957,38 @@
             const frequencyLabels = Object.keys(frequencyMap).sort((a, b) => a - b);
             const frequencyData = frequencyLabels.map(label => frequencyMap[label]);
             
-            charts.numberFrequencyChart.data.labels = frequencyLabels;
-            charts.numberFrequencyChart.data.datasets[0].data = frequencyData;
-            charts.numberFrequencyChart.update();
+            if (charts.numberFrequencyChart) {
+                charts.numberFrequencyChart.data.labels = frequencyLabels;
+                charts.numberFrequencyChart.data.datasets[0].data = frequencyData;
+                charts.numberFrequencyChart.update();
+            }
             
-            // Sum Analysis Chart
             const sums = tickets.map(t => t.numbers.reduce((a, b) => a + b, 0));
             const sumLabels = tickets.map((_, i) => `Ticket ${i + 1}`);
             
-            charts.sumAnalysisChart.data.labels = sumLabels;
-            charts.sumAnalysisChart.data.datasets[0].data = sums;
-            charts.sumAnalysisChart.update();
+            if (charts.sumAnalysisChart) {
+                charts.sumAnalysisChart.data.labels = sumLabels;
+                charts.sumAnalysisChart.data.datasets[0].data = sums;
+                charts.sumAnalysisChart.update();
+            }
             
-            // Pattern Analysis Chart
             const patterns = tickets.map(t => countConsecutivePairs(t.numbers));
             
-            charts.patternAnalysisChart.data.labels = sumLabels;
-            charts.patternAnalysisChart.data.datasets[0].data = patterns;
-            charts.patternAnalysisChart.update();
+            if (charts.patternAnalysisChart) {
+                charts.patternAnalysisChart.data.labels = sumLabels;
+                charts.patternAnalysisChart.data.datasets[0].data = patterns;
+                charts.patternAnalysisChart.update();
+            }
         }
 
         function clearGenerator() {
             document.getElementById('generatedTickets').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate some numbers to see results</p>';
             
-            // Reset charts
-            Object.values(charts).forEach(chart => {
-                if (chart.canvas.id.includes('Frequency') || 
-                    chart.canvas.id.includes('Analysis') || 
-                    chart.canvas.id.includes('Pattern')) {
-                    chart.data.labels = [];
-                    chart.data.datasets[0].data = [];
-                    chart.update();
+            ['numberFrequencyChart', 'sumAnalysisChart', 'patternAnalysisChart'].forEach(id => {
+                 if (charts[id]) {
+                    charts[id].data.labels = [];
+                    charts[id].data.datasets[0].data = [];
+                    charts[id].update();
                 }
             });
             
@@ -1967,13 +2003,13 @@
                 return;
             }
             
-            const tickets = Array.from(ticketsDiv.querySelectorAll('div')).map(div => {
+            const ticketsText = Array.from(ticketsDiv.querySelectorAll('.p-3')).map(div => {
                 const numbers = Array.from(div.querySelectorAll('.number-ball:not(.bonus-ball)')).map(ball => ball.textContent);
                 const bonus = Array.from(div.querySelectorAll('.bonus-ball')).map(ball => ball.textContent);
-                return `${numbers.join(',')}|${bonus.join(',')}`;
+                return `Numbers: ${numbers.join(', ')} | Bonus: ${bonus.join(', ')}`;
             }).join('\n');
             
-            const blob = new Blob([tickets], { type: 'text/plain' });
+            const blob = new Blob([ticketsText], { type: 'text/plain' });
             downloadBlob(blob, 'tickets.txt');
             showNotification('Tickets exported as TXT!');
         }
@@ -1985,14 +2021,14 @@
                 return;
             }
             
-            const tickets = Array.from(ticketsDiv.querySelectorAll('div')).map((div, index) => {
+            let csvContent = 'Ticket,Numbers,Bonus\n';
+            Array.from(ticketsDiv.querySelectorAll('.p-3')).forEach((div, index) => {
                 const numbers = Array.from(div.querySelectorAll('.number-ball:not(.bonus-ball)')).map(ball => ball.textContent);
                 const bonus = Array.from(div.querySelectorAll('.bonus-ball')).map(ball => ball.textContent);
-                return `Ticket ${index + 1},${numbers.join(',')},${bonus.join(',')}`;
-            }).join('\n');
+                csvContent += `Ticket ${index + 1},"${numbers.join(',')}","${bonus.join(',')}"\n`;
+            });
             
-            const headers = 'Ticket,Numbers,Bonus\n';
-            const blob = new Blob([headers + tickets], { type: 'text/csv' });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             downloadBlob(blob, 'tickets.csv');
             showNotification('Tickets exported as CSV!');
         }
@@ -2004,13 +2040,19 @@
                 return;
             }
             
-            const tickets = Array.from(ticketsDiv.querySelectorAll('div')).map(div => {
+            const ticketsText = Array.from(ticketsDiv.querySelectorAll('.p-3')).map(div => {
                 const numbers = Array.from(div.querySelectorAll('.number-ball:not(.bonus-ball)')).map(ball => ball.textContent);
                 const bonus = Array.from(div.querySelectorAll('.bonus-ball')).map(ball => ball.textContent);
                 return `Numbers: ${numbers.join(', ')} | Bonus: ${bonus.join(', ')}`;
             }).join('\n');
             
-            document.execCommand('copy'); // Use execCommand for clipboard due to iframe restrictions
+            const textarea = document.createElement('textarea');
+            textarea.value = ticketsText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
             showNotification('Tickets copied to clipboard!');
         }
 
@@ -2021,7 +2063,7 @@
                 return;
             }
             
-            const tickets = Array.from(ticketsDiv.querySelectorAll('div')).map(div => {
+            const tickets = Array.from(ticketsDiv.querySelectorAll('.p-3')).map(div => {
                 const numbers = Array.from(div.querySelectorAll('.number-ball:not(.bonus-ball)')).map(ball => parseInt(ball.textContent));
                 const bonus = Array.from(div.querySelectorAll('.bonus-ball')).map(ball => parseInt(ball.textContent));
                 return { numbers, bonus };
@@ -2046,7 +2088,7 @@
         // Analyzer Functions
         function analyzeNumbers() {
             const input = document.getElementById('numbersToAnalyze').value;
-            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+            const numbers = parseNumbers(input);
             
             if (numbers.length === 0) {
                 showNotification('Please enter valid numbers!');
@@ -2067,59 +2109,47 @@
                 config = gameConfigs[game];
             }
             
-            // Basic analysis
-            const sum = numbers.reduce((a, b) => a + b, 0);
-            const avg = sum / numbers.length;
-            const oddCount = numbers.filter(n => n % 2 === 1).length;
-            const evenCount = numbers.length - oddCount;
-            const consecutivePairs = countConsecutivePairs(numbers);
-            const primes = numbers.filter(isPrime).length;
-            const fibs = numbers.filter(n => isFibonacci(n)).length;
-            
+            const analysis = getNumberAnalysis(numbers, config.mainPool);
+
             document.getElementById('basicStats').innerHTML = `
-                <p>Count: ${numbers.length}</p>
-                <p>Sum: ${sum}</p>
-                <p>Average: ${avg.toFixed(2)}</p>
-                <p>Range: ${Math.min(...numbers)} - ${Math.max(...numbers)}</p>
+                <p>Count: ${analysis.count}</p>
+                <p>Sum: ${analysis.sum}</p>
+                <p>Average: ${analysis.avg.toFixed(2)}</p>
+                <p>Range: ${analysis.min} - ${analysis.max}</p>
             `;
             
             document.getElementById('numberProps').innerHTML = `
-                <p>Odd: ${oddCount} (${(oddCount / numbers.length * 100).toFixed(1)}%)</p>
-                <p>Even: ${evenCount} (${(evenCount / numbers.length * 100).toFixed(1)}%)</p>
-                <p>Primes: ${primes}</p>
-                <p>Fibonacci: ${fibs}</p>
+                <p>Odd: ${analysis.oddCount} (${analysis.oddPercent.toFixed(1)}%)</p>
+                <p>Even: ${analysis.evenCount} (${analysis.evenPercent.toFixed(1)}%)</p>
+                <p>Primes: ${analysis.primes}</p>
+                <p>Fibonacci: ${analysis.fibs}</p>
             `;
             
             document.getElementById('patternStats').innerHTML = `
-                <p>Consecutive Pairs: ${consecutivePairs}</p>
-                <p>Gaps: ${calculateGaps(numbers).join(', ')}</p>
-                <p>Last Digits: ${numbers.map(n => n % 10).join(', ')}</p>
+                <p>Consecutive Pairs: ${analysis.consecutivePairs}</p>
+                <p>Gaps: ${analysis.gaps.join(', ')}</p>
+                <p>Last Digits: ${analysis.lastDigits.join(', ')}</p>
             `;
             
             document.getElementById('advancedMetrics').innerHTML = `
-                <p>Standard Deviation: ${calculateStandardDeviation(numbers).toFixed(2)}</p>
-                <p>Number Spread: ${calculateSpread(numbers).toFixed(2)}%</p>
-                <p>Low/High Ratio: ${calculateLowHighRatio(numbers, config.mainPool).toFixed(2)}</p>
+                <p>Standard Deviation: ${analysis.stdDev.toFixed(2)}</p>
+                <p>Number Spread: ${analysis.spread.toFixed(2)}%</p>
+                <p>Low/High Ratio: ${analysis.lowHighRatio.toFixed(2)}</p>
             `;
             
-            // Calculate frequency of numbers within the input itself
             const inputFrequency = numbers.reduce((acc, num) => {
                 acc[num] = (acc[num] || 0) + 1;
                 return acc;
             }, {});
 
-            // Sort by frequency for most and least used
             const sortedByFrequency = Object.entries(inputFrequency).sort((a, b) => b[1] - a[1]);
 
-            // Most Used Numbers from Input (now 12 results)
             const mostUsedNumbers = sortedByFrequency.slice(0, 12).map(([num, count]) => `<span class="number-ball hot-number">${num} (${count}x)</span>`).join('');
-            document.getElementById('mostUsedNumbersInput').innerHTML = mostUsedNumbers || '<p>No numbers entered or frequency data available.</p>';
+            document.getElementById('mostUsedNumbersInput').innerHTML = mostUsedNumbers || '<p>No frequency data.</p>';
 
-            // Least Used Numbers from Input (now 15 results)
             const leastUsedNumbers = sortedByFrequency.slice(-15).reverse().map(([num, count]) => `<span class="number-ball cold-number">${num} (${count}x)</span>`).join('');
-            document.getElementById('leastUsedNumbersInput').innerHTML = leastUsedNumbers || '<p>No numbers entered or frequency data available.</p>';
+            document.getElementById('leastUsedNumbersInput').innerHTML = leastUsedNumbers || '<p>No frequency data.</p>';
             
-            // Detect unused numbers and pairs from input
             const { unusedNumbers, unusedPairs } = detectUnusedFromInput(numbers, config.mainPool);
             const unusedNumbersDiv = document.getElementById('unusedNumbersAndPairs');
             
@@ -2135,25 +2165,19 @@
                 <p><strong>Unused Pairs (${unusedPairs.length.toLocaleString()}):</strong> ${unusedPairsDisplay}</p>
             `;
 
-            // Update charts
             updateAnalyzerCharts(numbers);
             
-            // Update analysis results
             document.getElementById('analysisResults').innerHTML = `
                 <p class="font-medium">Analysis Complete</p>
-                <p class="text-sm">Analyzed ${numbers.length} numbers with average ${avg.toFixed(2)}</p>
+                <p class="text-sm">Analyzed ${numbers.length} numbers with average ${analysis.avg.toFixed(2)}</p>
             `;
             
             showNotification('Analysis completed!');
         }
-        
-        /**
-         * New: Generates advanced predictions based on unused numbers from pool, most used from input, and least used from input,
-         * with an additional filter for bias.
-         */
+
         async function generateAdvancedPrediction() {
             const input = document.getElementById('numbersToAnalyze').value;
-            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+            const numbers = parseNumbers(input);
 
             if (numbers.length === 0) {
                 showNotification('Please enter numbers to analyze first to generate predictions!');
@@ -2175,8 +2199,8 @@
             }
 
             const advanceFilter = document.getElementById('advanceFilter').value;
-            const predictionAlgorithm = document.getElementById('advancedPredictionAlgorithm').value; // Get selected prediction algorithm
-            const numPredictions = 40; // Generate 40 predictions
+            const predictionAlgorithm = document.getElementById('advancedPredictionAlgorithm').value;
+            const numPredictions = 40;
 
             appState.lastPredictionConfig = {
                 inputNumbers: numbers,
@@ -2188,19 +2212,18 @@
 
             const advancedPredictionLoading = document.getElementById('advancedPredictionLoading');
             advancedPredictionLoading.classList.remove('hidden');
-            document.getElementById('advancedPredictionOutput').classList.remove('hidden'); // Ensure output is visible
+            document.getElementById('advancedPredictionOutput').classList.remove('hidden');
 
             const tickets = [];
 
-            // Categorize numbers from input
             const inputFrequencyMap = numbers.reduce((acc, num) => {
                 acc[num] = (acc[num] || 0) + 1;
                 return acc;
             }, {});
 
             const sortedByFrequency = Object.entries(inputFrequencyMap).sort((a, b) => b[1] - a[1]);
-            const mostUsed = sortedByFrequency.map(item => item[0]);
-            const leastUsed = sortedByFrequency.slice().reverse().map(item => item[0]); // Reverse for least used
+            const mostUsed = sortedByFrequency.map(item => parseInt(item[0]));
+            const leastUsed = sortedByFrequency.slice().reverse().map(item => parseInt(item[0]));
             const { unusedNumbers } = detectUnusedFromInput(numbers, config.mainPool);
 
             try {
@@ -2226,7 +2249,6 @@
                             break;
                     }
                     
-                    // Ensure uniqueness and correct pickCount
                     mainNumbers = [...new Set(mainNumbers)].slice(0, config.pickCount);
                     while (mainNumbers.length < config.pickCount) {
                         const randomNum = Math.floor(Math.random() * config.mainPool) + 1;
@@ -2235,7 +2257,6 @@
                         }
                     }
 
-                    // Always shuffle the results for randomness in presentation
                     mainNumbers = _.shuffle(mainNumbers);
                     bonusNumbers = _.shuffle(bonusNumbers);
                     tickets.push({ numbers: mainNumbers.sort((a, b) => a - b), bonus: bonusNumbers.sort((a, b) => a - b), filter: advanceFilter, algorithm: predictionAlgorithm });
@@ -2271,83 +2292,8 @@
                 showNotification('No previous prediction to regenerate. Please generate a prediction first.');
                 return;
             }
-
-            const { inputNumbers, gameConfig, advanceFilter, predictionAlgorithm, numPredictions } = appState.lastPredictionConfig;
-
-            const advancedPredictionLoading = document.getElementById('advancedPredictionLoading');
-            advancedPredictionLoading.classList.remove('hidden');
-            document.getElementById('advancedPredictionOutput').classList.remove('hidden');
-
-            const tickets = [];
-
-            const inputFrequencyMap = inputNumbers.reduce((acc, num) => {
-                acc[num] = (acc[num] || 0) + 1;
-                return acc;
-            }, {});
-
-            const sortedByFrequency = Object.entries(inputFrequencyMap).sort((a, b) => b[1] - a[1]);
-            const mostUsed = sortedByFrequency.map(item => item[0]);
-            const leastUsed = sortedByFrequency.slice().reverse().map(item => item[0]);
-            const { unusedNumbers } = detectUnusedFromInput(inputNumbers, gameConfig.mainPool);
-
-            try {
-                for (let i = 0; i < numPredictions; i++) {
-                    let mainNumbers = [];
-                    let bonusNumbers = Array.from({ length: gameConfig.bonusCount }, () => Math.floor(Math.random() * gameConfig.bonusPool) + 1);
-
-                    switch (advanceFilter) {
-                        case 'balanced':
-                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                        case 'favorUnused':
-                            mainNumbers = await generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                        case 'favorMostUsed':
-                            mainNumbers = await generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                        case 'favorLeastUsed':
-                            mainNumbers = await generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                        default:
-                            mainNumbers = await generateAICombinedPrediction(mostUsed, leastUsed, unusedNumbers, gameConfig.pickCount, gameConfig.mainPool, predictionAlgorithm);
-                            break;
-                    }
-                    
-                    mainNumbers = [...new Set(mainNumbers)].slice(0, gameConfig.pickCount);
-                    while (mainNumbers.length < gameConfig.pickCount) {
-                        const randomNum = Math.floor(Math.random() * gameConfig.mainPool) + 1;
-                        if (!mainNumbers.includes(randomNum)) {
-                            mainNumbers.push(randomNum);
-                        }
-                    }
-
-                    mainNumbers = _.shuffle(mainNumbers);
-                    bonusNumbers = _.shuffle(bonusNumbers);
-                    tickets.push({ numbers: mainNumbers.sort((a, b) => a - b), bonus: bonusNumbers.sort((a, b) => a - b), filter: advanceFilter, algorithm: predictionAlgorithm });
-                }
-            } catch (error) {
-                console.error("Error regenerating advanced predictions:", error);
-                showNotification("Error regenerating predictions. Please try again.");
-            } finally {
-                advancedPredictionLoading.classList.add('hidden');
-            }
-
-            const outputDiv = document.getElementById('advancedPredictionOutput');
-            outputDiv.innerHTML = tickets.map((ticket, index) => `
-                <div class="p-3 bg-white dark:bg-gray-600 rounded-lg mb-2 border border-gray-200 dark:border-gray-500">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-sm font-medium">Prediction ${index + 1} (Filter: ${ticket.filter.replace(/([A-Z])/g, ' $1').trim()}, Algo: ${ticket.algorithm.replace(/([A-Z])/g, ' $1').trim()})</span>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Sum: ${ticket.numbers.reduce((a, b) => a + b, 0)}</span>
-                    </div>
-                    <div class="flex flex-wrap gap-1 mb-1">
-                        ${ticket.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
-                    </div>
-                    <div class="flex flex-wrap gap-1">
-                        ${ticket.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-
+            // Re-run the generation with the stored configuration
+            await generateAdvancedPrediction();
             showNotification('Regenerated advanced predictions!');
         }
 
@@ -2370,78 +2316,11 @@
             
             Combine these categories intelligently to suggest a balanced set of numbers.${algorithmHint} Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
 
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
-                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
-
-                    // Apply prime filter if selected
-                    if (predictionAlgorithm === 'primeFilter') {
-                        const primesInPool = getPrimesUpTo(mainPool);
-                        let primeNumbers = generatedNumbers.filter(isPrime);
-                        let nonPrimeNumbers = generatedNumbers.filter(n => !isPrime(n));
-
-                        // Ensure we have enough primes if the filter is active
-                        while (primeNumbers.length < pickCount && primesInPool.length > 0) {
-                            const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
-                            if (!primeNumbers.includes(randomPrime) && !generatedNumbers.includes(randomPrime)) {
-                                primeNumbers.push(randomPrime);
-                                generatedNumbers.push(randomPrime); // Add to overall generated for uniqueness check
-                            }
-                        }
-                        generatedNumbers = primeNumbers.slice(0, pickCount);
-                        // If still not enough, fill with non-primes
-                        while (generatedNumbers.length < pickCount) {
-                            const randomNonPrime = nonPrimeNumbers[Math.floor(Math.random() * nonPrimeNumbers.length)];
-                            if (randomNonPrime && !generatedNumbers.includes(randomNonPrime)) {
-                                generatedNumbers.push(randomNonPrime);
-                            } else {
-                                // Fallback to any random number if non-primes are exhausted or not enough
-                                const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                                if (!generatedNumbers.includes(randomNum)) {
-                                    generatedNumbers.push(randomNum);
-                                }
-                            }
-                        }
-                    }
-
-                    while (generatedNumbers.length < pickCount) {
-                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                        if (!generatedNumbers.includes(randomNum)) {
-                            generatedNumbers.push(randomNum);
-                        }
-                    }
-                } else {
-                    console.error("Gemini API did not return expected content structure for AI combined prediction.");
-                    showNotification("AI combined prediction failed. Falling back to random combination.");
-                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'balanced', predictionAlgorithm);
-                }
-            } catch (error) {
-                console.error("Error calling Gemini API for AI combined prediction:", error);
-                showNotification("AI combined prediction failed due to an error. Falling back to random combination.");
-                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'balanced', predictionAlgorithm);
-            }
-            return generatedNumbers;
+            return await callAIGeneration(prompt, pickCount, mainPool);
         }
 
         async function generateAIFavorUnused(unusedNumbers, mostUsed, leastUsed, pickCount, mainPool, predictionAlgorithm) {
-            let generatedNumbers = [];
-            let algorithmHint = '';
+             let algorithmHint = '';
             if (predictionAlgorithm === 'fisherYatesEnhanced') {
                 algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
             } else if (predictionAlgorithm === 'cryptoSecureEnhanced') {
@@ -2449,7 +2328,6 @@
             } else if (predictionAlgorithm === 'primeFilter') {
                 algorithmHint = ' Prioritize prime numbers in the selection.';
             }
-
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
             Prioritize numbers from the 'unused numbers' list, but also consider numbers from 'most used' and 'least used' lists to create a diverse set.${algorithmHint}
             - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
@@ -2457,74 +2335,10 @@
             - Least Used Numbers: ${leastUsed.join(', ')}
             Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
 
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
-                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
-
-                    // Apply prime filter if selected
-                    if (predictionAlgorithm === 'primeFilter') {
-                        const primesInPool = getPrimesUpTo(mainPool);
-                        let primeNumbers = generatedNumbers.filter(isPrime);
-                        let nonPrimeNumbers = generatedNumbers.filter(n => !isPrime(n));
-
-                        while (primeNumbers.length < pickCount && primesInPool.length > 0) {
-                            const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
-                            if (!primeNumbers.includes(randomPrime) && !generatedNumbers.includes(randomPrime)) {
-                                primeNumbers.push(randomPrime);
-                                generatedNumbers.push(randomPrime);
-                            }
-                        }
-                        generatedNumbers = primeNumbers.slice(0, pickCount);
-                        while (generatedNumbers.length < pickCount) {
-                            const randomNonPrime = nonPrimeNumbers[Math.floor(Math.random() * nonPrimeNumbers.length)];
-                            if (randomNonPrime && !generatedNumbers.includes(randomNonPrime)) {
-                                generatedNumbers.push(randomNonPrime);
-                            } else {
-                                const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                                if (!generatedNumbers.includes(randomNum)) {
-                                    generatedNumbers.push(randomNum);
-                                }
-                            }
-                        }
-                    }
-
-                    while (generatedNumbers.length < pickCount) {
-                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                        if (!generatedNumbers.includes(randomNum)) {
-                            generatedNumbers.push(randomNum);
-                        }
-                    }
-                } else {
-                    console.error("Gemini API did not return expected content structure for AI favor unused prediction.");
-                    showNotification("AI favor unused prediction failed. Falling back to random combination.");
-                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorUnused', predictionAlgorithm);
-                }
-            } catch (error) {
-                console.error("Error calling Gemini API for AI favor unused prediction:", error);
-                showNotification("AI favor unused prediction failed due to an error. Falling back to random combination.");
-                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorUnused', predictionAlgorithm);
-            }
-            return generatedNumbers;
+            return await callAIGeneration(prompt, pickCount, mainPool);
         }
 
         async function generateAIFavorMostUsed(mostUsed, unusedNumbers, leastUsed, pickCount, mainPool, predictionAlgorithm) {
-            let generatedNumbers = [];
             let algorithmHint = '';
             if (predictionAlgorithm === 'fisherYatesEnhanced') {
                 algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
@@ -2533,7 +2347,6 @@
             } else if (predictionAlgorithm === 'primeFilter') {
                 algorithmHint = ' Prioritize prime numbers in the selection.';
             }
-
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
             Prioritize numbers from the 'most used' list, but also consider numbers from 'unused' and 'least used' lists to create a diverse set.${algorithmHint}
             - Most Used Numbers: ${mostUsed.join(', ')}
@@ -2541,74 +2354,10 @@
             - Least Used Numbers: ${leastUsed.join(', ')}
             Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
 
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
-                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
-
-                    // Apply prime filter if selected
-                    if (predictionAlgorithm === 'primeFilter') {
-                        const primesInPool = getPrimesUpTo(mainPool);
-                        let primeNumbers = generatedNumbers.filter(isPrime);
-                        let nonPrimeNumbers = generatedNumbers.filter(n => !isPrime(n));
-
-                        while (primeNumbers.length < pickCount && primesInPool.length > 0) {
-                            const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
-                            if (!primeNumbers.includes(randomPrime) && !generatedNumbers.includes(randomPrime)) {
-                                primeNumbers.push(randomPrime);
-                                generatedNumbers.push(randomPrime);
-                            }
-                        }
-                        generatedNumbers = primeNumbers.slice(0, pickCount);
-                        while (generatedNumbers.length < pickCount) {
-                            const randomNonPrime = nonPrimeNumbers[Math.floor(Math.random() * nonPrimeNumbers.length)];
-                            if (randomNonPrime && !generatedNumbers.includes(randomNonPrime)) {
-                                generatedNumbers.push(randomNonPrime);
-                            } else {
-                                const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                                if (!generatedNumbers.includes(randomNum)) {
-                                    generatedNumbers.push(randomNum);
-                                }
-                            }
-                        }
-                    }
-
-                    while (generatedNumbers.length < pickCount) {
-                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                        if (!generatedNumbers.includes(randomNum)) {
-                            generatedNumbers.push(randomNum);
-                        }
-                    }
-                } else {
-                    console.error("Gemini API did not return expected content structure for AI favor most used prediction.");
-                    showNotification("AI favor most used prediction failed. Falling back to random combination.");
-                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorMostUsed', predictionAlgorithm);
-                }
-            } catch (error) {
-                console.error("Error calling Gemini API for AI favor most used prediction:", error);
-                showNotification("AI favor most used prediction failed due to an error. Falling back to random combination.");
-                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorMostUsed', predictionAlgorithm);
-            }
-            return generatedNumbers;
+            return await callAIGeneration(prompt, pickCount, mainPool);
         }
 
         async function generateAIFavorLeastUsed(leastUsed, mostUsed, unusedNumbers, pickCount, mainPool, predictionAlgorithm) {
-            let generatedNumbers = [];
             let algorithmHint = '';
             if (predictionAlgorithm === 'fisherYatesEnhanced') {
                 algorithmHint = ' Ensure the selection process simulates a highly randomized shuffle, similar to a Fisher-Yates shuffle, to avoid any discernible patterns.';
@@ -2617,7 +2366,6 @@
             } else if (predictionAlgorithm === 'primeFilter') {
                 algorithmHint = ' Prioritize prime numbers in the selection.';
             }
-
             const prompt = `Generate ${pickCount} unique lottery numbers between 1 and ${mainPool}.
             Prioritize numbers from the 'least used' list, but also consider numbers from 'most used' and 'unused' lists to create a diverse set.${algorithmHint}
             - Least Used Numbers: ${leastUsed.join(', ')}
@@ -2625,12 +2373,16 @@
             - Unused Numbers (from the full pool): ${unusedNumbers.join(', ')}
             Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
 
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            return await callAIGeneration(prompt, pickCount, mainPool);
+        }
 
+        async function callAIGeneration(prompt, pickCount, mainPool) {
+            let generatedNumbers = [];
             try {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -2638,128 +2390,33 @@
                 });
                 const result = await response.json();
 
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
+                if (result.candidates && result.candidates[0]?.content?.parts?.[0]) {
                     const text = result.candidates[0].content.parts[0].text;
                     const parsed = text.split(',').map(Number).filter(n => !isNaN(n) && n >= 1 && n <= mainPool);
-                    generatedNumbers = [...new Set(parsed)].slice(0, pickCount);
-
-                    // Apply prime filter if selected
-                    if (predictionAlgorithm === 'primeFilter') {
-                        const primesInPool = getPrimesUpTo(mainPool);
-                        let primeNumbers = generatedNumbers.filter(isPrime);
-                        let nonPrimeNumbers = generatedNumbers.filter(n => !isPrime(n));
-
-                        while (primeNumbers.length < pickCount && primesInPool.length > 0) {
-                            const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
-                            if (!primeNumbers.includes(randomPrime) && !generatedNumbers.includes(randomPrime)) {
-                                primeNumbers.push(randomPrime);
-                                generatedNumbers.push(randomPrime);
-                            }
-                        }
-                        generatedNumbers = primeNumbers.slice(0, pickCount);
-                        while (generatedNumbers.length < pickCount) {
-                            const randomNonPrime = nonPrimeNumbers[Math.floor(Math.random() * nonPrimeNumbers.length)];
-                            if (randomNonPrime && !generatedNumbers.includes(randomNonPrime)) {
-                                generatedNumbers.push(randomNonPrime);
-                            } else {
-                                const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                                if (!generatedNumbers.includes(randomNum)) {
-                                    generatedNumbers.push(randomNum);
-                                }
-                            }
-                        }
-                    }
-
-                    while (generatedNumbers.length < pickCount) {
-                        const randomNum = Math.floor(Math.random() * mainPool) + 1;
-                        if (!generatedNumbers.includes(randomNum)) {
-                            generatedNumbers.push(randomNum);
-                        }
-                    }
+                    generatedNumbers = [...new Set(parsed)];
                 } else {
-                    console.error("Gemini API did not return expected content structure for AI favor least used prediction.");
-                    showNotification("AI favor least used prediction failed. Falling back to random combination.");
-                    generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorLeastUsed', predictionAlgorithm);
+                    throw new Error("Invalid API response structure");
                 }
             } catch (error) {
-                console.error("Error calling Gemini API for AI favor least used prediction:", error);
-                showNotification("AI favor least used prediction failed due to an error. Falling back to random combination.");
-                generatedNumbers = generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, 'favorLeastUsed', predictionAlgorithm);
-            }
-            return generatedNumbers;
-        }
-
-        // Fallback function for combined prediction if AI fails
-        function generateFallbackCombined(mostUsed, leastUsed, unusedNumbers, pickCount, mainPool, filter, predictionAlgorithm) {
-            let pool = [];
-            const allNumbers = Array.from({ length: mainPool }, (_, i) => i + 1);
-
-            switch (filter) {
-                case 'balanced':
-                    // Mix of all three categories
-                    pool = [...mostUsed, ...unusedNumbers, ...leastUsed];
-                    break;
-                case 'favorUnused':
-                    // More unused, some most used, few least used
-                    pool = [...unusedNumbers, ...unusedNumbers, ...mostUsed, ...leastUsed];
-                    break;
-                case 'favorMostUsed':
-                    // More most used, some unused, few least used
-                    pool = [...mostUsed, ...mostUsed, ...unusedNumbers, ...leastUsed];
-                    break;
-                case 'favorLeastUsed':
-                    // More least used, some unused, few most used
-                    pool = [...leastUsed, ...leastUsed, ...unusedNumbers, ...mostUsed];
-                    break;
-            }
-
-            // Apply prime filter if selected
-            if (predictionAlgorithm === 'primeFilter') {
-                const primesInPool = getPrimesUpTo(mainPool);
-                pool = pool.filter(num => primesInPool.includes(num));
-                // If filtering by prime numbers resulted in too few numbers, add more primes
-                while (pool.length < pickCount && primesInPool.length > 0) {
-                    const randomPrime = primesInPool[Math.floor(Math.random() * primesInPool.length)];
-                    if (!pool.includes(randomPrime)) {
-                        pool.push(randomPrime);
-                    }
-                }
-            }
-
-            // Ensure the pool has enough unique numbers, add from all possible numbers if needed
-            let uniquePool = [...new Set(pool)];
-            if (uniquePool.length < pickCount) {
-                const missingCount = pickCount - uniquePool.length;
-                const additionalNumbers = allNumbers.filter(n => !uniquePool.includes(n));
-                
-                // Apply Fisher-Yates or Crypto-secure like shuffle for fallback if requested
-                if (predictionAlgorithm === 'fisherYatesEnhanced' || predictionAlgorithm === 'cryptoSecureEnhanced') {
-                    // Use Fisher-Yates for shuffling the additional numbers
-                    for (let i = additionalNumbers.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [additionalNumbers[i], additionalNumbers[j]] = [additionalNumbers[j], additionalNumbers[i]];
-                    }
-                }
-                uniquePool = [...uniquePool, ...additionalNumbers.slice(0, missingCount)];
+                console.error("Error calling Gemini API:", error);
+                showNotification("AI generation failed. Using fallback.");
             }
             
-            // Final shuffle for the result to ensure randomness, especially for enhanced algorithms
-            if (predictionAlgorithm === 'fisherYatesEnhanced' || predictionAlgorithm === 'cryptoSecureEnhanced') {
-                for (let i = uniquePool.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [uniquePool[i], uniquePool[j]] = [uniquePool[j], uniquePool[i]];
+            // Fallback to ensure correct count
+            while (generatedNumbers.length < pickCount) {
+                const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                if (!generatedNumbers.includes(randomNum)) {
+                    generatedNumbers.push(randomNum);
                 }
             }
-
-            return uniquePool.slice(0, pickCount);
+            
+            return generatedNumbers.slice(0, pickCount);
         }
 
 
         async function getAIInsights() {
             const input = document.getElementById('numbersToAnalyze').value;
-            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+            const numbers = parseNumbers(input);
 
             const aiInsightsOutput = document.getElementById('aiInsightsOutput');
             const aiInsightsText = document.getElementById('aiInsightsText');
@@ -2776,37 +2433,20 @@
             }
 
             const game = document.getElementById('analyzerGame').value;
-            let config;
+            const config = game === 'custom' ? {
+                mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
+                pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5
+            } : gameConfigs[game];
 
-            if (game === 'custom') {
-                config = {
-                    mainPool: parseInt(document.getElementById('analyzerMainPool').value) || 69,
-                    pickCount: parseInt(document.getElementById('analyzerPickCount').value) || 5,
-                    bonusPool: parseInt(document.getElementById('analyzerBonusPool').value) || 26,
-                    bonusCount: parseInt(document.getElementById('analyzerBonusCount').value) || 1
-                };
-            } else {
-                config = gameConfigs[game];
-            }
-
-            const sum = numbers.reduce((a, b) => a + b, 0);
-            const avg = sum / numbers.length;
-            const oddCount = numbers.filter(n => n % 2 === 1).length;
-            const evenCount = numbers.length - oddCount;
-            const consecutivePairs = countConsecutivePairs(numbers);
-            const primes = numbers.filter(isPrime).length;
-            const fibs = numbers.filter(n => isFibonacci(n)).length;
-            const stdDev = calculateStandardDeviation(numbers);
-            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
+            const analysis = getNumberAnalysis(numbers, config.mainPool);
 
             let prompt = `Analyze the following lottery numbers for a ${game} game (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers): ${numbers.join(', ')}.
-            Their sum is ${sum}, average is ${avg.toFixed(2)}, with ${oddCount} odd and ${evenCount} even numbers.
-            There are ${consecutivePairs} consecutive pairs, ${primes} prime numbers, and ${fibs} Fibonacci numbers.
-            The standard deviation is ${stdDev.toFixed(2)} and the low/high ratio is ${lowHighRatio.toFixed(2)}.
+            Their sum is ${analysis.sum}, average is ${analysis.avg.toFixed(2)}, with ${analysis.oddCount} odd and ${analysis.evenCount} even numbers.
+            There are ${analysis.consecutivePairs} consecutive pairs, ${analysis.primes} prime numbers, and ${analysis.fibs} Fibonacci numbers.
+            The standard deviation is ${analysis.stdDev.toFixed(2)} and the low/high ratio is ${analysis.lowHighRatio.toFixed(2)}.
             Provide an insightful, concise analysis of these numbers, highlighting any interesting patterns, strengths, or weaknesses for a lottery draw. Focus on common lottery number analysis concepts like balance, distribution, and historical trends if applicable.`;
 
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
             const payload = { contents: chatHistory };
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
@@ -2818,13 +2458,10 @@
                 });
                 const result = await response.json();
 
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
+                if (result.candidates && result.candidates[0]?.content?.parts?.[0]) {
                     aiInsightsText.textContent = result.candidates[0].content.parts[0].text;
                 } else {
-                    aiInsightsText.textContent = 'Could not retrieve AI insights.';
-                    console.error("Gemini API did not return expected content structure for insights.");
+                    throw new Error("Invalid API response structure");
                 }
             } catch (error) {
                 aiInsightsText.textContent = 'Error fetching AI insights.';
@@ -2833,6 +2470,33 @@
                 aiInsightsLoading.classList.add('hidden');
             }
             showNotification('AI Insights generated!');
+        }
+        
+        function getNumberAnalysis(numbers, mainPool) {
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            const count = numbers.length;
+            const avg = count > 0 ? sum / count : 0;
+            const oddCount = numbers.filter(n => n % 2 === 1).length;
+            const evenCount = count - oddCount;
+            return {
+                sum,
+                count,
+                avg,
+                min: Math.min(...numbers),
+                max: Math.max(...numbers),
+                oddCount,
+                evenCount,
+                oddPercent: count > 0 ? (oddCount / count) * 100 : 0,
+                evenPercent: count > 0 ? (evenCount / count) * 100 : 0,
+                consecutivePairs: countConsecutivePairs(numbers),
+                primes: numbers.filter(isPrime).length,
+                fibs: numbers.filter(isFibonacci).length,
+                gaps: calculateGaps(numbers),
+                lastDigits: numbers.map(n => n % 10),
+                stdDev: calculateStandardDeviation(numbers),
+                spread: calculateSpread(numbers),
+                lowHighRatio: calculateLowHighRatio(numbers, mainPool)
+            };
         }
 
         function isPrime(num) {
@@ -2873,7 +2537,7 @@
             if (numbers.length < 2) return 0;
             const sorted = [...numbers].sort((a, b) => a - b);
             const range = sorted[sorted.length - 1] - sorted[0];
-            return (range / (sorted.length - 1)) * 100; // Percentage spread over number count
+            return (range / (sorted.length - 1)) * 100;
         }
 
         function calculateLowHighRatio(numbers, mainPool) {
@@ -2881,40 +2545,15 @@
             const mid = mainPool / 2;
             const low = numbers.filter(n => n <= mid).length;
             const high = numbers.length - low;
-            return low / (high || 1); // Avoid division by zero
-        }
-
-        function isHotNumber(num) {
-            if (appState.historicalData.length === 0) return false;
-            const frequency = getNumberFrequency();
-            const values = Object.values(frequency);
-            if (values.length === 0) return false;
-            const avgFrequency = values.reduce((a, b) => a + b, 0) / values.length;
-            return (frequency[num] || 0) > avgFrequency * 1.2;
-        }
-
-        function isDueNumber(num) {
-            if (appState.historicalData.length === 0) return false;
-            const gaps = getGapAnalysis();
-            const values = Object.values(gaps);
-            if (values.length === 0) return false;
-            const avgGap = values.reduce((a, b) => a + b, 0) / values.length;
-            return (gaps[num] || 0) > avgGap * 1.5;
+            return high > 0 ? low / high : low;
         }
         
-        /**
-         * New: Detects unused numbers and pairs based on a set of input numbers against the game's pool.
-         * @param {number[]} inputNumbers - The array of numbers provided by the user.
-         * @param {number} mainPool - The maximum number in the main pool for the selected game.
-         * @returns {{unusedNumbers: number[], unusedPairs: string[]}} - An object containing arrays of unused numbers and pairs.
-         */
         function detectUnusedFromInput(inputNumbers, mainPool) {
             const allPossibleNumbers = new Set(Array.from({ length: mainPool }, (_, i) => i + 1));
             const usedNumbers = new Set(inputNumbers);
 
             const unusedNumbers = [...allPossibleNumbers].filter(num => !usedNumbers.has(num));
 
-            // Find unused pairs by comparing all possible pairs to pairs present in the input
             const allPossiblePairs = new Set();
             for (let i = 1; i <= mainPool; i++) {
                 for (let j = i + 1; j <= mainPool; j++) {
@@ -2923,7 +2562,7 @@
             }
 
             const usedPairs = new Set();
-            const sortedInput = [...inputNumbers].sort((a,b)=>a-b);
+            const sortedInput = [...new Set(inputNumbers)].sort((a,b)=>a-b);
             for (let i = 0; i < sortedInput.length; i++) {
                 for (let j = i + 1; j < sortedInput.length; j++) {
                     usedPairs.add(`${sortedInput[i]}-${sortedInput[j]}`);
@@ -2937,7 +2576,6 @@
 
 
         function updateAnalyzerCharts(numbers) {
-            // Frequency Distribution
             const frequencyMap = numbers.reduce((acc, num) => {
                 acc[num] = (acc[num] || 0) + 1;
                 return acc;
@@ -2946,76 +2584,247 @@
             const freqLabels = Object.keys(frequencyMap).sort((a, b) => a - b);
             const freqData = freqLabels.map(label => frequencyMap[label]);
             
-            charts.freqDistributionChart.data.labels = freqLabels;
-            charts.freqDistributionChart.data.datasets[0].data = freqData;
-            charts.freqDistributionChart.update();
+            if (charts.freqDistributionChart) {
+                charts.freqDistributionChart.data.labels = freqLabels;
+                charts.freqDistributionChart.data.datasets[0].data = freqData;
+                charts.freqDistributionChart.update();
+            }
             
-            // Last Digit Distribution
             const lastDigits = numbers.map(n => n % 10);
             const lastDigitCounts = Array(10).fill(0);
             lastDigits.forEach(digit => lastDigitCounts[digit]++);
             
-            charts.lastDigitDistributionChart.data.labels = Array(10).fill().map((_, i) => i);
-            charts.lastDigitDistributionChart.data.datasets[0].data = lastDigitCounts;
-            charts.lastDigitDistributionChart.update();
+            if (charts.lastDigitDistributionChart) {
+                charts.lastDigitDistributionChart.data.labels = Array.from({length: 10}, (_, i) => i);
+                charts.lastDigitDistributionChart.data.datasets[0].data = lastDigitCounts;
+                charts.lastDigitDistributionChart.update();
+            }
             
-            // Sum Distribution
             const sum = numbers.reduce((a, b) => a + b, 0);
+            if (charts.sumDistributionChart) {
+                charts.sumDistributionChart.data.labels = ['Sum'];
+                charts.sumDistributionChart.data.datasets[0].data = [sum];
+                charts.sumDistributionChart.update();
+            }
             
-            charts.sumDistributionChart.data.labels = ['Sum'];
-            charts.sumDistributionChart.data.datasets[0].data = [sum];
-            charts.sumDistributionChart.update();
-            
-            // Odd/Even Distribution
             const oddCount = numbers.filter(n => n % 2 === 1).length;
             const evenCount = numbers.length - oddCount;
-            
-            charts.oddEvenDistributionChart.data.labels = ['Odd', 'Even'];
-            charts.oddEvenDistributionChart.data.datasets[0].data = [oddCount, evenCount];
-            charts.oddEvenDistributionChart.update();
+            if (charts.oddEvenDistributionChart) {
+                charts.oddEvenDistributionChart.data.labels = ['Odd', 'Even'];
+                charts.oddEvenDistributionChart.data.datasets[0].data = [oddCount, evenCount];
+                charts.oddEvenDistributionChart.update();
+            }
         }
 
         function clearAnalyzer() {
             document.getElementById('numbersToAnalyze').value = '';
             document.getElementById('analysisResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Enter numbers to analyze them</p>';
             
-            ['basicStats', 'numberProps', 'patternStats', 'advancedMetrics'].forEach(id => {
-                document.getElementById(id).innerHTML = '';
+            ['basicStats', 'numberProps', 'patternStats', 'advancedMetrics', 'mostUsedNumbersInput', 'leastUsedNumbersInput', 'unusedNumbersAndPairs'].forEach(id => {
+                document.getElementById(id).innerHTML = `<p>Analyze numbers to see results.</p>`;
             });
             
-            document.getElementById('mostUsedNumbersInput').innerHTML = '<p>Analyze numbers to see the most frequently entered numbers.</p>';
-            document.getElementById('leastUsedNumbersInput').innerHTML = '<p>Analyze numbers to see the least frequently entered numbers.</p>';
-            document.getElementById('aiInsightsOutput').classList.add('hidden'); // Hide AI insights output
-            document.getElementById('aiInsightsText').textContent = ''; // Clear AI insights text
-            document.getElementById('unusedNumbersAndPairs').innerHTML = '<p>Analyze numbers to see unused numbers and pairs relative to the game\'s pool.</p>';
+            document.getElementById('aiInsightsOutput').classList.add('hidden');
+            document.getElementById('aiInsightsText').textContent = '';
             
-            // Clear new advanced prediction output
             document.getElementById('advancedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate advanced predictions to see results here.</p>';
             document.getElementById('advancedPredictionLoading').classList.add('hidden');
 
-
-            // Reset charts
             ['freqDistributionChart', 'lastDigitDistributionChart', 'sumDistributionChart', 'oddEvenDistributionChart'].forEach(id => {
-                charts[id].data.labels = [];
-                charts[id].data.datasets[0].data = [];
-                charts[id].update();
+                if(charts[id]) {
+                    charts[id].data.labels = [];
+                    charts[id].data.datasets[0].data = [];
+                    charts[id].update();
+                }
             });
             
             showNotification('Analyzer cleared!');
         }
 
-        // Clear Advanced Prediction function
         function clearAdvancedPrediction() {
             document.getElementById('advancedPredictionOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate advanced predictions to see results here.</p>';
             document.getElementById('advancedPredictionLoading').classList.add('hidden');
-            appState.lastPredictionConfig = null; // Clear the last prediction config
+            appState.lastPredictionConfig = null;
             showNotification('Advanced predictions cleared!');
+        }
+
+        // Combinatorics Lab Functions
+        function findCommonPairs() {
+            const input = document.getElementById('pairsDataInput').value;
+            const minFrequency = parseInt(document.getElementById('minPairFrequency').value) || 2;
+            const lines = input.split('\n').filter(line => line.trim() !== '');
+
+            if (lines.length === 0) {
+                showNotification('Please enter draw data.');
+                return;
+            }
+
+            const pairCounts = {};
+            lines.forEach(line => {
+                const numbers = parseNumbers(line).sort((a, b) => a - b);
+                if (numbers.length < 2) return;
+
+                for (let i = 0; i < numbers.length; i++) {
+                    for (let j = i + 1; j < numbers.length; j++) {
+                        const pairKey = `${numbers[i]}-${numbers[j]}`;
+                        pairCounts[pairKey] = (pairCounts[pairKey] || 0) + 1;
+                    }
+                }
+            });
+
+            const commonPairs = Object.entries(pairCounts)
+                .filter(([_, count]) => count >= minFrequency)
+                .sort((a, b) => b[1] - a[1]);
+
+            const outputDiv = document.getElementById('commonPairsOutput');
+            if (commonPairs.length === 0) {
+                outputDiv.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No common pairs found with the specified minimum frequency.</p>';
+            } else {
+                outputDiv.innerHTML = commonPairs.map(([pair, count]) => {
+                    const [num1, num2] = pair.split('-');
+                    return `
+                        <div class="flex items-center justify-between p-2 bg-white dark:bg-gray-600 rounded-lg mb-2">
+                            <div class="flex gap-1">
+                                <span class="number-ball">${num1}</span>
+                                <span class="number-ball">${num2}</span>
+                            </div>
+                            <span class="font-bold text-lg text-primary">${count}x</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            showNotification(`Found ${commonPairs.length} common pairs.`);
+        }
+
+        function useHistoricalDataForPairs() {
+            if (appState.historicalData.length === 0) {
+                showNotification('No historical data loaded. Please load data in the "Historical Data" tab first.');
+                return;
+            }
+
+            const dataAsString = appState.historicalData.map(draw => draw.numbers.join(' ')).join('\n');
+            document.getElementById('pairsDataInput').value = dataAsString;
+            showNotification('Loaded historical data into the input.');
+        }
+
+        function clearPairsGenerator() {
+            document.getElementById('pairsDataInput').value = '';
+            document.getElementById('minPairFrequency').value = '2';
+            document.getElementById('commonPairsOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Find pairs to see results.</p>';
+            showNotification('Pairs Generator cleared.');
+        }
+
+        function generateCombinations() {
+            const input = document.getElementById('comboNumbersInput').value;
+            const combinationSize = parseInt(document.getElementById('combinationSize').value);
+            const numbers = [...new Set(parseNumbers(input))].sort((a, b) => a - b);
+
+            if (numbers.length === 0 || isNaN(combinationSize) || combinationSize <= 0) {
+                showNotification('Please enter a valid set of numbers and combination size.');
+                return;
+            }
+
+            if (numbers.length < combinationSize) {
+                showNotification('Combination size cannot be larger than the number of unique inputs.');
+                return;
+            }
+
+            const combinations = getCombinations(numbers, combinationSize);
+            const outputDiv = document.getElementById('combinationsOutput');
+            const countSpan = document.getElementById('combinationCount');
+
+            countSpan.textContent = combinations.length.toLocaleString();
+
+            if (combinations.length === 0) {
+                outputDiv.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No combinations could be generated.</p>';
+            } else {
+                outputDiv.innerHTML = combinations.map(combo => {
+                    return `
+                        <div class="flex flex-wrap gap-1 p-2 border-b border-gray-200 dark:border-gray-600">
+                            ${combo.map(num => `<span class="number-ball text-sm w-8 h-8">${num}</span>`).join('')}
+                        </div>
+                    `;
+                }).join('');
+            }
+            showNotification(`Generated ${combinations.length.toLocaleString()} combinations.`);
+        }
+
+        function getCombinations(sourceArray, comboLength) {
+            const results = [];
+            
+            function recurse(start, combo) {
+                if (combo.length === comboLength) {
+                    results.push(combo);
+                    return;
+                }
+                if (start === sourceArray.length) {
+                    return;
+                }
+                
+                // Include sourceArray[start]
+                recurse(start + 1, [...combo, sourceArray[start]]);
+                
+                // Exclude sourceArray[start]
+                recurse(start + 1, combo);
+            }
+            
+            recurse(0, []);
+            return results;
+        }
+
+        function clearCombinationsGenerator() {
+            document.getElementById('comboNumbersInput').value = '';
+            document.getElementById('combinationSize').value = '3';
+            document.getElementById('combinationsOutput').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate combinations to see results.</p>';
+            document.getElementById('combinationCount').textContent = '0';
+            showNotification('Combinations Generator cleared.');
+        }
+
+        function exportCombinationsTxt() {
+            const combinationsDiv = document.getElementById('combinationsOutput');
+            const combinationsText = Array.from(combinationsDiv.querySelectorAll('.flex.flex-wrap.gap-1')).map(div => {
+                return Array.from(div.querySelectorAll('.number-ball')).map(ball => ball.textContent).join(',');
+            }).join('\n');
+
+            if (!combinationsText) {
+                showNotification('No combinations to export!');
+                return;
+            }
+
+            const blob = new Blob([combinationsText], { type: 'text/plain' });
+            downloadBlob(blob, 'combinations.txt');
+            showNotification('Combinations exported as TXT!');
+        }
+
+        function copyAllCombinations() {
+            const combinationsDiv = document.getElementById('combinationsOutput');
+            const combinationsText = Array.from(combinationsDiv.querySelectorAll('.flex.flex-wrap.gap-1')).map(div => {
+                return Array.from(div.querySelectorAll('.number-ball')).map(ball => ball.textContent).join(',');
+            }).join('\n');
+
+            if (!combinationsText) {
+                showNotification('No combinations to copy!');
+                return;
+            }
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = combinationsText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showNotification('All combinations copied to clipboard!');
+        }
+        
+        function parseNumbers(inputString) {
+            return inputString.split(/[\s,;\-\n]+/).map(Number).filter(n => !isNaN(n) && n > 0);
         }
 
         // Reverse Engineering Functions
         async function reverseEngineerNumbers() {
             const input = document.getElementById('numbersToReverse').value;
-            const numbers = input.split(/[\s,-]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+            const numbers = parseNumbers(input);
             
             if (numbers.length === 0) {
                 showNotification('Please enter valid numbers to reverse engineer!');
@@ -3026,127 +2835,101 @@
             const config = gameConfigs[game];
             const method = document.getElementById('reverseMethod').value;
             
-            // Basic statistical analysis
-            const sum = numbers.reduce((a, b) => a + b, 0);
-            const avg = sum / numbers.length;
-            const oddCount = numbers.filter(n => n % 2 === 1).length;
-            const evenCount = numbers.length - oddCount;
-            const consecutivePairs = countConsecutivePairs(numbers);
-            const primes = numbers.filter(isPrime).length;
-            const fibs = numbers.filter(isFibonacci).length;
-            const stdDev = calculateStandardDeviation(numbers);
-            const lowHighRatio = calculateLowHighRatio(numbers, config.mainPool);
+            const analysis = getNumberAnalysis(numbers, config.mainPool);
             
             document.getElementById('reverseStats').innerHTML = `
-                <p>Count: ${numbers.length}</p>
-                <p>Sum: ${sum}</p>
-                <p>Average: ${avg.toFixed(2)}</p>
-                <p>Odd/Even: ${oddCount}/${evenCount}</p>
-                <p>Std Dev: ${stdDev.toFixed(2)}</p>
+                <p>Count: ${analysis.count}</p>
+                <p>Sum: ${analysis.sum}</p>
+                <p>Average: ${analysis.avg.toFixed(2)}</p>
+                <p>Odd/Even: ${analysis.oddCount}/${analysis.evenCount}</p>
+                <p>Std Dev: ${analysis.stdDev.toFixed(2)}</p>
             `;
             
             document.getElementById('reversePatterns').innerHTML = `
-                <p>Consecutive Pairs: ${consecutivePairs}</p>
-                <p>Primes: ${primes}</p>
-                <p>Fibonacci: ${fibs}</p>
-                <p>Low/High Ratio: ${lowHighRatio.toFixed(2)}</p>
+                <p>Consecutive Pairs: ${analysis.consecutivePairs}</p>
+                <p>Primes: ${analysis.primes}</p>
+                <p>Fibonacci: ${analysis.fibs}</p>
+                <p>Low/High Ratio: ${analysis.lowHighRatio.toFixed(2)}</p>
             `;
             
-            // Generate potential seed values based on analysis
             let potentialSeeds = [];
             if (method === 'statistical') {
                 potentialSeeds = generateStatisticalSeeds(numbers, config);
                 document.getElementById('optimalCharacteristics').classList.add('hidden');
                 document.getElementById('seedComparison').classList.add('hidden');
+                displayPotentialSeeds(potentialSeeds);
             } else if (method === 'pattern') {
                 potentialSeeds = generatePatternSeeds(numbers, config);
                 document.getElementById('optimalCharacteristics').classList.add('hidden');
                 document.getElementById('seedComparison').classList.add('hidden');
+                displayPotentialSeeds(potentialSeeds);
             } else if (method === 'ai') {
-                // AI-powered analysis for optimal characteristics and comparison
                 document.getElementById('optimalCharacteristics').classList.remove('hidden');
                 document.getElementById('seedComparison').classList.remove('hidden');
                 await getOptimalGameCharacteristics(numbers, config);
                 await compareSeedToOptimal(numbers, config);
-                // AI seed generation is handled separately within generateAISeeds
                 await generateAISeeds(numbers, config);
-                potentialSeeds = []; // AI seeds are displayed by generateAISeeds
             }
             
-            displayPotentialSeeds(potentialSeeds);
             updateReverseChart(numbers);
-            updateSeedVisualsChart(numbers); // Update the new chart
+            updateSeedVisualsChart(numbers);
             
             document.getElementById('reverseResults').innerHTML = `
                 <p class="font-medium">Reverse Engineering Complete (${method})</p>
-                <p class="text-sm">Analyzed ${numbers.length} numbers with average ${avg.toFixed(2)}</p>
+                <p class="text-sm">Analyzed ${numbers.length} numbers with average ${analysis.avg.toFixed(2)}</p>
             `;
             
             showNotification('Reverse engineering completed!');
         }
 
         function generateStatisticalSeeds(numbers, config) {
-            // Simple seed generation based on statistical properties
             const sum = numbers.reduce((a, b) => a + b, 0);
             const avg = sum / numbers.length;
             const oddCount = numbers.filter(n => n % 2 === 1).length;
             
-            // Generate seeds based on various number properties
             const seeds = [
                 sum,
                 Math.round(avg * 100),
                 oddCount * 1000 + numbers.length,
-                parseInt(numbers.map(n => n % 10).join('')), // Last digits
-                parseInt(numbers.join('').slice(0, 10)), // First 10 digits of concatenated numbers
-                numbers.reduce((a, b) => a ^ b, 0) * 1000 // XOR of all numbers
-            ].filter(seed => seed > 0);
+                parseInt(numbers.map(n => n % 10).join('')),
+                parseInt(numbers.join('').slice(0, 10)),
+                numbers.reduce((a, b) => a ^ b, 0) * 1000
+            ].filter(seed => seed > 0 && !isNaN(seed));
             
-            return [...new Set(seeds)]; // Return unique seeds
+            return [...new Set(seeds)];
         }
 
         function generatePatternSeeds(numbers, config) {
-            // More sophisticated seed generation based on patterns
             const sorted = [...numbers].sort((a, b) => a - b);
-            const gaps = [];
-            for (let i = 1; i < sorted.length; i++) {
-                gaps.push(sorted[i] - sorted[i - 1]);
-            }
+            const gaps = calculateGaps(sorted);
             
             const seeds = [
-                // Based on gaps between numbers
                 parseInt(gaps.join('')),
-                // Based on prime factors
                 parseInt(numbers.map(n => {
                     let factors = 0;
-                    for (let i = 2; i <= n; i++) {
-                        if (n % i === 0) factors++;
-                    }
+                    for (let i = 2; i <= n; i++) { if (n % i === 0) factors++; }
                     return factors;
                 }).join('')),
-                // Based on digit sums
                 parseInt(numbers.map(n => String(n).split('').reduce((a, c) => a + parseInt(c), 0)).join('')),
-                // Based on position in number range
                 Math.round(numbers.reduce((a, b) => a + (b / config.mainPool), 0) * 10000)
-            ].filter(seed => seed > 0);
+            ].filter(seed => seed > 0 && !isNaN(seed));
             
             return [...new Set(seeds)];
         }
 
         async function generateAISeeds(numbers, config) {
-            const reverseResults = document.getElementById('reverseResults');
-            reverseResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Analyzing with AI... <span class="loading-indicator"></span></p>';
+            const reverseSeedsDiv = document.getElementById('reverseSeeds');
+            reverseSeedsDiv.innerHTML = '<p>AI is analyzing for seeds... <span class="loading-indicator"></span></p>';
             
             try {
                 const prompt = `Given these lottery numbers: ${numbers.join(', ')}, analyze them to suggest possible seed values or patterns that might generate similar numbers. Consider:
                 - Statistical properties (sum, average, distribution)
                 - Number patterns (consecutive, gaps, sequences)
                 - Mathematical properties (primes, Fibonacci, digit sums)
-                - Any other relevant characteristics
                 
                 Provide 5-10 potential seed values or patterns that could generate similar numbers, with brief explanations. Format as a numbered list.`;
                 
-                let chatHistory = [];
-                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
                 const payload = { contents: chatHistory };
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
@@ -3157,42 +2940,26 @@
                 });
                 const result = await response.json();
 
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
+                if (result.candidates && result.candidates[0]?.content?.parts?.[0]) {
                     const analysis = result.candidates[0].content.parts[0].text;
-                    reverseResults.innerHTML = `
-                        <p class="font-medium">AI Reverse Engineering Results</p>
-                        <div class="text-sm mt-2">${analysis.replace(/\n/g, '<br>')}</div>
+                    reverseSeedsDiv.innerHTML = `
+                        <p class="font-medium">AI Seed Analysis</p>
+                        <div class="text-xs mt-2">${analysis.replace(/\n/g, '<br>')}</div>
                     `;
                 } else {
-                    reverseResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400">AI analysis failed. Try another method.</p>';
+                    throw new Error("Invalid API response for seeds");
                 }
             } catch (error) {
                 console.error("Error calling Gemini API for reverse engineering:", error);
-                reverseResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Error during AI analysis. Try again later.</p>';
+                reverseSeedsDiv.innerHTML = '<p class="text-red-500">Error during AI analysis.</p>';
             }
-            
-            // Still show basic stats
-            const sum = numbers.reduce((a, b) => a + b, 0);
-            const avg = sum / numbers.length;
-            document.getElementById('reverseStats').innerHTML = `
-                <p>Count: ${numbers.length}</p>
-                <p>Sum: ${sum}</p>
-                <p>Average: ${avg.toFixed(2)}</p>
-            `;
-            
-            updateReverseChart(numbers);
         }
 
         async function getOptimalGameCharacteristics(numbers, config) {
-            const optimalCharacteristicsDiv = document.getElementById('optimalCharacteristics');
             const optimalCharacteristicsText = document.getElementById('optimalCharacteristicsText');
             const optimalCharacteristicsLoading = document.getElementById('optimalCharacteristicsLoading');
-
-            optimalCharacteristicsDiv.classList.remove('hidden');
-            optimalCharacteristicsText.innerHTML = '';
             optimalCharacteristicsLoading.classList.remove('hidden');
+            optimalCharacteristicsText.innerHTML = '';
 
             const prompt = `Given the lottery game configuration (main pool up to ${config.mainPool}, pick ${config.pickCount} numbers) and the following input numbers: ${numbers.join(', ')}.
             Based on common lottery strategies and statistical balance, describe the "optimal" characteristics for a set of ${config.pickCount} numbers for this game.
@@ -3206,27 +2973,20 @@
 
             Provide a concise description of these optimal characteristics.`;
 
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
             try {
+                 let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
+                if (result.candidates && result.candidates[0]?.content?.parts?.[0]) {
                     optimalCharacteristicsText.textContent = result.candidates[0].content.parts[0].text;
-                } else {
-                    optimalCharacteristicsText.textContent = 'Could not retrieve optimal characteristics.';
-                    console.error("Gemini API did not return expected content structure for optimal characteristics.");
-                }
+                } else { throw new Error("Invalid API response for optimal characteristics"); }
             } catch (error) {
                 optimalCharacteristicsText.textContent = 'Error fetching optimal characteristics.';
                 console.error("Error calling Gemini API for optimal characteristics:", error);
@@ -3236,47 +2996,32 @@
         }
 
         async function compareSeedToOptimal(numbers, config) {
-            const seedComparisonDiv = document.getElementById('seedComparison');
             const seedComparisonText = document.getElementById('seedComparisonText');
             const seedComparisonLoading = document.getElementById('seedComparisonLoading');
-
-            seedComparisonDiv.classList.remove('hidden');
-            seedComparisonText.innerHTML = '';
             seedComparisonLoading.classList.remove('hidden');
+            seedComparisonText.innerHTML = '';
 
-            const sum = numbers.reduce((a, b) => a + b, 0);
-            const oddCount = numbers.filter(n => n % 2 === 1).length;
-            const evenCount = numbers.length - oddCount;
-            const consecutivePairs = countConsecutivePairs(numbers);
-            const primes = numbers.filter(isPrime).length;
-            const fibs = numbers.filter(isFibonacci).length;
+            const analysis = getNumberAnalysis(numbers, config.mainPool);
 
             const prompt = `Given the following lottery numbers: ${numbers.join(', ')}.
-            Their sum is ${sum}, odd numbers: ${oddCount}, even numbers: ${evenCount}, consecutive pairs: ${consecutivePairs}, prime numbers: ${primes}, Fibonacci numbers: ${fibs}.
+            Their sum is ${analysis.sum}, odd numbers: ${analysis.oddCount}, even numbers: ${analysis.evenCount}, consecutive pairs: ${analysis.consecutivePairs}, prime numbers: ${analysis.primes}, Fibonacci numbers: ${analysis.fibs}.
             Considering a lottery game with a main pool up to ${config.mainPool} and picking ${config.pickCount} numbers, how do these numbers compare to statistically "optimal" or "balanced" lottery numbers for this game type?
             Highlight strengths and weaknesses based on common lottery number analysis.`;
 
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
             try {
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
+                if (result.candidates && result.candidates[0]?.content?.parts?.[0]) {
                     seedComparisonText.textContent = result.candidates[0].content.parts[0].text;
-                } else {
-                    seedComparisonText.textContent = 'Could not retrieve comparison to optimal.';
-                    console.error("Gemini API did not return expected content structure for comparison.");
-                }
+                } else { throw new Error("Invalid API response for comparison"); }
             } catch (error) {
                 seedComparisonText.textContent = 'Error fetching comparison to optimal.';
                 console.error("Error calling Gemini API for comparison:", error);
@@ -3311,9 +3056,11 @@
             const labels = Object.keys(frequencyMap).sort((a, b) => a - b);
             const data = labels.map(label => frequencyMap[label]);
             
-            charts.reverseChart.data.labels = labels;
-            charts.reverseChart.data.datasets[0].data = data;
-            charts.reverseChart.update();
+            if(charts.reverseChart) {
+                charts.reverseChart.data.labels = labels;
+                charts.reverseChart.data.datasets[0].data = data;
+                charts.reverseChart.update();
+            }
         }
 
         function updateSeedVisualsChart(numbers) {
@@ -3325,9 +3072,11 @@
             const labels = Object.keys(frequencyMap).sort((a, b) => a - b);
             const data = labels.map(label => frequencyMap[label]);
             
-            charts.seedVisualsChart.data.labels = labels;
-            charts.seedVisualsChart.data.datasets[0].data = data;
-            charts.seedVisualsChart.update();
+            if(charts.seedVisualsChart) {
+                charts.seedVisualsChart.data.labels = labels;
+                charts.seedVisualsChart.data.datasets[0].data = data;
+                charts.seedVisualsChart.update();
+            }
         }
 
         function clearReverseEngineer() {
@@ -3338,24 +3087,22 @@
             document.getElementById('reverseSeeds').innerHTML = '<p>Analyze numbers to see potential seed values</p>';
             
             document.getElementById('optimalCharacteristics').classList.add('hidden');
-            document.getElementById('optimalCharacteristicsText').innerHTML = '';
-            document.getElementById('optimalCharacteristicsLoading').classList.add('hidden');
-
             document.getElementById('seedComparison').classList.add('hidden');
-            document.getElementById('seedComparisonText').innerHTML = '';
-            document.getElementById('seedComparisonLoading').classList.add('hidden');
 
-            charts.reverseChart.data.labels = [];
-            charts.reverseChart.data.datasets[0].data = [];
-            charts.reverseChart.update();
+            if(charts.reverseChart) {
+                charts.reverseChart.data.labels = [];
+                charts.reverseChart.data.datasets[0].data = [];
+                charts.reverseChart.update();
+            }
 
-            charts.seedVisualsChart.data.labels = [];
-            charts.seedVisualsChart.data.datasets[0].data = [];
-            charts.seedVisualsChart.update();
+            if(charts.seedVisualsChart) {
+                charts.seedVisualsChart.data.labels = [];
+                charts.seedVisualsChart.data.datasets[0].data = [];
+                charts.seedVisualsChart.update();
+            }
             
             showNotification('Reverse engineer cleared!');
         }
-
 
         // Historical Data Functions
         function loadHistoricalData() {
@@ -3364,7 +3111,6 @@
             const config = gameConfigs[game];
             
             if (source === 'sample') {
-                // Generate sample data
                 const drawCount = parseInt(document.getElementById('pastDraws').value) || 50;
                 appState.historicalData = Array.from({ length: drawCount }, (_, i) => {
                     const date = new Date();
@@ -3372,9 +3118,8 @@
                     
                     return {
                         date: date.toISOString().split('T')[0],
-                        numbers: Array.from({ length: config.pickCount }, () => Math.floor(Math.random() * config.mainPool) + 1)
-                                      .sort((a, b) => a - b),
-                        bonus: Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1)
+                        numbers: [...new Set(Array.from({ length: config.pickCount }, () => Math.floor(Math.random() * config.mainPool) + 1))].sort((a, b) => a - b),
+                        bonus: [...new Set(Array.from({ length: config.bonusCount }, () => Math.floor(Math.random() * config.bonusPool) + 1))]
                     };
                 });
                 
@@ -3397,7 +3142,6 @@
                         return;
                     }
                     
-                    // Parse CSV (simple implementation)
                     appState.historicalData = lines.slice(1).map(line => {
                         const [date, ...nums] = line.split(',');
                         const numbers = nums.slice(0, config.pickCount).map(Number).filter(n => !isNaN(n));
@@ -3415,11 +3159,9 @@
                         return;
                     }
                     
-                    // Apply past draws limit
                     const pastDraws = document.getElementById('pastDraws').value;
                     if (pastDraws !== 'all') {
-                        const limit = parseInt(pastDraws);
-                        appState.historicalData = appState.historicalData.slice(-limit);
+                        appState.historicalData = appState.historicalData.slice(-parseInt(pastDraws));
                     }
                     
                     appState.currentPage = 1;
@@ -3436,11 +3178,7 @@
             const tableBody = document.getElementById('historicalTable').querySelector('tbody');
             
             if (appState.historicalData.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="p-4 text-center text-gray-500 dark:text-gray-400">Load data to view historical draws</td>
-                    </tr>
-                `;
+                tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 dark:text-gray-400">Load data to view historical draws</td></tr>`;
                 document.getElementById('paginationInfo').textContent = 'Showing 0 of 0';
                 document.getElementById('prevPage').disabled = true;
                 document.getElementById('nextPage').disabled = true;
@@ -3454,76 +3192,41 @@
             tableBody.innerHTML = paginatedData.map(draw => `
                 <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
                     <td class="p-2">${draw.date}</td>
-                    <td class="p-2">
-                        <div class="flex flex-wrap gap-1">
-                            ${draw.numbers.map(n => `<span class="number-ball">${n}</span>`).join('')}
-                        </div>
-                    </td>
-                    <td class="p-2">
-                        <div class="flex flex-wrap gap-1">
-                            ${draw.bonus.map(n => `<span class="number-ball bonus-ball">${n}</span>`).join('')}
-                        </div>
-                    </td>
+                    <td class="p-2"><div class="flex flex-wrap gap-1">${draw.numbers.map(n => `<span class="number-ball">${n}</span>`).join('')}</div></td>
+                    <td class="p-2"><div class="flex flex-wrap gap-1">${draw.bonus.map(n => `<span class="number-ball bonus-ball">${n}</span>`).join('')}</div></td>
                     <td class="p-2">${draw.numbers.reduce((a, b) => a + b, 0)}</td>
-                    <td class="p-2">
-                        ${draw.numbers.filter(n => n % 2 === 1).length} Odd / 
-                        ${draw.numbers.filter(n => n % 2 === 0).length} Even
-                    </td>
+                    <td class="p-2">${draw.numbers.filter(n => n % 2 === 1).length} Odd / ${draw.numbers.filter(n => n % 2 === 0).length} Even</td>
                 </tr>
             `).join('');
             
-            // Update pagination info
-            document.getElementById('paginationInfo').textContent = 
-                `Showing ${start + 1}-${Math.min(end, appState.historicalData.length)} of ${appState.historicalData.length}`;
-            
-            // Update pagination buttons
+            document.getElementById('paginationInfo').textContent = `Showing ${start + 1}-${Math.min(end, appState.historicalData.length)} of ${appState.historicalData.length}`;
             document.getElementById('prevPage').disabled = appState.currentPage === 1;
             document.getElementById('nextPage').disabled = end >= appState.historicalData.length;
             
-            // Update data summary
             updateDataSummary();
         }
 
         function updateDataSummary() {
             if (appState.historicalData.length === 0) {
                 document.getElementById('dataSummary').innerHTML = '<p class="text-gray-500 dark:text-gray-400">No data loaded</p>';
-                document.getElementById('mostFrequent').innerHTML = '';
-                document.getElementById('leastFrequent').innerHTML = '';
-                document.getElementById('dueNumbers').innerHTML = '';
-                document.getElementById('recentTrends').innerHTML = '';
-                document.getElementById('patternFrequency').innerHTML = '';
-                document.getElementById('sumStatistics').innerHTML = '';
+                ['mostFrequent', 'leastFrequent', 'dueNumbers', 'recentTrends', 'patternFrequency', 'sumStatistics'].forEach(id => {
+                    document.getElementById(id).innerHTML = '';
+                });
                 return;
             }
             
             const frequency = getNumberFrequency();
             const gaps = getGapAnalysis();
             
-            // Most frequent numbers
-            const mostFrequent = Object.entries(frequency)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([num, count]) => `${num} (${count}x)`);
-            
+            const mostFrequent = Object.entries(frequency).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([num, count]) => `${num} (${count}x)`);
             document.getElementById('mostFrequent').innerHTML = mostFrequent.join(', ');
             
-            // Least frequent numbers
-            const leastFrequent = Object.entries(frequency)
-                .sort((a, b) => a[1] - b[1])
-                .slice(0, 5)
-                .map(([num, count]) => `${num} (${count}x)`);
-            
+            const leastFrequent = Object.entries(frequency).sort((a, b) => a[1] - b[1]).slice(0, 5).map(([num, count]) => `${num} (${count}x)`);
             document.getElementById('leastFrequent').innerHTML = leastFrequent.join(', ');
             
-            // Due numbers (numbers with longest gap since last appearance)
-            const dueNumbers = Object.entries(gaps)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([num, gap]) => `${num} (${gap} draws)`);
-            
+            const dueNumbers = Object.entries(gaps).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([num, gap]) => `${num} (${gap} draws)`);
             document.getElementById('dueNumbers').innerHTML = dueNumbers.join(', ');
             
-            // Recent trends (numbers in last 10 draws)
             const recentDraws = appState.historicalData.slice(-10);
             const recentNumbers = recentDraws.flatMap(d => d.numbers);
             const recentFrequency = recentNumbers.reduce((acc, num) => {
@@ -3531,99 +3234,71 @@
                 return acc;
             }, {});
             
-            const hotRecent = Object.entries(recentFrequency)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([num, count]) => `${num} (${count}x)`);
+            const hotRecent = Object.entries(recentFrequency).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([num, count]) => `${num} (${count}x)`);
+            document.getElementById('recentTrends').innerHTML = hotRecent.length > 0 ? hotRecent.join(', ') : 'No recent trends detected';
             
-            document.getElementById('recentTrends').innerHTML = hotRecent.length > 0 ? 
-                hotRecent.join(', ') : 'No recent trends detected';
-            
-            // Pattern frequency (consecutive numbers)
             const patternCounts = recentDraws.map(d => countConsecutivePairs(d.numbers));
             const avgPatterns = patternCounts.reduce((a, b) => a + b, 0) / patternCounts.length;
+            document.getElementById('patternFrequency').innerHTML = `Avg consecutive pairs (last 10): ${avgPatterns.toFixed(2)}`;
             
-            document.getElementById('patternFrequency').innerHTML = `
-                Average consecutive pairs in last 10 draws: ${avgPatterns.toFixed(2)}
-            `;
-            
-            // Sum statistics
             const sums = appState.historicalData.map(d => d.numbers.reduce((a, b) => a + b, 0));
             const minSum = Math.min(...sums);
             const maxSum = Math.max(...sums);
             const avgSum = sums.reduce((a, b) => a + b, 0) / sums.length;
+            document.getElementById('sumStatistics').innerHTML = `<p>Min: ${minSum}</p><p>Max: ${maxSum}</p><p>Avg: ${avgSum.toFixed(2)}</p>`;
             
-            document.getElementById('sumStatistics').innerHTML = `
-                <p>Min: ${minSum}</p>
-                <p>Max: ${maxSum}</p>
-                <p>Average: ${avgSum.toFixed(2)}</p>
-            `;
-            
-            // Main data summary
             const firstDate = appState.historicalData[0].date;
             const lastDate = appState.historicalData[appState.historicalData.length - 1].date;
-            
-            document.getElementById('dataSummary').innerHTML = `
-                <p>Total Draws: ${appState.historicalData.length}</p>
-                <p>Date Range: ${firstDate} to ${lastDate}</p>
-                <p>Average Sum: ${avgSum.toFixed(2)}</p>
-                <p>Hot Numbers: ${mostFrequent.join(', ')}</p>
-            `;
+            document.getElementById('dataSummary').innerHTML = `<p>Total Draws: ${appState.historicalData.length}</p><p>Date Range: ${firstDate} to ${lastDate}</p><p>Avg Sum: ${avgSum.toFixed(2)}</p>`;
         }
 
         function updateHistoricalCharts() {
             if (appState.historicalData.length === 0) {
-                // Reset charts if no data
-                charts.freqHeatmapChart.data.labels = [];
-                charts.freqHeatmapChart.data.datasets[0].data = [];
-                charts.freqOverTimeChart.data.labels = [];
-                charts.freqOverTimeChart.data.datasets[0].data = [];
-                charts.gapAnalysisChart.data.labels = [];
-                charts.gapAnalysisChart.data.datasets[0].data = [];
-                
-                charts.freqHeatmapChart.update();
-                charts.freqOverTimeChart.update();
-                charts.gapAnalysisChart.update();
+                ['freqHeatmapChart', 'freqOverTimeChart', 'gapAnalysisChart'].forEach(id => {
+                    if (charts[id]) {
+                        charts[id].data.labels = [];
+                        charts[id].data.datasets[0].data = [];
+                        charts[id].update();
+                    }
+                });
                 return;
             }
             
             const frequency = getNumberFrequency();
             const gaps = getGapAnalysis();
             
-            // Frequency Heatmap
             const heatmapLabels = Object.keys(frequency).sort((a, b) => a - b);
             const heatmapData = heatmapLabels.map(label => frequency[label]);
+            if (charts.freqHeatmapChart) {
+                charts.freqHeatmapChart.data.labels = heatmapLabels;
+                charts.freqHeatmapChart.data.datasets[0].data = heatmapData;
+                charts.freqHeatmapChart.update();
+            }
             
-            charts.freqHeatmapChart.data.labels = heatmapLabels;
-            charts.freqHeatmapChart.data.datasets[0].data = heatmapData;
-            charts.freqHeatmapChart.update();
-            
-            // Frequency Over Time
             const timeLabels = appState.historicalData.map((_, i) => i + 1);
             const timeData = appState.historicalData.map(d => d.numbers.reduce((a, b) => a + b, 0));
+            if (charts.freqOverTimeChart) {
+                charts.freqOverTimeChart.data.labels = timeLabels;
+                charts.freqOverTimeChart.data.datasets[0].data = timeData;
+                charts.freqOverTimeChart.update();
+            }
             
-            charts.freqOverTimeChart.data.labels = timeLabels;
-            charts.freqOverTimeChart.data.datasets[0].data = timeData;
-            charts.freqOverTimeChart.update();
-            
-            // Gap Analysis
             const gapLabels = Object.keys(gaps).sort((a, b) => a - b);
             const gapData = gapLabels.map(label => gaps[label]);
-            
-            charts.gapAnalysisChart.data.labels = gapLabels;
-            charts.gapAnalysisChart.data.datasets[0].data = gapData;
-            charts.gapAnalysisChart.update();
+            if (charts.gapAnalysisChart) {
+                charts.gapAnalysisChart.data.labels = gapLabels;
+                charts.gapAnalysisChart.data.datasets[0].data = gapData;
+                charts.gapAnalysisChart.update();
+            }
         }
 
         function getNumberFrequency() {
             const frequency = {};
-            
             appState.historicalData.forEach(draw => {
                 draw.numbers.forEach(num => {
                     frequency[num] = (frequency[num] || 0) + 1;
                 });
             });
-            
             return frequency;
         }
 
@@ -3632,28 +3307,18 @@
             const game = document.getElementById('historicalGame').value;
             const mainPool = gameConfigs[game].mainPool;
             
-            // Initialize gaps for all possible numbers
-            for (let i = 1; i <= mainPool; i++) {
-                gaps[i] = appState.historicalData.length; // Default to max gap
-            }
+            for (let i = 1; i <= mainPool; i++) { gaps[i] = appState.historicalData.length; }
             
-            // Track last seen index for each number
             const lastSeenIndex = {};
             appState.historicalData.forEach((draw, index) => {
-                draw.numbers.forEach(num => {
-                    lastSeenIndex[num] = index;
-                });
+                draw.numbers.forEach(num => { lastSeenIndex[num] = index; });
             });
 
-            // Calculate gaps
             for (let i = 1; i <= mainPool; i++) {
                 if (lastSeenIndex[i] !== undefined) {
                     gaps[i] = appState.historicalData.length - 1 - lastSeenIndex[i];
-                } else {
-                    gaps[i] = appState.historicalData.length; // If never seen, gap is full history length
                 }
             }
-            
             return gaps;
         }
 
@@ -3690,12 +3355,8 @@
             const config = gameConfigs[game];
             
             const csvData = [
-                ['Date', ...Array.from({ length: config.pickCount }, (_, i) => `Number ${i + 1}`), ...Array.from({ length: config.bonusCount }, (_, i) => `Bonus ${i + 1}`)],
-                ...appState.historicalData.map(draw => [
-                    draw.date,
-                    ...draw.numbers,
-                    ...draw.bonus
-                ])
+                ['Date', ...Array.from({ length: config.pickCount }, (_, i) => `Number${i + 1}`), ...Array.from({ length: config.bonusCount }, (_, i) => `Bonus${i + 1}`)],
+                ...appState.historicalData.map(draw => [draw.date, ...draw.numbers, ...draw.bonus])
             ].map(row => row.join(',')).join('\n');
             
             const blob = new Blob([csvData], { type: 'text/csv' });
@@ -3706,7 +3367,6 @@
         // Strategy Functions
         function applyStrategy(e) {
             const strategy = e.target.dataset.strategy;
-            let recommendedNumbers = [];
             
             if (appState.historicalData.length === 0) {
                 showNotification('Load historical data first to apply strategies!');
@@ -3715,67 +3375,29 @@
             
             const game = document.getElementById('historicalGame').value;
             const config = gameConfigs[game];
+            let recommendedNumbers = [];
             
             switch (strategy) {
                 case 'frequency':
                     const frequency = getNumberFrequency();
-                    recommendedNumbers = Object.entries(frequency)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, config.pickCount * 2) // Get more numbers than needed, then filter unique
-                        .map(([num]) => parseInt(num));
+                    recommendedNumbers = Object.entries(frequency).sort((a, b) => b[1] - a[1]).slice(0, config.pickCount * 2).map(([num]) => parseInt(num));
                     break;
-                    
                 case 'gap':
                     const gaps = getGapAnalysis();
-                    recommendedNumbers = Object.entries(gaps)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, config.pickCount * 2) // Get more numbers than needed, then filter unique
-                        .map(([num]) => parseInt(num));
+                    recommendedNumbers = Object.entries(gaps).sort((a, b) => b[1] - a[1]).slice(0, config.pickCount * 2).map(([num]) => parseInt(num));
                     break;
-                    
                 case 'pattern':
-                    // Simple pattern detection - numbers that appear together frequently
-                    const pairFrequency = {};
-                    appState.historicalData.forEach(draw => {
-                        const nums = draw.numbers;
-                        for (let i = 0; i < nums.length; i++) {
-                            for (let j = i + 1; j < nums.length; j++) {
-                                const key = `${Math.min(nums[i], nums[j])}-${Math.max(nums[i], nums[j])}`;
-                                pairFrequency[key] = (pairFrequency[key] || 0) + 1;
-                            }
-                        }
-                    });
-                    
-                    const topPairs = Object.entries(pairFrequency)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, 5);
-                    
-                    recommendedNumbers = [...new Set(
-                        topPairs.flatMap(([pair]) => pair.split('-').map(Number))
-                    )];
+                    const pairFrequency = getPairFrequency();
+                    const topPairs = Object.entries(pairFrequency).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                    recommendedNumbers = [...new Set(topPairs.flatMap(([pair]) => pair.split('-').map(Number)))];
                     break;
             }
             
-            // Ensure we have exactly pickCount unique numbers for recommendation
             recommendedNumbers = [...new Set(recommendedNumbers)].slice(0, config.pickCount);
 
-            // Display results
-            document.getElementById('strategyResults').innerHTML = `
-                <p class="font-medium">${strategy.charAt(0).toUpperCase() + strategy.slice(1)} Strategy Applied</p>
-                <p class="text-sm">Recommended numbers based on historical data analysis</p>
-            `;
-            
-            const numbersDiv = document.getElementById('recommendedNumbers');
-            numbersDiv.innerHTML = recommendedNumbers
-                .sort((a, b) => a - b)
-                .map(num => `<span class="number-ball ${strategy}-strategy">${num}</span>`)
-                .join('');
-                
-            document.getElementById('strategyAnalysis').innerHTML = `
-                <p>Numbers recommended: ${recommendedNumbers.length}</p>
-                <p>Strategy: ${strategy}</p>
-                <p>Historical draws analyzed: ${appState.historicalData.length}</p>
-            `;
+            document.getElementById('strategyResults').innerHTML = `<p class="font-medium">${strategy.charAt(0).toUpperCase() + strategy.slice(1)} Strategy Applied</p><p class="text-sm">Recommended numbers based on historical data analysis</p>`;
+            document.getElementById('recommendedNumbers').innerHTML = recommendedNumbers.sort((a, b) => a - b).map(num => `<span class="number-ball">${num}</span>`).join('');
+            document.getElementById('strategyAnalysis').innerHTML = `<p>Numbers recommended: ${recommendedNumbers.length}</p><p>Strategy: ${strategy}</p><p>Draws analyzed: ${appState.historicalData.length}</p>`;
             
             showNotification(`${strategy} strategy applied successfully!`);
         }
@@ -3786,9 +3408,7 @@
                 return;
             }
             
-            const components = Array.from(document.querySelectorAll('.strategyComponent:checked'))
-                .map(el => el.value);
-                
+            const components = Array.from(document.querySelectorAll('.strategyComponent:checked')).map(el => el.value);
             if (components.length === 0) {
                 showNotification('Select at least one strategy component!');
                 return;
@@ -3805,82 +3425,41 @@
             const config = gameConfigs[game];
             const mainPool = config.mainPool;
             
-            // Get all possible numbers
             const candidates = Array.from({ length: mainPool }, (_, i) => i + 1);
             
-            // Calculate scores for each number based on selected components
             const frequency = components.includes('frequency') ? getNumberFrequency() : {};
             const gaps = components.includes('gap') ? getGapAnalysis() : {};
             const pairFrequency = components.includes('pattern') ? getPairFrequency() : {};
             
             const scoredNumbers = candidates.map(num => {
                 let score = 0;
-                
                 if (components.includes('frequency')) {
-                    const maxFreq = Math.max(...Object.values(frequency));
-                    const freqScore = maxFreq > 0 ? (frequency[num] || 0) / maxFreq : 0;
-                    score += freqScore * weights.frequency;
+                    const maxFreq = Math.max(...Object.values(frequency), 1);
+                    score += ((frequency[num] || 0) / maxFreq) * weights.frequency;
                 }
-                
                 if (components.includes('gap')) {
-                    const maxGap = Math.max(...Object.values(gaps));
-                    const gapScore = maxGap > 0 ? (gaps[num] || 0) / maxGap : 0;
-                    score += gapScore * weights.gap;
+                    const maxGap = Math.max(...Object.values(gaps), 1);
+                    score += ((gaps[num] || 0) / maxGap) * weights.gap;
                 }
-                
                 if (components.includes('pattern')) {
-                    // Calculate pattern score based on how often this number appears in frequent pairs
                     let patternScore = 0;
-                    for (const pair in pairFrequency) {
-                        if (pair.includes(num.toString())) {
-                            patternScore += pairFrequency[pair];
-                        }
-                    }
-                    const maxPairFreq = Math.max(...Object.values(pairFrequency));
-                    patternScore = maxPairFreq > 0 ? patternScore / maxPairFreq : 0;
-                    score += patternScore * weights.pattern;
+                    for (const pair in pairFrequency) { if (pair.includes(String(num))) patternScore += pairFrequency[pair]; }
+                    const maxPairFreq = Math.max(...Object.values(pairFrequency), 1);
+                    score += (patternScore / maxPairFreq) * weights.pattern;
                 }
-                
-                // Other factors (sum, prime, fibonacci)
-                if (components.includes('prime') && isPrime(num)) {
-                    score += weights.other;
-                }
-                
-                if (components.includes('fibonacci') && isFibonacci(num)) {
-                    score += weights.other;
-                }
-                
-                // Add a small random component to break ties and add variety
-                score += Math.random() * 0.01; 
-                
+                if (components.includes('prime') && isPrime(num)) score += weights.other;
+                if (components.includes('fibonacci') && isFibonacci(num)) score += weights.other;
+                score += Math.random() * 0.01;
                 return { num, score };
             });
             
-            // Sort by score and get top numbers
-            const recommendedNumbers = scoredNumbers
-                .sort((a, b) => b.score - a.score)
-                .slice(0, config.pickCount) // Get exactly pickCount numbers
-                .map(item => item.num);
+            const recommendedNumbers = scoredNumbers.sort((a, b) => b.score - a.score).slice(0, config.pickCount).map(item => item.num);
             
-            // Display results
-            document.getElementById('strategyResults').innerHTML = `
-                <p class="font-medium">Custom Strategy Applied</p>
-                <p class="text-sm">Recommended numbers based on your custom strategy</p>
-            `;
+            document.getElementById('strategyResults').innerHTML = `<p class="font-medium">Custom Strategy Applied</p><p class="text-sm">Recommended numbers based on your custom strategy</p>`;
+            document.getElementById('recommendedNumbers').innerHTML = recommendedNumbers.sort((a, b) => a - b).map(num => `<span class="number-ball">${num}</span>`).join('');
+            document.getElementById('strategyAnalysis').innerHTML = `<p>Components: ${components.join(', ')}</p><p>Weights: Freq(${(weights.frequency*100).toFixed(0)}%), Gap(${(weights.gap*100).toFixed(0)}%), Pattern(${(weights.pattern*100).toFixed(0)}%), Other(${(weights.other*100).toFixed(0)}%)</p>`;
             
-            const numbersDiv = document.getElementById('recommendedNumbers');
-            numbersDiv.innerHTML = recommendedNumbers
-                .sort((a, b) => a - b)
-                .map(num => `<span class="number-ball">${num}</span>`)
-                .join('');
-                
-            document.getElementById('strategyAnalysis').innerHTML = `
-                <p>Components: ${components.join(', ')}</p>
-                <p>Weights: Frequency (${(weights.frequency*100).toFixed(0)}%), Gap (${(weights.gap*100).toFixed(0)}%), Pattern (${(weights.pattern*100).toFixed(0)}%), Other (${(weights.other*100).toFixed(0)}%)</p>
-                <p>Numbers recommended: ${recommendedNumbers.length}</p>
-            `;
-            
-            showNotification('Custom strategy applied successfully! Check the recommended numbers.');
+            showNotification('Custom strategy applied successfully!');
         }
 
         function getPairFrequency() {
@@ -3900,34 +3479,20 @@
         function updateStrategyWeights() {
             const checkedComponents = Array.from(document.querySelectorAll('.strategyComponent:checked'));
             
-            // Reset all weights to 0
-            document.getElementById('freqWeight').value = 0;
-            document.getElementById('gapWeight').value = 0;
-            document.getElementById('patternWeight').value = 0;
-            document.getElementById('otherWeight').value = 0;
+            ['freqWeight', 'gapWeight', 'patternWeight', 'otherWeight'].forEach(id => document.getElementById(id).value = 0);
             
-            // Distribute weights based on selected components
             if (checkedComponents.length > 0) {
                 const weightPerComponent = 100 / checkedComponents.length;
-                
                 checkedComponents.forEach(comp => {
-                    switch (comp.value) {
-                        case 'frequency':
-                            document.getElementById('freqWeight').value = parseFloat(document.getElementById('freqWeight').value) + weightPerComponent;
-                            break;
-                        case 'gap':
-                            document.getElementById('gapWeight').value = parseFloat(document.getElementById('gapWeight').value) + weightPerComponent;
-                            break;
-                        case 'pattern':
-                            document.getElementById('patternWeight').value = parseFloat(document.getElementById('patternWeight').value) + weightPerComponent;
-                            break;
-                        default: // For sum, prime, fibonacci, etc.
-                            document.getElementById('otherWeight').value = 
-                                parseFloat(document.getElementById('otherWeight').value) + weightPerComponent;
-                    }
+                    let targetId = 'otherWeight';
+                    if (comp.value === 'frequency') targetId = 'freqWeight';
+                    else if (comp.value === 'gap') targetId = 'gapWeight';
+                    else if (comp.value === 'pattern') targetId = 'patternWeight';
+                    
+                    const el = document.getElementById(targetId);
+                    el.value = parseFloat(el.value) + weightPerComponent;
                 });
             }
-            
             updateStrategyWeightValues();
         }
 
@@ -3952,7 +3517,6 @@
             const jackpot = parseFloat(document.getElementById('jackpotSize').value) || 0;
             const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
             
-            // Calculate basic probabilities
             const mainCombinations = combinations(config.mainPool, config.pickCount);
             const bonusCombinations = combinations(config.bonusPool, config.bonusCount);
             const totalCombinations = mainCombinations * bonusCombinations;
@@ -3960,66 +3524,44 @@
             const chancePerTicket = 1 / totalCombinations;
             const chanceWithTickets = 1 - Math.pow(1 - chancePerTicket, tickets);
             
-            // Calculate expected value
             const afterTaxJackpot = jackpot * (1 - taxRate / 100);
             const expectedValue = afterTaxJackpot / totalCombinations;
             
-            // Display results
-            document.getElementById('probResults').innerHTML = `
-                <p class="font-medium">Probability Analysis</p>
-                <p class="text-sm">Calculated for ${game} with ${tickets} ticket${tickets > 1 ? 's' : ''}</p>
-            `;
-            
-            document.getElementById('basicProbs').innerHTML = `
-                <p>Total combinations: ${totalCombinations.toLocaleString()}</p>
-                <p>Chance per ticket: 1 in ${totalCombinations.toLocaleString()}</p>
-                <p>Chance with ${tickets} ticket${tickets > 1 ? 's' : ''}: ${(chanceWithTickets * 100).toFixed(8)}%</p>
-            `;
-            
-            document.getElementById('winChances').innerHTML = `
-                <p>Match all: 1 in ${totalCombinations.toLocaleString()}</p>
-                <p>Match ${config.pickCount - 1} + bonus: ~1 in ${Math.round(totalCombinations / (config.pickCount * config.bonusCount)).toLocaleString()}</p>
-                <p>Match ${config.pickCount - 1}: ~1 in ${Math.round(totalCombinations / config.pickCount).toLocaleString()}</p>
-            `;
-            
+            document.getElementById('probResults').innerHTML = `<p class="font-medium">Probability Analysis</p><p class="text-sm">Calculated for ${game} with ${tickets} ticket${tickets > 1 ? 's' : ''}</p>`;
+            document.getElementById('basicProbs').innerHTML = `<p>Total combinations: ${totalCombinations.toLocaleString()}</p><p>Chance per ticket: 1 in ${totalCombinations.toLocaleString()}</p><p>Chance with ${tickets} ticket${tickets > 1 ? 's' : ''}: ${(chanceWithTickets * 100).toExponential(4)}%</p>`;
+            document.getElementById('winChances').innerHTML = `<p>Match all: 1 in ${totalCombinations.toLocaleString()}</p><p>Match ${config.pickCount - 1} + bonus: ~1 in ${Math.round(totalCombinations / (config.pickCount * config.bonusCount)).toLocaleString()}</p>`;
             document.getElementById('expectedValue').textContent = `$${expectedValue.toFixed(2)}`;
             
-            // Update probability distribution chart
             updateProbabilityChart(totalCombinations, tickets);
-            
-            // Update comparisons
             updateProbabilityComparisons(totalCombinations);
-            
             showNotification('Probability calculation completed!');
         }
 
         function combinations(n, k) {
             if (k < 0 || k > n) return 0;
             if (k === 0 || k === n) return 1;
-            if (k > n / 2) k = n - k; // Optimization
-            
+            if (k > n / 2) k = n - k;
             let result = 1;
             for (let i = 1; i <= k; i++) {
                 result = result * (n - i + 1) / i;
             }
-            
             return Math.round(result);
         }
 
         function updateProbabilityChart(totalCombinations, tickets) {
             const labels = [];
             const data = [];
-            
             for (let i = 1; i <= 10; i++) {
                 const currentTickets = i * tickets;
                 const prob = 1 - Math.pow(1 - (1 / totalCombinations), currentTickets);
                 labels.push(currentTickets);
                 data.push(prob * 100);
             }
-            
-            charts.probDistributionChart.data.labels = labels;
-            charts.probDistributionChart.data.datasets[0].data = data;
-            charts.probDistributionChart.update();
+            if(charts.probDistributionChart) {
+                charts.probDistributionChart.data.labels = labels;
+                charts.probDistributionChart.data.datasets[0].data = data;
+                charts.probDistributionChart.update();
+            }
         }
 
         function updateProbabilityComparisons(totalCombinations) {
@@ -4033,41 +3575,30 @@
             
             let html = '';
             for (const [event, odds] of Object.entries(comparisons)) {
-                const ratio = (totalCombinations / odds).toFixed(1);
-                html += `<p>${event}: ${ratio}x ${ratio > 1 ? 'more' : 'less'} likely</p>`;
+                const ratio = (totalCombinations / odds);
+                html += `<p>${event}: ${ratio.toLocaleString(undefined, {maximumFractionDigits: 1})}x ${ratio > 1 ? 'less' : 'more'} likely</p>`;
             }
-            
             document.getElementById('probComparisons').innerHTML = html;
             
-            // Investment analysis
             const jackpot = parseFloat(document.getElementById('jackpotSize').value) || 0;
             const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
             const afterTax = jackpot * (1 - taxRate / 100);
             const breakEven = totalCombinations;
-            
-            document.getElementById('investmentAnalysis').innerHTML = `
-                <p>Break-even jackpot: $${breakEven.toLocaleString()}</p>
-                <p>After-tax value: $${afterTax.toLocaleString()}</p>
-                <p>Expected return: ${((afterTax / breakEven) * 100).toFixed(2)}%</p>
-            `;
+            document.getElementById('investmentAnalysis').innerHTML = `<p>Break-even jackpot: $${breakEven.toLocaleString()}</p><p>After-tax value: $${afterTax.toLocaleString()}</p><p>Expected return: ${((afterTax / breakEven) * 100).toFixed(2)}%</p>`;
         }
 
         function resetProbabilityCalculator() {
             document.getElementById('ticketsToPlay').value = '1';
             document.getElementById('jackpotSize').value = '';
             document.getElementById('taxRate').value = '';
-            
             document.getElementById('probResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Calculate probabilities to see results</p>';
-            document.getElementById('basicProbs').innerHTML = '';
-            document.getElementById('winChances').innerHTML = '';
+            ['basicProbs', 'winChances', 'probComparisons', 'investmentAnalysis'].forEach(id => document.getElementById(id).innerHTML = '');
             document.getElementById('expectedValue').textContent = '$0.00';
-            document.getElementById('probComparisons').innerHTML = '';
-            document.getElementById('investmentAnalysis').innerHTML = '';
-            
-            charts.probDistributionChart.data.labels = [];
-            charts.probDistributionChart.data.datasets[0].data = [];
-            charts.probDistributionChart.update();
-            
+            if(charts.probDistributionChart) {
+                charts.probDistributionChart.data.labels = [];
+                charts.probDistributionChart.data.datasets[0].data = [];
+                charts.probDistributionChart.update();
+            }
             showNotification('Probability calculator reset!');
         }
 
@@ -4094,18 +3625,12 @@
             const expectedValue = afterTaxJackpot / totalCombinations;
             
             const data = [
+                ['Parameter', 'Value'],
                 ['Game', game],
-                ['Main Numbers', `${config.pickCount} from ${config.mainPool}`],
-                ['Bonus Numbers', `${config.bonusCount} from ${config.bonusPool}`],
                 ['Total Combinations', totalCombinations.toLocaleString()],
-                ['Chance per Ticket', `1 in ${totalCombinations.toLocaleString()}`],
                 ['Tickets Played', tickets],
-                ['Chance with Tickets', `${(chanceWithTickets * 100).toFixed(8)}%`],
-                ['Jackpot Size', `$${jackpot.toLocaleString()}`],
-                ['Tax Rate', `${taxRate}%`],
-                ['After-Tax Jackpot', `$${afterTaxJackpot.toLocaleString()}`],
-                ['Expected Value', `$${expectedValue.toFixed(2)}`],
-                ['Break-even Jackpot', `$${totalCombinations.toLocaleString()}`]
+                ['Chance with Tickets (%)', (chanceWithTickets * 100).toExponential(4)],
+                ['Expected Value ($)', expectedValue.toFixed(2)]
             ].map(row => row.join(',')).join('\n');
             
             const blob = new Blob([data], { type: 'text/csv' });
@@ -4123,64 +3648,13 @@
             const game = document.getElementById('historicalGame').value;
             const config = gameConfigs[game];
             
-            // Simple prediction based on frequency and gaps
-            const frequency = getNumberFrequency();
-            const gaps = getGapAnalysis();
+            const { numbers, bonus, confidence, scoredNumbers } = generatePredictionData(config);
             
-            // Combine frequency and gaps for scoring
-            const scoredNumbers = Object.keys(frequency).map(num => {
-                const numInt = parseInt(num);
-                const maxFreq = Math.max(...Object.values(frequency));
-                const maxGap = Math.max(...Object.values(gaps));
-
-                const freqScore = maxFreq > 0 ? (frequency[num] || 0) / maxFreq : 0;
-                const gapScore = maxGap > 0 ? (gaps[num] || 0) / maxGap : 0;
-                
-                return {
-                    num: numInt,
-                    score: freqScore * 0.6 + gapScore * 0.4 + Math.random() * 0.1 // Add some randomness
-                };
-            });
+            document.getElementById('predictionResults').innerHTML = `<p class="font-medium">Next Draw Prediction</p><p class="text-sm">Predicted numbers based on historical data analysis</p>`;
+            document.getElementById('predictedNumbers').innerHTML = numbers.map(num => `<span class="number-ball">${num}</span>`).join('') + bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('');
+            document.getElementById('confidenceScores').innerHTML = `<p>Confidence: ${confidence}%</p>`;
             
-            // Sort by score and pick top numbers
-            const predictedNumbers = _.shuffle(scoredNumbers // Shuffle before slicing
-                .sort((a, b) => b.score - a.score)
-                .slice(0, config.pickCount)
-                .map(item => item.num)
-                .sort((a, b) => a - b)); // Sort again for display consistency after shuffling
-
-            // Generate bonus numbers
-            const bonusFrequency = appState.historicalData.reduce((acc, draw) => {
-                draw.bonus.forEach(num => {
-                    acc[num] = (acc[num] || 0) + 1;
-                });
-                return acc;
-            }, {});
-            
-            const predictedBonus = _.shuffle(Object.entries(bonusFrequency) // Shuffle before slicing
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, config.bonusCount)
-                .map(([num]) => parseInt(num)));
-            
-            // Display results
-            document.getElementById('predictionResults').innerHTML = `
-                <p class="font-medium">Next Draw Prediction</p>
-                <p class="text-sm">Predicted numbers based on historical data analysis</p>
-            `;
-            
-            const numbersDiv = document.getElementById('predictedNumbers');
-            numbersDiv.innerHTML = predictedNumbers
-                .map(num => `<span class="number-ball">${num}</span>`)
-                .join('');
-                
-            document.getElementById('confidenceScores').innerHTML = `
-                <p>Main Numbers Confidence: ${(Math.random() * 30 + 70).toFixed(1)}%</p>
-                <p>Bonus Numbers Confidence: ${(Math.random() * 20 + 60).toFixed(1)}%</p>
-            `;
-            
-            // Update prediction chart
-            updatePredictionChart(predictedNumbers, scoredNumbers);
-            
+            updatePredictionChart(numbers, scoredNumbers);
             showNotification('Prediction generated successfully!');
         }
 
@@ -4193,31 +3667,13 @@
             const game = document.getElementById('historicalGame').value;
             const config = gameConfigs[game];
             
-            // Generate predictions for next 40 draws (changed from 5 to 40)
             let forecast = '';
             for (let i = 1; i <= 40; i++) {
-                // This is a simplified version - in a real app, this would use more sophisticated forecasting
                 const prediction = generatePredictionData(config);
-                
-                forecast += `
-                    <div class="mb-4">
-                        <p class="font-medium">Draw ${i}</p>
-                        <div class="flex flex-wrap gap-1 my-2">
-                            ${prediction.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
-                            ${prediction.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
-                        </div>
-                        <p class="text-sm">Confidence: ${prediction.confidence}%</p>
-                    </div>
-                `;
+                forecast += `<div class="mb-4"><p class="font-medium">Draw ${i}</p><div class="flex flex-wrap gap-1 my-2">${prediction.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}${prediction.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}</div><p class="text-sm">Confidence: ${prediction.confidence}%</p></div>`;
             }
             
-            // Display results
-            document.getElementById('predictionResults').innerHTML = `
-                <p class="font-medium">Next 40 Draws Forecast</p>
-                <p class="text-sm">Predicted numbers for upcoming draws</p>
-                ${forecast}
-            `;
-            
+            document.getElementById('predictionResults').innerHTML = `<p class="font-medium">Next 40 Draws Forecast</p><p class="text-sm">Predicted numbers for upcoming draws</p>${forecast}`;
             document.getElementById('predictedNumbers').innerHTML = '';
             document.getElementById('confidenceScores').innerHTML = '';
             
@@ -4225,61 +3681,40 @@
         }
 
         function generatePredictionData(config) {
-            // Simplified prediction generation
             const frequency = getNumberFrequency();
             const gaps = getGapAnalysis();
             
-            const scoredNumbers = Object.keys(frequency).map(num => {
-                const numInt = parseInt(num);
-                const maxFreq = Math.max(...Object.values(frequency));
-                const maxGap = Math.max(...Object.values(gaps));
-
-                return {
-                    num: numInt,
-                    score: (maxFreq > 0 ? (frequency[num] || 0) / maxFreq : 0) * 0.6 + 
-                           (maxGap > 0 ? (gaps[num] || 0) / maxGap : 0) * 0.4 +
-                           Math.random() * 0.1
-                };
+            const scoredNumbers = Object.keys(frequency).map(numStr => {
+                const num = parseInt(numStr);
+                const maxFreq = Math.max(...Object.values(frequency), 1);
+                const maxGap = Math.max(...Object.values(gaps), 1);
+                const freqScore = (frequency[num] || 0) / maxFreq;
+                const gapScore = (gaps[num] || 0) / maxGap;
+                return { num, score: freqScore * 0.6 + gapScore * 0.4 + Math.random() * 0.1 };
             });
             
-            const numbers = _.shuffle(scoredNumbers // Shuffle before slicing
-                .sort((a, b) => b.score - a.score)
-                .slice(0, config.pickCount)
-                .map(item => item.num)
-                .sort((a, b) => a - b)); // Sort again for display consistency after shuffling
+            const numbers = _.shuffle(scoredNumbers).sort((a, b) => b.score - a.score).slice(0, config.pickCount).map(item => item.num).sort((a, b) => a - b);
             
-            // Generate bonus numbers
             const bonusFrequency = appState.historicalData.reduce((acc, draw) => {
-                draw.bonus.forEach(num => {
-                    acc[num] = (acc[num] || 0) + 1;
-                });
+                draw.bonus.forEach(num => { acc[num] = (acc[num] || 0) + 1; });
                 return acc;
             }, {});
             
-            const predictedBonus = _.shuffle(Object.entries(bonusFrequency) // Shuffle before slicing
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, config.bonusCount)
-                .map(([num]) => parseInt(num)));
+            const bonus = _.shuffle(Object.entries(bonusFrequency)).sort((a, b) => b[1] - a[1]).slice(0, config.bonusCount).map(([num]) => parseInt(num));
                 
-            return {
-                numbers,
-                bonus: predictedBonus,
-                confidence: (Math.random() * 20 + 70).toFixed(1)
-            };
+            return { numbers, bonus, confidence: (Math.random() * 20 + 70).toFixed(1), scoredNumbers };
         }
 
         function updatePredictionChart(predictedNumbers, scoredNumbers) {
-            // Get top 15 numbers for visualization
-            const topNumbers = scoredNumbers
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 15);
-                
+            const topNumbers = scoredNumbers.sort((a, b) => b.score - a.score).slice(0, 15);
             const labels = topNumbers.map(item => item.num);
             const data = topNumbers.map(item => item.score * 100);
             
-            charts.predictionVizChart.data.labels = labels;
-            charts.predictionVizChart.data.datasets[0].data = data;
-            charts.predictionVizChart.update();
+            if(charts.predictionVizChart) {
+                charts.predictionVizChart.data.labels = labels;
+                charts.predictionVizChart.data.datasets[0].data = data;
+                charts.predictionVizChart.update();
+            }
         }
 
         function runCustomPrediction() {
@@ -4292,7 +3727,6 @@
                 showNotification('Load historical data first to run custom prediction!');
                 return;
             }
-            
             if (focusParams.length === 0) {
                 showNotification('Select at least one focus parameter!');
                 return;
@@ -4301,30 +3735,13 @@
             const game = document.getElementById('historicalGame').value;
             const config = gameConfigs[game];
             
-            // Generate predictions (simplified)
             let predictions = '';
             for (let i = 1; i <= numPredictions; i++) {
-                const prediction = generatePredictionData(config); // This function already shuffles
-                
-                predictions += `
-                    <div class="mb-4">
-                        <p class="font-medium">Prediction ${i}</p>
-                        <div class="flex flex-wrap gap-1 my-2">
-                            ${prediction.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}
-                            ${prediction.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}
-                        </div>
-                        <p class="text-sm">Confidence: ${prediction.confidence}%</p>
-                    </div>
-                `;
+                const prediction = generatePredictionData(config);
+                predictions += `<div class="mb-4"><p class="font-medium">Prediction ${i}</p><div class="flex flex-wrap gap-1 my-2">${prediction.numbers.map(num => `<span class="number-ball">${num}</span>`).join('')}${prediction.bonus.map(num => `<span class="number-ball bonus-ball">${num}</span>`).join('')}</div><p class="text-sm">Confidence: ${prediction.confidence}%</p></div>`;
             }
             
-            // Display results
-            document.getElementById('predictionResults').innerHTML = `
-                <p class="font-medium">Custom Prediction Results</p>
-                <p class="text-sm">Model: ${model} | Data Range: ${dataRange} | Focus: ${focusParams.join(', ')}</p>
-                ${predictions}
-            `;
-            
+            document.getElementById('predictionResults').innerHTML = `<p class="font-medium">Custom Prediction Results</p><p class="text-sm">Model: ${model} | Data Range: ${dataRange} | Focus: ${focusParams.join(', ')}</p>${predictions}`;
             document.getElementById('predictedNumbers').innerHTML = '';
             document.getElementById('confidenceScores').innerHTML = '';
             
@@ -4371,20 +3788,8 @@
         }
 
         function clearAllData() {
-            // Using a custom modal-like confirmation instead of browser's confirm()
             const confirmReset = (callback) => {
-                const modalHtml = `
-                    <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 text-center">
-                            <h3 class="text-xl font-semibold mb-4">Confirm Reset</h3>
-                            <p class="mb-6">Are you sure you want to reset all application data? This cannot be undone.</p>
-                            <div class="flex justify-center gap-4">
-                                <button id="confirmCancel" class="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">Cancel</button>
-                                <button id="confirmProceed" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600 flex-1">Proceed</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                const modalHtml = `<div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"><div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 text-center"><h3 class="text-xl font-semibold mb-4">Confirm Reset</h3><p class="mb-6">Are you sure you want to reset all application data? This cannot be undone.</p><div class="flex justify-center gap-4"><button id="confirmCancel" class="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">Cancel</button><button id="confirmProceed" class="p-2 bg-danger text-white rounded-lg hover:bg-red-600 flex-1">Proceed</button></div></div></div>`;
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
 
                 document.getElementById('confirmCancel').addEventListener('click', () => {
@@ -4400,27 +3805,21 @@
             confirmReset((confirmed) => {
                 if (confirmed) {
                     localStorage.clear();
-                    appState.historicalData = [];
-                    appState.savedTickets = [];
-                    appState.notificationCount = 0;
-                    appState.currentPage = 1;
-                    appState.lastPredictionConfig = null; // Clear last prediction config
+                    Object.assign(appState, {
+                        historicalData: [], savedTickets: [], notificationCount: 0, currentPage: 1, lastPredictionConfig: null,
+                        darkMode: true, animations: true, notifications: true, defaultGame: 'powerball'
+                    });
                     
-                    // Reset UI
                     clearGenerator();
                     clearAnalyzer();
                     clearHistoricalData();
                     resetProbabilityCalculator();
-                    clearReverseEngineer(); // Clear the new section
+                    clearReverseEngineer();
+                    clearPairsGenerator();
+                    clearCombinationsGenerator();
                     
                     document.getElementById('predictionResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Generate predictions to see results</p>';
                     document.getElementById('strategyResults').innerHTML = '<p class="text-gray-500 dark:text-gray-400">Apply a strategy to see recommendations</p>';
-                    
-                    // Reset settings to defaults
-                    appState.darkMode = true;
-                    appState.animations = true;
-                    appState.notifications = true;
-                    appState.defaultGame = 'powerball';
                     
                     updateUI();
                     showNotification('All application data has been reset!');
@@ -4455,24 +3854,12 @@
             reader.onload = (event) => {
                 try {
                     const data = JSON.parse(event.target.result);
+                    if (data.settings) Object.assign(appState, data.settings);
+                    if (data.historicalData) appState.historicalData = data.historicalData;
+                    if (data.savedTickets) appState.savedTickets = data.savedTickets;
                     
-                    if (data.settings) {
-                        appState.darkMode = data.settings.darkMode ?? true;
-                        appState.animations = data.settings.animations ?? true;
-                        appState.notifications = data.settings.notifications ?? true;
-                        appState.defaultGame = data.settings.defaultGame ?? 'powerball';
-                    }
-                    
-                    if (data.historicalData) {
-                        appState.historicalData = data.historicalData;
-                        displayHistoricalData();
-                        updateHistoricalCharts();
-                    }
-                    
-                    if (data.savedTickets) {
-                        appState.savedTickets = data.savedTickets;
-                    }
-                    
+                    displayHistoricalData();
+                    updateHistoricalCharts();
                     updateUI();
                     showNotification('Application data imported successfully!');
                 } catch (err) {
@@ -4481,7 +3868,7 @@
             };
             
             reader.readAsText(file);
-            e.target.value = ''; // Reset file input
+            e.target.value = '';
         }
 
         function saveSettings() {
@@ -4498,10 +3885,7 @@
             if (savedSettings) {
                 try {
                     const settings = JSON.parse(savedSettings);
-                    appState.darkMode = settings.darkMode ?? true;
-                    appState.animations = settings.animations ?? true;
-                    appState.notifications = settings.notifications ?? true;
-                    appState.defaultGame = settings.defaultGame ?? 'powerball';
+                    Object.assign(appState, settings);
                 } catch (err) {
                     console.error('Error loading settings:', err);
                 }
@@ -4513,10 +3897,8 @@
             const activityDiv = document.getElementById('recentActivity');
             const now = new Date().toLocaleTimeString();
             
-            let html = activityDiv.innerHTML;
-            html = `<p><span class="text-gray-500 dark:text-gray-400">[${now}]</span> ${message}</p>` + html;
+            let html = `<p><span class="text-gray-500 dark:text-gray-400">[${now}]</span> ${message}</p>` + activityDiv.innerHTML;
             
-            // Limit to 5 recent activities
             const paragraphs = html.split('</p>').filter(p => p.trim() !== '');
             if (paragraphs.length > 5) {
                 html = paragraphs.slice(0, 5).join('</p>') + '</p>';
@@ -4537,11 +3919,7 @@
             const oddCount = numbers.filter(n => n % 2 === 1).length;
             const evenCount = numbers.length - oddCount;
             
-            document.getElementById('statsOverview').innerHTML = `
-                <p>Numbers Generated: ${numbers.length}</p>
-                <p>Average Number: ${avg.toFixed(1)}</p>
-                <p>Odd/Even: ${oddCount}/${evenCount}</p>
-            `;
+            document.getElementById('statsOverview').innerHTML = `<p>Numbers Generated: ${numbers.length}</p><p>Average Number: ${avg.toFixed(1)}</p><p>Odd/Even: ${oddCount}/${evenCount}</p>`;
         }
 
         function handleQuickAction(e) {
@@ -4561,13 +3939,11 @@
                     }
                     break;
                 case 'checkOdds':
-                    // Scroll to probability section
                     document.getElementById('probability').scrollIntoView({ behavior: 'smooth' });
                     break;
             }
         }
 
-        // Initialize the application when the DOM is loaded
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
