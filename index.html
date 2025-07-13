@@ -253,6 +253,7 @@
                                 <option value="fibonacci">Fibonacci Filter</option>
                                 <option value="statistical">Statistical Weighted</option>
                                 <option value="ai">AI-Powered ✨</option>
+                                <option value="quantumInspired">Quantum-Inspired ⚛️</option>
                             </select>
                         </div>
                         
@@ -1360,7 +1361,7 @@
             document.getElementById('probabilityGame').addEventListener('change', handleProbabilityGameChange);
             document.getElementById('analyzerGame').addEventListener('change', handleAnalyzerGameChange); // New event listener for analyzer game
             document.getElementById('randomSeedBtn').addEventListener('click', generateRandomSeed);
-            document.getElementById('reverseGame').addEventListener('change', () => { /* No specific action needed for game change here yet */ });
+            document.getElementById('reverseGame').addEventListener('change', () => { /* No specific action needed for game change yet */ });
             
             // Generator Controls
             document.getElementById('generateSmart').addEventListener('click', generateSmartNumbers);
@@ -1676,6 +1677,10 @@
                 case 'ai':
                     numbers = await generateUsingAI(config, options);
                     break;
+
+                case 'quantumInspired':
+                    numbers = await generateUsingQuantumInspiredAI(config, options);
+                    break;
                     
                 default:
                     numbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
@@ -1789,6 +1794,124 @@
             
             return generatedNumbers;
         }
+
+        async function generateUsingQuantumInspiredAI(config, options) {
+            const { mainPool, pickCount } = config;
+            let generatedNumbers = [];
+
+            const generateSmartBtn = document.getElementById('generateSmart');
+            let loadingIndicator = generateSmartBtn.querySelector('.loading-indicator');
+            if (!loadingIndicator) {
+                loadingIndicator = document.createElement('span');
+                loadingIndicator.className = 'loading-indicator';
+                generateSmartBtn.appendChild(loadingIndicator);
+            }
+            loadingIndicator.classList.remove('hidden');
+
+            try {
+                if (appState.historicalData.length === 0) {
+                    showNotification("No historical data for Quantum-Inspired algorithm. Please load data first.");
+                    return Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
+                }
+
+                const numberScores = {};
+                for (let i = 1; i <= mainPool; i++) {
+                    numberScores[i] = 0;
+                }
+
+                // Step 1: Calculate "Quantum State" (Probability Scores)
+                // Combine frequency and gap analysis
+                const frequency = getNumberFrequency();
+                const gaps = getGapAnalysis();
+                const pairFrequency = getPairFrequency();
+
+                const maxFreq = Math.max(...Object.values(frequency), 1);
+                const maxGap = Math.max(...Object.values(gaps), 1);
+                const maxPairFreq = Math.max(...Object.values(pairFrequency), 1);
+
+                for (let i = 1; i <= mainPool; i++) {
+                    let score = 0;
+
+                    // Frequency contribution
+                    score += (frequency[i] || 0) / maxFreq * 0.4; // 40% importance
+
+                    // Gap contribution (higher gap means more "due")
+                    score += (gaps[i] || 0) / maxGap * 0.3; // 30% importance
+
+                    // Pair correlation contribution (entanglement-like)
+                    let pairScore = 0;
+                    for (const pair in pairFrequency) {
+                        const [num1, num2] = pair.split('-').map(Number);
+                        if (num1 === i || num2 === i) {
+                            pairScore += pairFrequency[pair];
+                        }
+                    }
+                    score += (pairScore / maxPairFreq) * 0.2; // 20% importance
+
+                    // Step 2: Introduce "Quantum Fluctuations" (controlled randomness)
+                    score += Math.random() * 0.1; // 10% randomness for exploration
+
+                    numberScores[i] = score;
+                }
+
+                // Step 3 & 4: "Measure" (Select Numbers)
+                const sortedNumbers = Object.entries(numberScores)
+                    .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+                    .map(([num]) => parseInt(num));
+
+                generatedNumbers = [];
+                let attempts = 0;
+                const maxAttempts = 100; // Prevent infinite loops
+
+                while (generatedNumbers.length < pickCount && attempts < maxAttempts) {
+                    // Select from the top-scoring numbers, but also allow some lower-scoring ones
+                    // This simulates a probabilistic "collapse" of the quantum state
+                    const selectionPool = sortedNumbers.slice(0, Math.min(mainPool, pickCount * 3)); // Consider top N*3 numbers
+                    
+                    let selectedNum;
+                    if (selectionPool.length > 0) {
+                        // Weighted random selection from the pool
+                        const totalScore = selectionPool.reduce((sum, num) => sum + numberScores[num], 0);
+                        let randomPoint = Math.random() * totalScore;
+
+                        for (const num of selectionPool) {
+                            randomPoint -= numberScores[num];
+                            if (randomPoint <= 0) {
+                                selectedNum = num;
+                                break;
+                            }
+                        }
+                    } else {
+                        // Fallback to pure random if selection pool is empty
+                        selectedNum = Math.floor(Math.random() * mainPool) + 1;
+                    }
+
+                    if (selectedNum && !generatedNumbers.includes(selectedNum)) {
+                        generatedNumbers.push(selectedNum);
+                    }
+                    attempts++;
+                }
+
+                // Ensure pickCount is met, fill with random if necessary (shouldn't happen often with good scoring)
+                while (generatedNumbers.length < pickCount) {
+                    const randomNum = Math.floor(Math.random() * mainPool) + 1;
+                    if (!generatedNumbers.includes(randomNum)) {
+                        generatedNumbers.push(randomNum);
+                    }
+                }
+
+                generatedNumbers = generatedNumbers.slice(0, pickCount); // Trim if somehow over
+            } catch (error) {
+                console.error("Error in Quantum-Inspired generation:", error);
+                showNotification("Quantum-Inspired generation failed. Falling back to random numbers.");
+                generatedNumbers = Array.from({ length: pickCount }, () => Math.floor(Math.random() * mainPool) + 1);
+            } finally {
+                if (loadingIndicator) loadingIndicator.classList.add('hidden');
+            }
+
+            return generatedNumbers;
+        }
+
 
         function getPrimesUpTo(max) {
             const primes = [];
