@@ -1780,10 +1780,29 @@
                 if (options.useHistorical && appState.historicalData.length > 0) {
                     const frequency = getNumberFrequency();
                     const gaps = getGapAnalysis();
-                    prompt += ` Consider the following historical data: Most frequent numbers: ${JSON.stringify(frequency)}. Numbers with longest gaps since last appearance: ${JSON.stringify(gaps)}.`;
-                    if (options.favorHot) prompt += ` Favor hot numbers.`;
-                    if (options.includeDue) prompt += ` Include numbers that are statistically due.`;
-                    if (options.avoidRepeats) prompt += ` Avoid numbers that have appeared in the last 5 draws.`;
+
+                    // Determine hot, cold, and due numbers based on historical data
+                    const sortedByFreq = Object.entries(frequency).sort((a, b) => b[1] - a[1]);
+                    const hotNumbers = sortedByFreq.slice(0, Math.ceil(mainPool * 0.1)).map(([num]) => parseInt(num)); // Top 10% most frequent
+                    const coldNumbers = sortedByFreq.slice(-Math.ceil(mainPool * 0.1)).map(([num]) => parseInt(num)); // Bottom 10% least frequent
+
+                    const sortedByGap = Object.entries(gaps).sort((a, b) => b[1] - a[1]);
+                    const dueNumbers = sortedByGap.slice(0, Math.ceil(mainPool * 0.05)).map(([num]) => parseInt(num)); // Top 5% longest gaps
+
+                    let recentNumbers = [];
+                    if (options.avoidRepeats && appState.historicalData.length > 0) {
+                        const last5Draws = appState.historicalData.slice(-5);
+                        recentNumbers = [...new Set(last5Draws.flatMap(draw => draw.numbers))];
+                    }
+
+                    prompt += ` Based on historical data:
+                    - Hot numbers (most frequent): ${hotNumbers.join(', ')}
+                    - Cold numbers (least frequent): ${coldNumbers.join(', ')}
+                    - Due numbers (longest absence): ${dueNumbers.join(', ')}`;
+
+                    if (options.favorHot) prompt += ` Strongly favor selecting from the hot numbers.`;
+                    if (options.includeDue) prompt += ` Ensure some due numbers are included.`;
+                    if (options.avoidRepeats) prompt += ` Avoid numbers that appeared in the last 5 draws: ${recentNumbers.join(', ')}.`;
                 }
                 prompt += ` Provide only the numbers as a comma-separated list, e.g., "1,5,12,23,40". Do not include any other text or explanation.`;
 
@@ -2986,7 +3005,7 @@
                     </div>
                 `).join('');
             }
-            showNotification(`Generated ${wheelTickets.length.toLocaleString()} wheel tickets.`);
+            showNotification(`Generated ${wheelTickets.length.toLocaleString()} full wheel tickets.`);
         }
 
         function clearWheelingSystem() {
