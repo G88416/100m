@@ -1,45 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCC CMMS Dashboard</title>
+    <title>BCC CMMS Dashboard - Enhanced Edition</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Load Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Load Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Custom styles for better aesthetics */
+        /* Custom styles for better aesthetics and dark mode */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f7f9fc;
+            transition: background-color 0.3s ease;
+        }
+        .dark body {
+            background-color: #1f2937;
+            color: #f3f4f6;
         }
         .card {
             background-color: white;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+        }
+        .dark .card {
+            background-color: #374151;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
         .card:hover {
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .dark .card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
         .scroll-area {
             max-height: 400px;
             overflow-y: auto;
+            scrollbar-width: thin;
         }
         .status-badge {
-            padding: 2px 8px;
+            padding: 4px 12px;
             border-radius: 9999px;
-            font-size: 0.75rem;
+            font-size: 0.875rem;
             font-weight: 600;
         }
-        /* Custom scrollbar for aesthetics */
-        .scroll-area::-webkit-scrollbar { width: 6px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        /* Custom scrollbar */
+        .scroll-area::-webkit-scrollbar { width: 8px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .scroll-area::-webkit-scrollbar-track { background: #f1f5f9; }
+        .dark .scroll-area::-webkit-scrollbar-thumb { background: #4b5563; }
+        .dark .scroll-area::-webkit-scrollbar-track { background: #1f2937; }
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        /* Search Input */
+        .search-input { transition: border-color 0.3s, box-shadow 0.3s; }
+        .search-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-8 transition-colors duration-300">
     
     <!-- Tailwind JIT Fix: Explicitly include classes used dynamically -->
     <div class="hidden">
@@ -48,12 +72,18 @@
         <span class="border-green-500 text-green-400"></span>
     </div>
 
-    <header class="mb-8">
-        <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">BCC CMMS Dashboard</h1>
-        <p class="text-gray-500">Manage assets and streamline maintenance operations across all departments.</p>
-        <p class="mt-4 text-sm text-gray-600 p-2 bg-indigo-100 rounded-lg">
-            User ID (for collaboration): <span id="user-id-display" class="font-mono font-semibold text-indigo-800">Authenticating...</span>
-        </p>
+    <header class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div>
+            <h1 class="text-4xl font-extrabold text-indigo-700 dark:text-indigo-300 mb-2">BCC CMMS Dashboard - Super Special Edition</h1>
+            <p class="text-gray-500 dark:text-gray-400">Manage assets, streamline maintenance, and visualize operations across departments with enhanced features.</p>
+            <p class="mt-4 text-sm text-gray-600 dark:text-gray-300 p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+                User ID (for collaboration): <span id="user-id-display" class="font-mono font-semibold text-indigo-800 dark:text-indigo-200">Authenticating...</span>
+            </p>
+        </div>
+        <!-- Dark Mode Toggle -->
+        <button id="dark-mode-toggle" class="mt-4 md:mt-0 py-2 px-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+            <i data-lucide="moon" class="w-5 h-5 inline-block mr-1"></i> Toggle Dark Mode
+        </button>
     </header>
     
     <!-- Notification Area -->
@@ -61,33 +91,43 @@
         <!-- Notifications will appear here -->
     </div>
 
-    <!-- Department Filter -->
-    <div class="mb-8 p-4 bg-white rounded-xl shadow-lg flex flex-col md:flex-row items-start md:items-center space-y-3 md:space-y-0 md:space-x-4">
-        <label for="department-filter" class="font-semibold text-gray-700 flex items-center">
-            <i data-lucide="building-2" class="w-5 h-5 mr-2 text-indigo-500"></i>
+    <!-- Department Filter and Search -->
+    <div class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg flex flex-col md:flex-row items-start md:items-center space-y-3 md:space-y-0 md:space-x-4">
+        <label for="department-filter" class="font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+            <i data-lucide="building-2" class="w-5 h-5 mr-2 text-indigo-500 dark:text-indigo-400"></i>
             Filter by Department:
         </label>
-        <select id="department-filter" onchange="changeDepartment(this.value)" class="flex-grow max-w-sm border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
+        <select id="department-filter" onchange="changeDepartment(this.value)" class="flex-grow max-w-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
             <!-- Options filled by JS -->
         </select>
+        <!-- Global Search -->
+        <input type="text" id="global-search" placeholder="Search assets or work orders..." class="mt-3 md:mt-0 md:ml-4 flex-grow max-w-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 search-input" oninput="handleGlobalSearch(this.value)">
     </div>
     
-    <!-- STATS ROW (New Feature) -->
+    <!-- Enhanced Stats Row with Charts -->
     <div id="stats-row" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <!-- Stats will be dynamically inserted here by JS -->
     </div>
+    <!-- Visualization Chart Section -->
+    <section class="card p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+            <i data-lucide="bar-chart-2" class="w-6 h-6 mr-2 text-indigo-500 dark:text-indigo-400"></i>
+            Maintenance Overview Chart
+        </h2>
+        <canvas id="maintenance-chart" class="w-full h-64"></canvas>
+    </section>
 
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         <!-- WORK ORDERS Section -->
         <section class="lg:col-span-2 card p-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                <i data-lucide="wrench" class="w-6 h-6 mr-2 text-indigo-500"></i>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                <i data-lucide="wrench" class="w-6 h-6 mr-2 text-indigo-500 dark:text-indigo-400"></i>
                 Active Work Orders
             </h2>
-            <div id="work-orders-list" class="scroll-area divide-y divide-gray-100">
+            <div id="work-orders-list" class="scroll-area divide-y divide-gray-100 dark:divide-gray-700">
                 <!-- Work Orders will be dynamically inserted here -->
-                <p class="p-4 text-gray-500 text-center" id="wo-placeholder">Loading work orders...</p>
+                <p class="p-4 text-gray-500 dark:text-gray-400 text-center" id="wo-placeholder">Loading work orders...</p>
             </div>
 
             <!-- New Work Order Form -->
@@ -99,13 +139,13 @@
 
         <!-- ASSETS Section -->
         <section class="card p-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                <i data-lucide="hard-hat" class="w-6 h-6 mr-2 text-indigo-500"></i>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                <i data-lucide="hard-hat" class="w-6 h-6 mr-2 text-indigo-500 dark:text-indigo-400"></i>
                 Registered Assets
             </h2>
-            <div id="assets-list" class="scroll-area divide-y divide-gray-100">
+            <div id="assets-list" class="scroll-area divide-y divide-gray-100 dark:divide-gray-700">
                 <!-- Assets will be dynamically inserted here -->
-                <p class="p-4 text-gray-500 text-center" id="asset-placeholder">Loading assets...</p>
+                <p class="p-4 text-gray-500 dark:text-gray-400 text-center" id="asset-placeholder">Loading assets...</p>
             </div>
 
             <!-- New Asset Form -->
@@ -117,37 +157,41 @@
     </main>
 
     <!-- Modal for New Work Order -->
-    <div id="new-wo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl w-full max-w-lg card">
-            <h3 class="text-xl font-bold mb-4">Create Work Order</h3>
+    <div id="new-wo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-full max-w-lg card">
+            <h3 class="text-xl font-bold mb-4 dark:text-gray-200">Create Work Order</h3>
             <form id="new-wo-form" onsubmit="handleNewWorkOrder(event)">
-                 <div class="mb-4">
-                    <label for="wo-department" class="block text-sm font-medium text-gray-700">Department</label>
-                    <select id="wo-department" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <div class="mb-4">
+                    <label for="wo-department" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department</label>
+                    <select id="wo-department" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
                         <!-- Options filled by JS -->
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label for="wo-title" class="block text-sm font-medium text-gray-700">Title</label>
-                    <input type="text" id="wo-title" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <label for="wo-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                    <input type="text" id="wo-title" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div class="mb-4">
-                    <label for="wo-asset" class="block text-sm font-medium text-gray-700">Related Asset</label>
-                    <select id="wo-asset" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <label for="wo-asset" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Related Asset</label>
+                    <select id="wo-asset" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
                         <option value="">Select an Asset</option>
                         <!-- Options filled by JS, filtered by selected department -->
                     </select>
                 </div>
-                 <div class="mb-4">
-                    <label for="wo-priority" class="block text-sm font-medium text-gray-700">Priority</label>
-                    <select id="wo-priority" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <div class="mb-4">
+                    <label for="wo-priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Priority</label>
+                    <select id="wo-priority" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
                         <option value="High">High</option>
                         <option value="Medium" selected>Medium</option>
                         <option value="Low">Low</option>
                     </select>
                 </div>
+                <div class="mb-4">
+                    <label for="wo-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description (New Feature)</label>
+                    <textarea id="wo-description" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200" rows="3"></textarea>
+                </div>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="toggleModal('new-wo-modal')" class="py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">Cancel</button>
+                    <button type="button" onclick="toggleModal('new-wo-modal')" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
                     <button type="submit" class="py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Create Work Order</button>
                 </div>
             </form>
@@ -155,31 +199,65 @@
     </div>
 
     <!-- Modal for New Asset -->
-    <div id="new-asset-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl w-full max-w-lg card">
-            <h3 class="text-xl font-bold mb-4">Register New Asset</h3>
+    <div id="new-asset-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-full max-w-lg card">
+            <h3 class="text-xl font-bold mb-4 dark:text-gray-200">Register New Asset</h3>
             <form id="new-asset-form" onsubmit="handleNewAsset(event)">
-                 <div class="mb-4">
-                    <label for="asset-department" class="block text-sm font-medium text-gray-700">Department</label>
-                    <select id="asset-department" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500">
+                <div class="mb-4">
+                    <label for="asset-department" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department</label>
+                    <select id="asset-department" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-200">
                         <!-- Options filled by JS -->
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label for="asset-name" class="block text-sm font-medium text-gray-700">Asset Name</label>
-                    <input type="text" id="asset-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500">
+                    <label for="asset-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Asset Name</label>
+                    <input type="text" id="asset-name" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div class="mb-4">
-                    <label for="asset-location" class="block text-sm font-medium text-gray-700">Location</label>
-                    <input type="text" id="asset-location" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500">
+                    <label for="asset-location" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+                    <input type="text" id="asset-location" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div class="mb-4">
-                    <label for="asset-serial" class="block text-sm font-medium text-gray-700">Serial/Model</label>
-                    <input type="text" id="asset-serial" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500">
+                    <label for="asset-serial" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Serial/Model</label>
+                    <input type="text" id="asset-serial" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-200">
+                </div>
+                <div class="mb-4">
+                    <label for="asset-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description (New Feature)</label>
+                    <textarea id="asset-description" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-200" rows="3"></textarea>
                 </div>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="toggleModal('new-asset-modal')" class="py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">Cancel</button>
+                    <button type="button" onclick="toggleModal('new-asset-modal')" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
                     <button type="submit" class="py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">Register Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Work Order Modal (New Feature) -->
+    <div id="edit-wo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-full max-w-lg card">
+            <h3 class="text-xl font-bold mb-4 dark:text-gray-200">Edit Work Order</h3>
+            <form id="edit-wo-form" onsubmit="handleEditWorkOrder(event)">
+                <input type="hidden" id="edit-wo-id">
+                <div class="mb-4">
+                    <label for="edit-wo-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                    <input type="text" id="edit-wo-title" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
+                </div>
+                <div class="mb-4">
+                    <label for="edit-wo-priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Priority</label>
+                    <select id="edit-wo-priority" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-wo-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                    <textarea id="edit-wo-description" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200" rows="3"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="toggleModal('edit-wo-modal')" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
+                    <button type="submit" class="py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -221,11 +299,12 @@
             db: db,
             auth: auth,
             userId: null,
-            // Store all fetched assets and work orders for client-side filtering
             allAssets: [], 
             allWorkOrders: [],
-            currentDepartment: 'all', // New state property
+            currentDepartment: 'all',
+            searchQuery: '',
             departments: DEPARTMENTS,
+            chart: null // For Chart.js instance
         };
 
         // Set log level to Debug for visibility in console
@@ -234,7 +313,7 @@
         /* --- UTILITY FUNCTIONS --- */
 
         /**
-         * Shows a transient notification message.
+         * Shows a transient notification message with animation.
          * @param {string} message The message to display.
          * @param {string} type 'success', 'error', or 'info'.
          */
@@ -259,7 +338,7 @@
             }
 
             const notification = document.createElement('div');
-            notification.className = `p-4 rounded-lg shadow-xl text-white border-b-4 ${colorClass} transition duration-500 transform translate-x-0`;
+            notification.className = `p-4 rounded-lg shadow-xl text-white border-b-4 ${colorClass} transition duration-500 transform translate-x-full fade-in`;
             notification.innerHTML = `<div class="flex items-center">
                 <i data-lucide="${icon}" class="w-5 h-5 mr-2"></i>
                 <span>${message}</span>
@@ -268,30 +347,40 @@
             notificationArea.appendChild(notification);
             lucide.createIcons(); // Re-render icon
 
-            // Automatically remove notification after 5 seconds
+            // Animate in
+            setTimeout(() => notification.classList.remove('translate-x-full'), 100);
+
+            // Automatically remove after 5 seconds
             setTimeout(() => {
                 notification.classList.add('opacity-0');
                 notification.addEventListener('transitionend', () => notification.remove());
             }, 5000);
         };
 
-
-        window.toggleModal = (id) => {
+        window.toggleModal = (id, data = null) => {
             const modal = document.getElementById(id);
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
                 
-                // Set the department dropdown in the modal to the current filter if applicable
+                // Populate edit modal if applicable
+                if (id === 'edit-wo-modal' && data) {
+                    document.getElementById('edit-wo-id').value = data.id;
+                    document.getElementById('edit-wo-title').value = data.title;
+                    document.getElementById('edit-wo-priority').value = data.priority;
+                    document.getElementById('edit-wo-description').value = data.description || '';
+                }
+
+                // Set department in creation modals
                 const currentDept = window.appState.currentDepartment;
                 if (currentDept !== 'all') {
                     if (id === 'new-wo-modal') {
-                         const deptEl = document.getElementById('wo-department');
-                         if (deptEl) deptEl.value = currentDept;
+                        const deptEl = document.getElementById('wo-department');
+                        if (deptEl) deptEl.value = currentDept;
                     }
                     if (id === 'new-asset-modal') {
-                         const deptEl = document.getElementById('asset-department');
-                         if (deptEl) deptEl.value = currentDept;
+                        const deptEl = document.getElementById('asset-department');
+                        if (deptEl) deptEl.value = currentDept;
                     }
                 }
                 updateWorkOrderModalAssets();
@@ -303,37 +392,36 @@
 
         const formatTimestamp = (timestamp) => {
             if (!timestamp) return 'N/A';
-            // Check if timestamp is a Firebase Timestamp object before calling toDate()
             const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         };
 
         const getStatusBadge = (status) => {
             switch (status) {
-                case 'Open': return `<span class="status-badge bg-red-100 text-red-700">Open</span>`;
-                case 'In Progress': return `<span class="status-badge bg-yellow-100 text-yellow-700">In Progress</span>`;
-                case 'Completed': return `<span class="status-badge bg-green-100 text-green-700">Completed</span>`;
-                default: return `<span class="status-badge bg-gray-100 text-gray-700">${status}</span>`;
+                case 'Open': return `<span class="status-badge bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200">Open</span>`;
+                case 'In Progress': return `<span class="status-badge bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200">In Progress</span>`;
+                case 'Completed': return `<span class="status-badge bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200">Completed</span>`;
+                default: return `<span class="status-badge bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200">${status}</span>`;
             }
         };
 
         /* --- DATA FILTERING & RENDERING --- */
         
-        // New function to render the high-level dashboard statistics
+        // Render summary stats
         const renderSummaryStats = () => {
             const statsRowEl = document.getElementById('stats-row');
             if (!statsRowEl) return;
 
-            // 1. Filter data based on current department filter
             const filteredAssets = window.appState.allAssets.filter(asset => 
-                window.appState.currentDepartment === 'all' || asset.department === window.appState.currentDepartment
+                (window.appState.currentDepartment === 'all' || asset.department === window.appState.currentDepartment) &&
+                (asset.name.toLowerCase().includes(window.appState.searchQuery) || asset.location.toLowerCase().includes(window.appState.searchQuery))
             );
             
             const filteredWOs = window.appState.allWorkOrders.filter(wo => 
-                window.appState.currentDepartment === 'all' || wo.department === window.appState.currentDepartment
+                (window.appState.currentDepartment === 'all' || wo.department === window.appState.currentDepartment) &&
+                (wo.title.toLowerCase().includes(window.appState.searchQuery) || (wo.description || '').toLowerCase().includes(window.appState.searchQuery))
             );
             
-            // 2. Calculate metrics
             const activeWOs = filteredWOs.filter(wo => wo.status !== 'Completed');
             const completedWOs = filteredWOs.filter(wo => wo.status === 'Completed');
 
@@ -343,66 +431,96 @@
                 { title: "Completed (Lifetime)", count: completedWOs.length, icon: "check-circle", color: "green" },
             ];
 
-            // 3. Render HTML
             statsRowEl.innerHTML = stats.map(stat => `
-                <div class="card p-5 border-l-4 border-${stat.color}-500 flex items-center justify-between">
+                <div class="card p-5 border-l-4 border-${stat.color}-500 flex items-center justify-between dark:border-${stat.color}-400">
                     <div>
-                        <p class="text-sm font-medium text-gray-500">${stat.title}</p>
-                        <p class="text-3xl font-bold text-gray-900">${stat.count}</p>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">${stat.title}</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">${stat.count}</p>
                     </div>
                     <i data-lucide="${stat.icon}" class="w-8 h-8 text-${stat.color}-400"></i>
                 </div>
             `).join('');
             
-            // Re-render lucide icons for the newly added HTML
-            lucide.createIcons(); 
+            lucide.createIcons();
         };
 
-        // Filters and renders the assets based on the currentDepartment
+        // Render Chart
+        const renderChart = () => {
+            const ctx = document.getElementById('maintenance-chart').getContext('2d');
+            const filteredWOs = window.appState.allWorkOrders.filter(wo => 
+                window.appState.currentDepartment === 'all' || wo.department === window.appState.currentDepartment
+            );
+
+            const priorities = { High: 0, Medium: 0, Low: 0 };
+            const statuses = { Open: 0, 'In Progress': 0, Completed: 0 };
+
+            filteredWOs.forEach(wo => {
+                priorities[wo.priority]++;
+                statuses[wo.status]++;
+            });
+
+            if (window.appState.chart) window.appState.chart.destroy();
+
+            window.appState.chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['High Priority', 'Medium Priority', 'Low Priority', 'Open', 'In Progress', 'Completed'],
+                    datasets: [{
+                        data: [priorities.High, priorities.Medium, priorities.Low, statuses.Open, statuses['In Progress'], statuses.Completed],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#22c55e', '#ef4444', '#f59e0b', '#22c55e'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        };
+
+        // Render assets
         const renderAssets = () => {
             const listEl = document.getElementById('assets-list');
             listEl.innerHTML = '';
             
             const filteredAssets = window.appState.allAssets.filter(asset => 
-                window.appState.currentDepartment === 'all' || asset.department === window.appState.currentDepartment
-            ).sort((a, b) => a.name.localeCompare(b.name)); // Sort assets alphabetically
+                (window.appState.currentDepartment === 'all' || asset.department === window.appState.currentDepartment) &&
+                (asset.name.toLowerCase().includes(window.appState.searchQuery) || asset.location.toLowerCase().includes(window.appState.searchQuery) || (asset.description || '').toLowerCase().includes(window.appState.searchQuery))
+            ).sort((a, b) => a.name.localeCompare(b.name));
 
             if (filteredAssets.length === 0) {
-                listEl.innerHTML = `<p class="p-4 text-gray-500 text-center">No assets registered in the selected department (${DEPARTMENTS.find(d => d.id === window.appState.currentDepartment)?.name || 'Unknown'}).</p>`;
-                renderSummaryStats(); // Update stats even if list is empty
+                listEl.innerHTML = `<p class="p-4 text-gray-500 dark:text-gray-400 text-center">No assets found.</p>`;
                 return;
             }
 
             filteredAssets.forEach(asset => {
                 const departmentName = DEPARTMENTS.find(d => d.id === asset.department)?.name || 'Unknown';
                 const item = document.createElement('div');
-                item.className = 'p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-50';
+                item.className = 'p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-50 dark:hover:bg-gray-700';
                 item.innerHTML = `
                     <div>
-                        <p class="font-semibold text-gray-800">${asset.name}</p>
-                        <p class="text-xs text-indigo-500 font-medium">${departmentName}</p>
-                        <p class="text-xs text-gray-500">Location: ${asset.location}</p>
+                        <p class="font-semibold text-gray-800 dark:text-gray-200">${asset.name}</p>
+                        <p class="text-xs text-indigo-500 dark:text-indigo-400 font-medium">${departmentName}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Location: ${asset.location}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${asset.description || 'No description'}</p>
                     </div>
                     <div class="mt-2 sm:mt-0 text-right">
-                        <p class="text-xs text-gray-400">Asset ID: ${asset.id.substring(0, 8)}...</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500">Asset ID: ${asset.id.substring(0, 8)}...</p>
                     </div>
                 `;
                 listEl.appendChild(item);
             });
-            renderSummaryStats();
         };
 
-        // Filters and renders the work orders based on the currentDepartment
+        // Render work orders
         const renderWorkOrders = () => {
             const listEl = document.getElementById('work-orders-list');
             listEl.innerHTML = '';
             
-            // 1. Filter by Department
-            let filteredWO = window.appState.allWorkOrders.filter(wo => 
-                window.appState.currentDepartment === 'all' || wo.department === window.appState.currentDepartment
+            const filteredWO = window.appState.allWorkOrders.filter(wo => 
+                (window.appState.currentDepartment === 'all' || wo.department === window.appState.currentDepartment) &&
+                (wo.title.toLowerCase().includes(window.appState.searchQuery) || (wo.description || '').toLowerCase().includes(window.appState.searchQuery))
             );
             
-            // 2. Filter by Active Status (Open or In Progress) and sort High > Medium > Low
             const activeWO = filteredWO
                 .filter(wo => wo.status !== 'Completed')
                 .sort((a, b) => {
@@ -411,8 +529,7 @@
                 });
 
             if (activeWO.length === 0) {
-                listEl.innerHTML = '<p class="p-4 text-gray-500 text-center">No active work orders in this department. Everything looks great!</p>';
-                renderSummaryStats(); // Update stats even if list is empty
+                listEl.innerHTML = '<p class="p-4 text-gray-500 dark:text-gray-400 text-center">No active work orders found.</p>';
                 return;
             }
 
@@ -421,15 +538,16 @@
                 const assetName = relatedAsset ? relatedAsset.name : 'Asset Not Found';
 
                 const item = document.createElement('div');
-                item.className = 'p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-50';
+                item.className = 'p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center hover:bg-gray-50 dark:hover:bg-gray-700';
                 item.innerHTML = `
                     <div class="flex-grow">
-                        <p class="font-semibold text-gray-800 flex items-center">
+                        <p class="font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                             ${wo.title} 
-                            <span class="ml-3 text-xs font-medium ${wo.priority === 'High' ? 'text-red-600' : wo.priority === 'Medium' ? 'text-yellow-600' : 'text-green-600'}">(${wo.priority})</span>
+                            <span class="ml-3 text-xs font-medium ${wo.priority === 'High' ? 'text-red-600 dark:text-red-400' : wo.priority === 'Medium' ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400'}">(${wo.priority})</span>
                         </p>
-                        <p class="text-sm text-gray-500 mt-1">Asset: ${assetName}</p>
-                        <p class="text-xs text-gray-400">Created: ${formatTimestamp(wo.createdAt)}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Asset: ${assetName}</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">${wo.description || 'No description'}</p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500">Created: ${formatTimestamp(wo.createdAt)}</p>
                     </div>
                     <div class="mt-2 sm:mt-0 flex items-center space-x-2">
                         ${getStatusBadge(wo.status)}
@@ -439,22 +557,22 @@
                                 ${wo.status === 'Open' ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white'} 
                                 transition duration-150">
                                 ${wo.status === 'Open' ? 'Start' : 'Complete'}
-                            </button>`
-                            : ''
+                            </button>` : ''
                         }
+                        <button onclick="toggleModal('edit-wo-modal', {id: '${wo.id}', title: '${wo.title}', priority: '${wo.priority}', description: '${wo.description || ''}'})" 
+                            class="py-1 px-3 text-xs rounded-full bg-blue-500 hover:bg-blue-600 text-white transition duration-150">
+                            Edit
+                        </button>
                     </div>
                 `;
                 listEl.appendChild(item);
             });
-            renderSummaryStats();
         };
         
-        // Updates the assets dropdown in the New Work Order modal based on the selected department filter
         const updateWorkOrderModalAssets = () => {
             const selectEl = document.getElementById('wo-asset');
             const deptToFilter = document.getElementById('wo-department')?.value || window.appState.currentDepartment;
             
-            // Clear existing options
             selectEl.innerHTML = '<option value="" disabled selected>Select an Asset</option>';
 
             const assetsForDropdown = window.appState.allAssets.filter(asset => 
@@ -462,9 +580,9 @@
             );
             
             if (assetsForDropdown.length === 0) {
-                 selectEl.innerHTML += `<option value="" disabled>No Assets in this Department</option>`;
+                selectEl.innerHTML += `<option value="" disabled>No Assets in this Department</option>`;
             } else {
-                 assetsForDropdown.forEach(asset => {
+                assetsForDropdown.forEach(asset => {
                     const option = document.createElement('option');
                     option.value = asset.id;
                     option.textContent = `${asset.name} (${asset.location})`;
@@ -473,25 +591,33 @@
             }
         };
 
-        // Function called when the main department filter changes
         window.changeDepartment = (newDeptId) => {
             window.appState.currentDepartment = newDeptId;
             renderAssets();
             renderWorkOrders();
             renderSummaryStats();
+            renderChart();
         };
         
+        window.handleGlobalSearch = (query) => {
+            window.appState.searchQuery = query.toLowerCase();
+            renderAssets();
+            renderWorkOrders();
+            renderSummaryStats();
+        };
+
         /* --- FIREBASE LISTENERS --- */
 
         const listenForAssets = () => {
             if (!window.appState.userId) return;
-            // Fetch from shared public collection using the full path
             const assetRef = collection(db, ASSETS_COLLECTION_PATH);
 
             onSnapshot(assetRef, (snapshot) => {
                 window.appState.allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderAssets();
                 updateWorkOrderModalAssets(); 
+                renderSummaryStats();
+                renderChart();
             }, (error) => {
                 console.error("Error listening to assets:", error);
             });
@@ -499,13 +625,14 @@
 
         const listenForWorkOrders = () => {
             if (!window.appState.userId) return;
-            // Fetch from shared public collection using the full path
             const woRef = collection(db, WO_COLLECTION_PATH);
             const q = query(woRef);
 
             onSnapshot(q, (snapshot) => {
                 window.appState.allWorkOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderWorkOrders();
+                renderSummaryStats();
+                renderChart();
             }, (error) => {
                 console.error("Error listening to work orders:", error);
             });
@@ -529,7 +656,8 @@
                 department: department,
                 name: assetName,
                 location: form['asset-location'].value,
-                serial: form['asset-serial'].value || 'N/A', // Allow serial to be optional
+                serial: form['asset-serial'].value || 'N/A',
+                description: form['asset-description'].value || '',
                 createdAt: new Date(),
                 createdBy: window.appState.userId
             };
@@ -569,6 +697,7 @@
                 title: woTitle,
                 assetId: assetId,
                 priority: form['wo-priority'].value,
+                description: form['wo-description'].value || '',
                 status: 'Open',
                 createdAt: new Date(),
                 createdBy: window.appState.userId
@@ -586,9 +715,30 @@
             }
         };
 
+        window.handleEditWorkOrder = async (event) => {
+            event.preventDefault();
+            const form = event.target;
+            const woId = form['edit-wo-id'].value;
+
+            const updateData = {
+                title: form['edit-wo-title'].value,
+                priority: form['edit-wo-priority'].value,
+                description: form['edit-wo-description'].value || ''
+            };
+
+            try {
+                const woDocRef = doc(db, WO_COLLECTION_PATH, woId);
+                await updateDoc(woDocRef, updateData);
+                toggleModal('edit-wo-modal');
+                showNotification(`Work Order updated successfully!`, 'success');
+            } catch (error) {
+                console.error("Error updating work order:", error);
+                showNotification("Failed to update work order. Check console.", 'error');
+            }
+        };
+
         window.updateWorkOrderStatus = async (woId, newStatus) => {
             try {
-                // Get the document reference using the full path
                 const woDocRef = doc(db, WO_COLLECTION_PATH, woId);
                 const updateData = {
                     status: newStatus,
@@ -614,7 +764,6 @@
             const assetDeptEl = document.getElementById('asset-department');
             const woDeptEl = document.getElementById('wo-department');
             
-            // Function to populate a single select element
             const populateSelect = (selectEl, includeAll = true) => {
                 selectEl.innerHTML = '';
                 if (!includeAll) {
@@ -622,7 +771,6 @@
                 }
                 
                 window.appState.departments.forEach(dept => {
-                    // Skip 'All Departments' for creation modals
                     if (dept.id === 'all' && !includeAll) return;
                     
                     const option = document.createElement('option');
@@ -632,17 +780,12 @@
                 });
             };
 
-            // Populate Filter (includes 'All Departments')
             populateSelect(filterEl, true); 
-            
-            // Populate Modals (does NOT include 'All Departments')
             populateSelect(assetDeptEl, false);
             populateSelect(woDeptEl, false);
             
-             // Attach event listener for work order asset filtering
             woDeptEl.addEventListener('change', updateWorkOrderModalAssets);
         };
-
 
         /* --- INITIALIZATION --- */
 
@@ -662,7 +805,6 @@
                 window.appState.userId = user.uid;
                 document.getElementById('user-id-display').textContent = user.uid;
                 
-                // Start listeners once authenticated (will now fetch collaborative data)
                 listenForAssets();
                 listenForWorkOrders();
 
@@ -672,11 +814,19 @@
                 showNotification("Authentication failed. Data will not sync.", 'error');
             }
             
-            // Render lucide icons after initialization is complete
             lucide.createIcons();
+
+            // Dark Mode Toggle
+            const toggleButton = document.getElementById('dark-mode-toggle');
+            toggleButton.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                toggleButton.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}" class="w-5 h-5 inline-block mr-1"></i> Toggle ${isDark ? 'Light' : 'Dark'} Mode`;
+                lucide.createIcons();
+                renderChart(); // Re-render chart for color updates if needed
+            });
         };
 
-        // Start the application after the window loads
         window.onload = initApp;
     </script>
 </body>
