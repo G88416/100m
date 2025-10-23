@@ -41,33 +41,28 @@
 </head>
 <body class="p-4 md:p-8">
 
-    <div id="loading-indicator" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-        <div class="text-white text-xl p-4 rounded-lg bg-indigo-600">
-            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Initializing BCC CMMS & Authenticating...
-        </div>
-    </div>
-
     <header class="mb-8">
         <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">BCC CMMS Dashboard</h1>
         <p class="text-gray-500">Manage assets and streamline maintenance operations across all departments.</p>
         <p class="mt-4 text-sm text-gray-600 p-2 bg-indigo-100 rounded-lg">
-            User ID (for collaboration): <span id="user-id-display" class="font-mono font-semibold text-indigo-800">Loading...</span>
+            User ID (for collaboration): <span id="user-id-display" class="font-mono font-semibold text-indigo-800">Authenticating...</span>
         </p>
     </header>
     
     <!-- Department Filter -->
-    <div class="mb-8 p-4 bg-white rounded-xl shadow-lg flex items-center space-x-4">
+    <div class="mb-8 p-4 bg-white rounded-xl shadow-lg flex flex-col md:flex-row items-start md:items-center space-y-3 md:space-y-0 md:space-x-4">
         <label for="department-filter" class="font-semibold text-gray-700 flex items-center">
             <i data-lucide="building-2" class="w-5 h-5 mr-2 text-indigo-500"></i>
-            Current Department:
+            Filter by Department:
         </label>
         <select id="department-filter" onchange="changeDepartment(this.value)" class="flex-grow max-w-sm border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500">
             <!-- Options filled by JS -->
         </select>
+    </div>
+    
+    <!-- STATS ROW (New Feature) -->
+    <div id="stats-row" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Stats will be dynamically inserted here by JS -->
     </div>
 
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -214,8 +209,9 @@
             allWorkOrders: [],
             currentDepartment: 'all', // New state property
             departments: DEPARTMENTS,
-            ASSETS_COLLECTION: `/artifacts/${appId}/users/`,
-            WO_COLLECTION: `/artifacts/${appId}/users/`,
+            // ADVANCEMENT: Use public path for collaborative data sharing
+            ASSETS_COLLECTION: `/artifacts/${appId}/public/data/`,
+            WO_COLLECTION: `/artifacts/${appId}/public/data/`,
         };
 
         // Set log level to Debug for visibility in console
@@ -245,7 +241,8 @@
 
         const formatTimestamp = (timestamp) => {
             if (!timestamp) return 'N/A';
-            const date = timestamp.toDate();
+            // Check if timestamp is a Firebase Timestamp object before calling toDate()
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         };
 
@@ -260,6 +257,45 @@
 
         /* --- DATA FILTERING & RENDERING --- */
         
+        // New function to render the high-level dashboard statistics
+        const renderSummaryStats = () => {
+            const statsRowEl = document.getElementById('stats-row');
+            if (!statsRowEl) return;
+
+            // 1. Filter data based on current department filter
+            const filteredAssets = window.appState.allAssets.filter(asset => 
+                window.appState.currentDepartment === 'all' || asset.department === window.appState.currentDepartment
+            );
+            
+            const filteredWOs = window.appState.allWorkOrders.filter(wo => 
+                window.appState.currentDepartment === 'all' || wo.department === window.appState.currentDepartment
+            );
+            
+            // 2. Calculate metrics
+            const activeWOs = filteredWOs.filter(wo => wo.status !== 'Completed');
+            const completedWOs = filteredWOs.filter(wo => wo.status === 'Completed');
+
+            const stats = [
+                { title: "Total Assets", count: filteredAssets.length, icon: "hard-hat", color: "indigo" },
+                { title: "Active Work Orders", count: activeWOs.length, icon: "wrench", color: "red" },
+                { title: "Completed (Lifetime)", count: completedWOs.length, icon: "check-circle", color: "green" },
+            ];
+
+            // 3. Render HTML
+            statsRowEl.innerHTML = stats.map(stat => `
+                <div class="card p-5 border-l-4 border-${stat.color}-500 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">${stat.title}</p>
+                        <p class="text-3xl font-bold text-gray-900">${stat.count}</p>
+                    </div>
+                    <i data-lucide="${stat.icon}" class="w-8 h-8 text-${stat.color}-400"></i>
+                </div>
+            `).join('');
+            
+            // Re-render lucide icons for the newly added HTML
+            lucide.createIcons(); 
+        };
+
         // Filters and renders the assets based on the currentDepartment
         const renderAssets = () => {
             const listEl = document.getElementById('assets-list');
@@ -271,6 +307,7 @@
 
             if (filteredAssets.length === 0) {
                 listEl.innerHTML = `<p class="p-4 text-gray-500 text-center">No assets registered in the selected department (${DEPARTMENTS.find(d => d.id === window.appState.currentDepartment).name}).</p>`;
+                renderSummaryStats(); // Update stats even if list is empty
                 return;
             }
 
@@ -290,6 +327,7 @@
                 `;
                 listEl.appendChild(item);
             });
+            renderSummaryStats();
         };
 
         // Filters and renders the work orders based on the currentDepartment
@@ -307,6 +345,7 @@
 
             if (activeWO.length === 0) {
                 listEl.innerHTML = '<p class="p-4 text-gray-500 text-center">No active work orders in this department. Everything looks great!</p>';
+                renderSummaryStats(); // Update stats even if list is empty
                 return;
             }
 
@@ -340,6 +379,7 @@
                 `;
                 listEl.appendChild(item);
             });
+            renderSummaryStats();
         };
         
         // Updates the assets dropdown in the New Work Order modal based on the selected department filter
@@ -366,13 +406,15 @@
             window.appState.currentDepartment = newDeptId;
             renderAssets();
             renderWorkOrders();
+            renderSummaryStats();
         };
         
         /* --- FIREBASE LISTENERS --- */
 
         const listenForAssets = () => {
             if (!window.appState.userId) return;
-            const assetRef = collection(db, window.appState.ASSETS_COLLECTION, window.appState.userId, 'cmms_assets');
+            // Fetch from shared public collection
+            const assetRef = collection(db, window.appState.ASSETS_COLLECTION, 'cmms_assets');
 
             onSnapshot(assetRef, (snapshot) => {
                 window.appState.allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -385,8 +427,8 @@
 
         const listenForWorkOrders = () => {
             if (!window.appState.userId) return;
-            const woRef = collection(db, window.appState.WO_COLLECTION, window.appState.userId, 'cmms_work_orders');
-            // Fetch all work orders for client-side filtering by department
+            // Fetch from shared public collection
+            const woRef = collection(db, window.appState.WO_COLLECTION, 'cmms_work_orders');
             const q = query(woRef);
 
             onSnapshot(q, (snapshot) => {
@@ -403,11 +445,9 @@
             event.preventDefault();
             const form = event.target;
             
-            // Validate department selection
             const department = form['asset-department'].value;
             if (department === 'all') {
                  console.error("Cannot create an asset without assigning a specific department.");
-                 alert("Please select a specific department for the asset."); // Use custom modal in a real app
                  return;
             }
             
@@ -421,7 +461,8 @@
             };
 
             try {
-                const assetsRef = collection(db, window.appState.ASSETS_COLLECTION, window.appState.userId, 'cmms_assets');
+                // Add to shared public collection
+                const assetsRef = collection(db, window.appState.ASSETS_COLLECTION, 'cmms_assets');
                 await addDoc(assetsRef, assetData);
                 form.reset();
                 toggleModal('new-asset-modal');
@@ -434,11 +475,9 @@
             event.preventDefault();
             const form = event.target;
 
-             // Validate department selection
             const department = form['wo-department'].value;
             if (department === 'all') {
                  console.error("Cannot create a work order without assigning a specific department.");
-                 alert("Please select a specific department for the work order."); // Use custom modal in a real app
                  return;
             }
 
@@ -453,7 +492,8 @@
             };
 
             try {
-                const woRef = collection(db, window.appState.WO_COLLECTION, window.appState.userId, 'cmms_work_orders');
+                // Add to shared public collection
+                const woRef = collection(db, window.appState.WO_COLLECTION, 'cmms_work_orders');
                 await addDoc(woRef, woData);
                 form.reset();
                 toggleModal('new-wo-modal');
@@ -463,13 +503,9 @@
         };
 
         window.updateWorkOrderStatus = async (woId, newStatus) => {
-             // In a real application, replace confirm() with a custom modal
-             if (!confirm(`Are you sure you want to change this Work Order status to: ${newStatus}?`)) {
-                return;
-            }
-
             try {
-                const woDocRef = doc(db, window.appState.WO_COLLECTION, window.appState.userId, 'cmms_work_orders', woId);
+                // Update in shared public collection
+                const woDocRef = doc(db, window.appState.WO_COLLECTION, 'cmms_work_orders', woId);
                 const updateData = {
                     status: newStatus,
                 };
@@ -494,6 +530,7 @@
             const populateSelect = (selectEl, includeAll = true) => {
                 selectEl.innerHTML = '';
                 window.appState.departments.forEach(dept => {
+                    // Skip 'All Departments' for creation modals
                     if (dept.id === 'all' && !includeAll) return;
                     
                     const option = document.createElement('option');
@@ -506,7 +543,7 @@
             // Populate Filter (includes 'All Departments')
             populateSelect(filterEl, true); 
             
-            // Populate Modals (does NOT include 'All Departments', forces specific selection)
+            // Populate Modals (does NOT include 'All Departments')
             populateSelect(assetDeptEl, false);
             populateSelect(woDeptEl, false);
             
@@ -520,7 +557,6 @@
         const initApp = async () => {
             populateDepartmentDropdowns();
             try {
-                // 1. Authenticate the user
                 let user;
                 if (initialAuthToken) {
                     const userCredential = await signInWithCustomToken(auth, initialAuthToken);
@@ -533,16 +569,13 @@
                 window.appState.userId = user.uid;
                 document.getElementById('user-id-display').textContent = user.uid;
                 
-                // 2. Start listeners once authenticated
+                // 2. Start listeners once authenticated (will now fetch collaborative data)
                 listenForAssets();
                 listenForWorkOrders();
 
             } catch (error) {
                 console.error("Firebase Authentication/Initialization Error:", error);
                 document.getElementById('user-id-display').textContent = 'AUTH ERROR';
-            } finally {
-                 // Hide loading indicator regardless of success or failure
-                document.getElementById('loading-indicator').classList.add('hidden');
             }
             
              // Render lucide icons after initialization is complete
@@ -554,4 +587,3 @@
     </script>
 </body>
 </html>
-   
