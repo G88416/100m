@@ -40,6 +40,13 @@
     </style>
 </head>
 <body class="p-4 md:p-8">
+    
+    <!-- Tailwind JIT Fix: Explicitly include classes used dynamically -->
+    <div class="hidden">
+        <span class="border-indigo-500 text-indigo-400"></span>
+        <span class="border-red-500 text-red-400"></span>
+        <span class="border-green-500 text-green-400"></span>
+    </div>
 
     <header class="mb-8">
         <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">BCC CMMS Dashboard</h1>
@@ -49,6 +56,11 @@
         </p>
     </header>
     
+    <!-- Notification Area -->
+    <div id="notification-area" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Notifications will appear here -->
+    </div>
+
     <!-- Department Filter -->
     <div class="mb-8 p-4 bg-white rounded-xl shadow-lg flex flex-col md:flex-row items-start md:items-center space-y-3 md:space-y-0 md:space-x-4">
         <label for="department-filter" class="font-semibold text-gray-700 flex items-center">
@@ -92,7 +104,7 @@
                 Registered Assets
             </h2>
             <div id="assets-list" class="scroll-area divide-y divide-gray-100">
-                 <!-- Assets will be dynamically inserted here -->
+                <!-- Assets will be dynamically inserted here -->
                 <p class="p-4 text-gray-500 text-center" id="asset-placeholder">Loading assets...</p>
             </div>
 
@@ -177,12 +189,17 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, addDoc, onSnapshot, collection, query, where, updateDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, addDoc, onSnapshot, collection, query, updateDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global variables provided by the environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-cmms-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Base path for public, collaborative data
+        const BASE_PUBLIC_PATH = `/artifacts/${appId}/public/data`;
+        const ASSETS_COLLECTION_PATH = `${BASE_PUBLIC_PATH}/cmms_assets`;
+        const WO_COLLECTION_PATH = `${BASE_PUBLIC_PATH}/cmms_work_orders`;
 
         // Departments list for BCC
         const DEPARTMENTS = [
@@ -209,28 +226,73 @@
             allWorkOrders: [],
             currentDepartment: 'all', // New state property
             departments: DEPARTMENTS,
-            // ADVANCEMENT: Use public path for collaborative data sharing
-            ASSETS_COLLECTION: `/artifacts/${appId}/public/data/`,
-            WO_COLLECTION: `/artifacts/${appId}/public/data/`,
         };
 
         // Set log level to Debug for visibility in console
         setLogLevel('debug');
 
-
         /* --- UTILITY FUNCTIONS --- */
+
+        /**
+         * Shows a transient notification message.
+         * @param {string} message The message to display.
+         * @param {string} type 'success', 'error', or 'info'.
+         */
+        const showNotification = (message, type = 'info') => {
+            const notificationArea = document.getElementById('notification-area');
+            let colorClass, icon;
+
+            switch (type) {
+                case 'success':
+                    colorClass = 'bg-green-500 border-green-700';
+                    icon = 'check-circle';
+                    break;
+                case 'error':
+                    colorClass = 'bg-red-500 border-red-700';
+                    icon = 'alert-triangle';
+                    break;
+                case 'info':
+                default:
+                    colorClass = 'bg-blue-500 border-blue-700';
+                    icon = 'info';
+                    break;
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `p-4 rounded-lg shadow-xl text-white border-b-4 ${colorClass} transition duration-500 transform translate-x-0`;
+            notification.innerHTML = `<div class="flex items-center">
+                <i data-lucide="${icon}" class="w-5 h-5 mr-2"></i>
+                <span>${message}</span>
+            </div>`;
+            
+            notificationArea.appendChild(notification);
+            lucide.createIcons(); // Re-render icon
+
+            // Automatically remove notification after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('opacity-0');
+                notification.addEventListener('transitionend', () => notification.remove());
+            }, 5000);
+        };
+
 
         window.toggleModal = (id) => {
             const modal = document.getElementById(id);
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
-                // Automatically set the department dropdown in the modal to the current filter
-                if (id === 'new-wo-modal' && window.appState.currentDepartment !== 'all') {
-                     document.getElementById('wo-department').value = window.appState.currentDepartment;
-                }
-                 if (id === 'new-asset-modal' && window.appState.currentDepartment !== 'all') {
-                     document.getElementById('asset-department').value = window.appState.currentDepartment;
+                
+                // Set the department dropdown in the modal to the current filter if applicable
+                const currentDept = window.appState.currentDepartment;
+                if (currentDept !== 'all') {
+                    if (id === 'new-wo-modal') {
+                         const deptEl = document.getElementById('wo-department');
+                         if (deptEl) deptEl.value = currentDept;
+                    }
+                    if (id === 'new-asset-modal') {
+                         const deptEl = document.getElementById('asset-department');
+                         if (deptEl) deptEl.value = currentDept;
+                    }
                 }
                 updateWorkOrderModalAssets();
             } else {
@@ -303,10 +365,10 @@
             
             const filteredAssets = window.appState.allAssets.filter(asset => 
                 window.appState.currentDepartment === 'all' || asset.department === window.appState.currentDepartment
-            );
+            ).sort((a, b) => a.name.localeCompare(b.name)); // Sort assets alphabetically
 
             if (filteredAssets.length === 0) {
-                listEl.innerHTML = `<p class="p-4 text-gray-500 text-center">No assets registered in the selected department (${DEPARTMENTS.find(d => d.id === window.appState.currentDepartment).name}).</p>`;
+                listEl.innerHTML = `<p class="p-4 text-gray-500 text-center">No assets registered in the selected department (${DEPARTMENTS.find(d => d.id === window.appState.currentDepartment)?.name || 'Unknown'}).</p>`;
                 renderSummaryStats(); // Update stats even if list is empty
                 return;
             }
@@ -340,8 +402,13 @@
                 window.appState.currentDepartment === 'all' || wo.department === window.appState.currentDepartment
             );
             
-            // 2. Filter by Active Status (Open or In Progress)
-            const activeWO = filteredWO.filter(wo => wo.status !== 'Completed');
+            // 2. Filter by Active Status (Open or In Progress) and sort High > Medium > Low
+            const activeWO = filteredWO
+                .filter(wo => wo.status !== 'Completed')
+                .sort((a, b) => {
+                    const priorityOrder = { 'High': 3, 'Medium': 2, 'Low': 1 };
+                    return priorityOrder[b.priority] - priorityOrder[a.priority];
+                });
 
             if (activeWO.length === 0) {
                 listEl.innerHTML = '<p class="p-4 text-gray-500 text-center">No active work orders in this department. Everything looks great!</p>';
@@ -385,20 +452,25 @@
         // Updates the assets dropdown in the New Work Order modal based on the selected department filter
         const updateWorkOrderModalAssets = () => {
             const selectEl = document.getElementById('wo-asset');
-            selectEl.innerHTML = '<option value="">Select an Asset</option>';
-            
             const deptToFilter = document.getElementById('wo-department')?.value || window.appState.currentDepartment;
+            
+            // Clear existing options
+            selectEl.innerHTML = '<option value="" disabled selected>Select an Asset</option>';
 
             const assetsForDropdown = window.appState.allAssets.filter(asset => 
                 deptToFilter === 'all' || asset.department === deptToFilter
             );
-
-            assetsForDropdown.forEach(asset => {
-                const option = document.createElement('option');
-                option.value = asset.id;
-                option.textContent = `${asset.name} (${asset.location})`;
-                selectEl.appendChild(option);
-            });
+            
+            if (assetsForDropdown.length === 0) {
+                 selectEl.innerHTML += `<option value="" disabled>No Assets in this Department</option>`;
+            } else {
+                 assetsForDropdown.forEach(asset => {
+                    const option = document.createElement('option');
+                    option.value = asset.id;
+                    option.textContent = `${asset.name} (${asset.location})`;
+                    selectEl.appendChild(option);
+                });
+            }
         };
 
         // Function called when the main department filter changes
@@ -413,8 +485,8 @@
 
         const listenForAssets = () => {
             if (!window.appState.userId) return;
-            // Fetch from shared public collection
-            const assetRef = collection(db, window.appState.ASSETS_COLLECTION, 'cmms_assets');
+            // Fetch from shared public collection using the full path
+            const assetRef = collection(db, ASSETS_COLLECTION_PATH);
 
             onSnapshot(assetRef, (snapshot) => {
                 window.appState.allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -427,8 +499,8 @@
 
         const listenForWorkOrders = () => {
             if (!window.appState.userId) return;
-            // Fetch from shared public collection
-            const woRef = collection(db, window.appState.WO_COLLECTION, 'cmms_work_orders');
+            // Fetch from shared public collection using the full path
+            const woRef = collection(db, WO_COLLECTION_PATH);
             const q = query(woRef);
 
             onSnapshot(q, (snapshot) => {
@@ -446,28 +518,31 @@
             const form = event.target;
             
             const department = form['asset-department'].value;
-            if (department === 'all') {
-                 console.error("Cannot create an asset without assigning a specific department.");
-                 return;
+            const assetName = form['asset-name'].value;
+
+            if (department === 'all' || !department) {
+                showNotification("Please select a specific department for the asset.", 'error');
+                return;
             }
             
             const assetData = {
                 department: department,
-                name: form['asset-name'].value,
+                name: assetName,
                 location: form['asset-location'].value,
-                serial: form['asset-serial'].value,
+                serial: form['asset-serial'].value || 'N/A', // Allow serial to be optional
                 createdAt: new Date(),
                 createdBy: window.appState.userId
             };
 
             try {
-                // Add to shared public collection
-                const assetsRef = collection(db, window.appState.ASSETS_COLLECTION, 'cmms_assets');
+                const assetsRef = collection(db, ASSETS_COLLECTION_PATH);
                 await addDoc(assetsRef, assetData);
                 form.reset();
                 toggleModal('new-asset-modal');
+                showNotification(`Asset '${assetName}' registered successfully!`, 'success');
             } catch (error) {
                 console.error("Error adding asset:", error);
+                showNotification("Error registering asset. Check console for details.", 'error');
             }
         };
 
@@ -476,15 +551,23 @@
             const form = event.target;
 
             const department = form['wo-department'].value;
-            if (department === 'all') {
-                 console.error("Cannot create a work order without assigning a specific department.");
-                 return;
+            const assetId = form['wo-asset'].value;
+            const woTitle = form['wo-title'].value;
+
+            if (department === 'all' || !department) {
+                showNotification("Please select a specific department for the work order.", 'error');
+                return;
+            }
+
+            if (!assetId) {
+                showNotification("Please select a related Asset.", 'error');
+                return;
             }
 
             const woData = {
                 department: department,
-                title: form['wo-title'].value,
-                assetId: form['wo-asset'].value,
+                title: woTitle,
+                assetId: assetId,
                 priority: form['wo-priority'].value,
                 status: 'Open',
                 createdAt: new Date(),
@@ -492,30 +575,35 @@
             };
 
             try {
-                // Add to shared public collection
-                const woRef = collection(db, window.appState.WO_COLLECTION, 'cmms_work_orders');
+                const woRef = collection(db, WO_COLLECTION_PATH);
                 await addDoc(woRef, woData);
                 form.reset();
                 toggleModal('new-wo-modal');
+                showNotification(`Work Order '${woTitle}' created successfully!`, 'success');
             } catch (error) {
                 console.error("Error adding work order:", error);
+                showNotification("Error creating work order. Check console for details.", 'error');
             }
         };
 
         window.updateWorkOrderStatus = async (woId, newStatus) => {
             try {
-                // Update in shared public collection
-                const woDocRef = doc(db, window.appState.WO_COLLECTION, 'cmms_work_orders', woId);
+                // Get the document reference using the full path
+                const woDocRef = doc(db, WO_COLLECTION_PATH, woId);
                 const updateData = {
                     status: newStatus,
                 };
                 if (newStatus === 'Completed') {
                     updateData.completedAt = new Date();
+                    showNotification(`Work Order ${woId.substring(0, 8)} marked as completed.`, 'success');
+                } else if (newStatus === 'In Progress') {
+                    showNotification(`Work Order ${woId.substring(0, 8)} started!`, 'info');
                 }
 
                 await updateDoc(woDocRef, updateData);
             } catch (error) {
                 console.error("Error updating work order status:", error);
+                showNotification("Failed to update status. Check console.", 'error');
             }
         };
         
@@ -529,6 +617,10 @@
             // Function to populate a single select element
             const populateSelect = (selectEl, includeAll = true) => {
                 selectEl.innerHTML = '';
+                if (!includeAll) {
+                    selectEl.innerHTML = `<option value="" disabled selected>Select a Department</option>`;
+                }
+                
                 window.appState.departments.forEach(dept => {
                     // Skip 'All Departments' for creation modals
                     if (dept.id === 'all' && !includeAll) return;
@@ -556,6 +648,7 @@
 
         const initApp = async () => {
             populateDepartmentDropdowns();
+            
             try {
                 let user;
                 if (initialAuthToken) {
@@ -569,17 +662,18 @@
                 window.appState.userId = user.uid;
                 document.getElementById('user-id-display').textContent = user.uid;
                 
-                // 2. Start listeners once authenticated (will now fetch collaborative data)
+                // Start listeners once authenticated (will now fetch collaborative data)
                 listenForAssets();
                 listenForWorkOrders();
 
             } catch (error) {
                 console.error("Firebase Authentication/Initialization Error:", error);
                 document.getElementById('user-id-display').textContent = 'AUTH ERROR';
+                showNotification("Authentication failed. Data will not sync.", 'error');
             }
             
-             // Render lucide icons after initialization is complete
-             lucide.createIcons();
+            // Render lucide icons after initialization is complete
+            lucide.createIcons();
         };
 
         // Start the application after the window loads
