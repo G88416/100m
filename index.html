@@ -61,15 +61,27 @@
         /* Search Input */
         .search-input { transition: border-color 0.3s, box-shadow 0.3s; }
         .search-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        
+        /* Manual color classes for dynamic content */
+        .stat-indigo { border-left-color: #6366f1; }
+        .stat-red { border-left-color: #ef4444; }
+        .stat-green { border-left-color: #22c55e; }
+        .text-indigo-400 { color: #818cf8; }
+        .text-red-400 { color: #f87171; }
+        .text-green-400 { color: #4ade80; }
     </style>
 </head>
 <body class="p-4 md:p-8 transition-colors duration-300">
     
-    <!-- Tailwind JIT Fix: Explicitly include classes used dynamically -->
-    <div class="hidden">
-        <span class="border-indigo-500 text-indigo-400"></span>
-        <span class="border-red-500 text-red-400"></span>
-        <span class="border-green-500 text-green-400"></span>
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="text-white text-xl p-4 rounded-lg bg-indigo-600">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Initializing BCC CMMS & Authenticating...
+        </div>
     </div>
 
     <header class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -97,11 +109,11 @@
             <i data-lucide="building-2" class="w-5 h-5 mr-2 text-indigo-500 dark:text-indigo-400"></i>
             Filter by Department:
         </label>
-        <select id="department-filter" onchange="changeDepartment(this.value)" class="flex-grow max-w-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
+        <select id="department-filter" class="flex-grow max-w-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
             <!-- Options filled by JS -->
         </select>
         <!-- Global Search -->
-        <input type="text" id="global-search" placeholder="Search assets or work orders..." class="mt-3 md:mt-0 md:ml-4 flex-grow max-w-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 search-input" oninput="handleGlobalSearch(this.value)">
+        <input type="text" id="global-search" placeholder="Search assets or work orders..." class="mt-3 md:mt-0 md:ml-4 flex-grow max-w-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200 search-input">
     </div>
     
     <!-- Enhanced Stats Row with Charts -->
@@ -131,7 +143,7 @@
             </div>
 
             <!-- New Work Order Form -->
-            <button onclick="toggleModal('new-wo-modal')" class="mt-6 w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-150">
+            <button id="new-wo-btn" class="mt-6 w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-150">
                 <i data-lucide="plus" class="w-5 h-5 inline-block mr-1"></i>
                 Create New Work Order
             </button>
@@ -149,7 +161,7 @@
             </div>
 
             <!-- New Asset Form -->
-            <button onclick="toggleModal('new-asset-modal')" class="mt-6 w-full py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-150">
+            <button id="new-asset-btn" class="mt-6 w-full py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-150">
                 <i data-lucide="factory" class="w-5 h-5 inline-block mr-1"></i>
                 Add New Asset
             </button>
@@ -157,10 +169,10 @@
     </main>
 
     <!-- Modal for New Work Order -->
-    <div id="new-wo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div id="new-wo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-full max-w-lg card">
             <h3 class="text-xl font-bold mb-4 dark:text-gray-200">Create Work Order</h3>
-            <form id="new-wo-form" onsubmit="handleNewWorkOrder(event)">
+            <form id="new-wo-form">
                 <div class="mb-4">
                     <label for="wo-department" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department</label>
                     <select id="wo-department" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200">
@@ -191,7 +203,7 @@
                     <textarea id="wo-description" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200" rows="3"></textarea>
                 </div>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="toggleModal('new-wo-modal')" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
+                    <button type="button" id="cancel-wo-btn" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
                     <button type="submit" class="py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Create Work Order</button>
                 </div>
             </form>
@@ -199,10 +211,10 @@
     </div>
 
     <!-- Modal for New Asset -->
-    <div id="new-asset-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div id="new-asset-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-full max-w-lg card">
             <h3 class="text-xl font-bold mb-4 dark:text-gray-200">Register New Asset</h3>
-            <form id="new-asset-form" onsubmit="handleNewAsset(event)">
+            <form id="new-asset-form">
                 <div class="mb-4">
                     <label for="asset-department" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Department</label>
                     <select id="asset-department" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-200">
@@ -226,7 +238,7 @@
                     <textarea id="asset-description" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-gray-200" rows="3"></textarea>
                 </div>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="toggleModal('new-asset-modal')" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
+                    <button type="button" id="cancel-asset-btn" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
                     <button type="submit" class="py-2 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">Register Asset</button>
                 </div>
             </form>
@@ -234,10 +246,10 @@
     </div>
 
     <!-- Edit Work Order Modal (New Feature) -->
-    <div id="edit-wo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div id="edit-wo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-full max-w-lg card">
             <h3 class="text-xl font-bold mb-4 dark:text-gray-200">Edit Work Order</h3>
-            <form id="edit-wo-form" onsubmit="handleEditWorkOrder(event)">
+            <form id="edit-wo-form">
                 <input type="hidden" id="edit-wo-id">
                 <div class="mb-4">
                     <label for="edit-wo-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
@@ -256,7 +268,7 @@
                     <textarea id="edit-wo-description" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200" rows="3"></textarea>
                 </div>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="toggleModal('edit-wo-modal')" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
+                    <button type="button" id="cancel-edit-wo-btn" class="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
                     <button type="submit" class="py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Save Changes</button>
                 </div>
             </form>
@@ -271,13 +283,8 @@
 
         // Global variables provided by the environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-cmms-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Base path for public, collaborative data
-        const BASE_PUBLIC_PATH = `/artifacts/${appId}/public/data`;
-        const ASSETS_COLLECTION_PATH = `${BASE_PUBLIC_PATH}/cmms_assets`;
-        const WO_COLLECTION_PATH = `${BASE_PUBLIC_PATH}/cmms_work_orders`;
 
         // Departments list for BCC
         const DEPARTMENTS = [
@@ -357,7 +364,7 @@
             }, 5000);
         };
 
-        window.toggleModal = (id, data = null) => {
+        const toggleModal = (id, data = null) => {
             const modal = document.getElementById(id);
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
@@ -392,8 +399,13 @@
 
         const formatTimestamp = (timestamp) => {
             if (!timestamp) return 'N/A';
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            try {
+                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } catch (error) {
+                console.error('Error formatting timestamp:', error);
+                return 'Invalid Date';
+            }
         };
 
         const getStatusBadge = (status) => {
@@ -432,7 +444,7 @@
             ];
 
             statsRowEl.innerHTML = stats.map(stat => `
-                <div class="card p-5 border-l-4 border-${stat.color}-500 flex items-center justify-between dark:border-${stat.color}-400">
+                <div class="card p-5 stat-${stat.color} border-l-4 flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">${stat.title}</p>
                         <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">${stat.count}</p>
@@ -446,7 +458,10 @@
 
         // Render Chart
         const renderChart = () => {
-            const ctx = document.getElementById('maintenance-chart').getContext('2d');
+            const ctx = document.getElementById('maintenance-chart');
+            if (!ctx) return;
+            
+            const canvas = ctx.getContext('2d');
             const filteredWOs = window.appState.allWorkOrders.filter(wo => 
                 window.appState.currentDepartment === 'all' || wo.department === window.appState.currentDepartment
             );
@@ -459,9 +474,11 @@
                 statuses[wo.status]++;
             });
 
-            if (window.appState.chart) window.appState.chart.destroy();
+            if (window.appState.chart) {
+                window.appState.chart.destroy();
+            }
 
-            window.appState.chart = new Chart(ctx, {
+            window.appState.chart = new Chart(canvas, {
                 type: 'doughnut',
                 data: {
                     labels: ['High Priority', 'Medium Priority', 'Low Priority', 'Open', 'In Progress', 'Completed'],
@@ -472,7 +489,14 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { position: 'top' } }
+                    plugins: { 
+                        legend: { 
+                            position: 'top',
+                            labels: {
+                                color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#374151'
+                            }
+                        } 
+                    }
                 }
             });
         };
@@ -480,11 +504,15 @@
         // Render assets
         const renderAssets = () => {
             const listEl = document.getElementById('assets-list');
+            if (!listEl) return;
+            
             listEl.innerHTML = '';
             
             const filteredAssets = window.appState.allAssets.filter(asset => 
                 (window.appState.currentDepartment === 'all' || asset.department === window.appState.currentDepartment) &&
-                (asset.name.toLowerCase().includes(window.appState.searchQuery) || asset.location.toLowerCase().includes(window.appState.searchQuery) || (asset.description || '').toLowerCase().includes(window.appState.searchQuery))
+                (asset.name.toLowerCase().includes(window.appState.searchQuery) || 
+                 asset.location.toLowerCase().includes(window.appState.searchQuery) || 
+                 (asset.description || '').toLowerCase().includes(window.appState.searchQuery))
             ).sort((a, b) => a.name.localeCompare(b.name));
 
             if (filteredAssets.length === 0) {
@@ -514,6 +542,8 @@
         // Render work orders
         const renderWorkOrders = () => {
             const listEl = document.getElementById('work-orders-list');
+            if (!listEl) return;
+            
             listEl.innerHTML = '';
             
             const filteredWO = window.appState.allWorkOrders.filter(wo => 
@@ -559,7 +589,7 @@
                                 ${wo.status === 'Open' ? 'Start' : 'Complete'}
                             </button>` : ''
                         }
-                        <button onclick="toggleModal('edit-wo-modal', {id: '${wo.id}', title: '${wo.title}', priority: '${wo.priority}', description: '${wo.description || ''}'})" 
+                        <button onclick="openEditWorkOrderModal('${wo.id}', '${wo.title.replace(/'/g, "\\'")}', '${wo.priority}', '${(wo.description || '').replace(/'/g, "\\'")}')" 
                             class="py-1 px-3 text-xs rounded-full bg-blue-500 hover:bg-blue-600 text-white transition duration-150">
                             Edit
                         </button>
@@ -571,6 +601,8 @@
         
         const updateWorkOrderModalAssets = () => {
             const selectEl = document.getElementById('wo-asset');
+            if (!selectEl) return;
+            
             const deptToFilter = document.getElementById('wo-department')?.value || window.appState.currentDepartment;
             
             selectEl.innerHTML = '<option value="" disabled selected>Select an Asset</option>';
@@ -591,7 +623,7 @@
             }
         };
 
-        window.changeDepartment = (newDeptId) => {
+        const changeDepartment = (newDeptId) => {
             window.appState.currentDepartment = newDeptId;
             renderAssets();
             renderWorkOrders();
@@ -599,7 +631,7 @@
             renderChart();
         };
         
-        window.handleGlobalSearch = (query) => {
+        const handleGlobalSearch = (query) => {
             window.appState.searchQuery = query.toLowerCase();
             renderAssets();
             renderWorkOrders();
@@ -609,43 +641,54 @@
         /* --- FIREBASE LISTENERS --- */
 
         const listenForAssets = () => {
-            if (!window.appState.userId) return;
-            const assetRef = collection(db, ASSETS_COLLECTION_PATH);
+            try {
+                // Use a simpler collection path structure
+                const assetRef = collection(db, 'cmms_assets');
 
-            onSnapshot(assetRef, (snapshot) => {
-                window.appState.allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderAssets();
-                updateWorkOrderModalAssets(); 
-                renderSummaryStats();
-                renderChart();
-            }, (error) => {
-                console.error("Error listening to assets:", error);
-            });
+                onSnapshot(assetRef, (snapshot) => {
+                    window.appState.allAssets = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    console.log(`Loaded ${window.appState.allAssets.length} assets`);
+                    renderAssets();
+                    updateWorkOrderModalAssets(); 
+                    renderSummaryStats();
+                    renderChart();
+                }, (error) => {
+                    console.error("Error listening to assets:", error);
+                    showNotification("Error loading assets", 'error');
+                });
+            } catch (error) {
+                console.error("Error setting up assets listener:", error);
+            }
         };
 
         const listenForWorkOrders = () => {
-            if (!window.appState.userId) return;
-            const woRef = collection(db, WO_COLLECTION_PATH);
-            const q = query(woRef);
+            try {
+                const woRef = collection(db, 'cmms_work_orders');
+                const q = query(woRef);
 
-            onSnapshot(q, (snapshot) => {
-                window.appState.allWorkOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderWorkOrders();
-                renderSummaryStats();
-                renderChart();
-            }, (error) => {
-                console.error("Error listening to work orders:", error);
-            });
+                onSnapshot(q, (snapshot) => {
+                    window.appState.allWorkOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    console.log(`Loaded ${window.appState.allWorkOrders.length} work orders`);
+                    renderWorkOrders();
+                    renderSummaryStats();
+                    renderChart();
+                }, (error) => {
+                    console.error("Error listening to work orders:", error);
+                    showNotification("Error loading work orders", 'error');
+                });
+            } catch (error) {
+                console.error("Error setting up work orders listener:", error);
+            }
         };
         
         /* --- FORM HANDLERS --- */
 
-        window.handleNewAsset = async (event) => {
+        const handleNewAsset = async (event) => {
             event.preventDefault();
             const form = event.target;
             
-            const department = form['asset-department'].value;
-            const assetName = form['asset-name'].value;
+            const department = document.getElementById('asset-department').value;
+            const assetName = document.getElementById('asset-name').value;
 
             if (department === 'all' || !department) {
                 showNotification("Please select a specific department for the asset.", 'error');
@@ -655,15 +698,15 @@
             const assetData = {
                 department: department,
                 name: assetName,
-                location: form['asset-location'].value,
-                serial: form['asset-serial'].value || 'N/A',
-                description: form['asset-description'].value || '',
+                location: document.getElementById('asset-location').value,
+                serial: document.getElementById('asset-serial').value || 'N/A',
+                description: document.getElementById('asset-description').value || '',
                 createdAt: new Date(),
-                createdBy: window.appState.userId
+                createdBy: window.appState.userId || 'anonymous'
             };
 
             try {
-                const assetsRef = collection(db, ASSETS_COLLECTION_PATH);
+                const assetsRef = collection(db, 'cmms_assets');
                 await addDoc(assetsRef, assetData);
                 form.reset();
                 toggleModal('new-asset-modal');
@@ -674,13 +717,13 @@
             }
         };
 
-        window.handleNewWorkOrder = async (event) => {
+        const handleNewWorkOrder = async (event) => {
             event.preventDefault();
             const form = event.target;
 
-            const department = form['wo-department'].value;
-            const assetId = form['wo-asset'].value;
-            const woTitle = form['wo-title'].value;
+            const department = document.getElementById('wo-department').value;
+            const assetId = document.getElementById('wo-asset').value;
+            const woTitle = document.getElementById('wo-title').value;
 
             if (department === 'all' || !department) {
                 showNotification("Please select a specific department for the work order.", 'error');
@@ -696,15 +739,15 @@
                 department: department,
                 title: woTitle,
                 assetId: assetId,
-                priority: form['wo-priority'].value,
-                description: form['wo-description'].value || '',
+                priority: document.getElementById('wo-priority').value,
+                description: document.getElementById('wo-description').value || '',
                 status: 'Open',
                 createdAt: new Date(),
-                createdBy: window.appState.userId
+                createdBy: window.appState.userId || 'anonymous'
             };
 
             try {
-                const woRef = collection(db, WO_COLLECTION_PATH);
+                const woRef = collection(db, 'cmms_work_orders');
                 await addDoc(woRef, woData);
                 form.reset();
                 toggleModal('new-wo-modal');
@@ -715,19 +758,19 @@
             }
         };
 
-        window.handleEditWorkOrder = async (event) => {
+        const handleEditWorkOrder = async (event) => {
             event.preventDefault();
             const form = event.target;
-            const woId = form['edit-wo-id'].value;
+            const woId = document.getElementById('edit-wo-id').value;
 
             const updateData = {
-                title: form['edit-wo-title'].value,
-                priority: form['edit-wo-priority'].value,
-                description: form['edit-wo-description'].value || ''
+                title: document.getElementById('edit-wo-title').value,
+                priority: document.getElementById('edit-wo-priority').value,
+                description: document.getElementById('edit-wo-description').value || ''
             };
 
             try {
-                const woDocRef = doc(db, WO_COLLECTION_PATH, woId);
+                const woDocRef = doc(db, 'cmms_work_orders', woId);
                 await updateDoc(woDocRef, updateData);
                 toggleModal('edit-wo-modal');
                 showNotification(`Work Order updated successfully!`, 'success');
@@ -737,9 +780,9 @@
             }
         };
 
-        window.updateWorkOrderStatus = async (woId, newStatus) => {
+        const updateWorkOrderStatus = async (woId, newStatus) => {
             try {
-                const woDocRef = doc(db, WO_COLLECTION_PATH, woId);
+                const woDocRef = doc(db, 'cmms_work_orders', woId);
                 const updateData = {
                     status: newStatus,
                 };
@@ -756,6 +799,15 @@
                 showNotification("Failed to update status. Check console.", 'error');
             }
         };
+
+        const openEditWorkOrderModal = (id, title, priority, description) => {
+            toggleModal('edit-wo-modal', {
+                id: id,
+                title: title,
+                priority: priority,
+                description: description
+            });
+        };
         
         /* --- UI POPULATION FUNCTIONS --- */
         
@@ -765,6 +817,8 @@
             const woDeptEl = document.getElementById('wo-department');
             
             const populateSelect = (selectEl, includeAll = true) => {
+                if (!selectEl) return;
+                
                 selectEl.innerHTML = '';
                 if (!includeAll) {
                     selectEl.innerHTML = `<option value="" disabled selected>Select a Department</option>`;
@@ -784,13 +838,89 @@
             populateSelect(assetDeptEl, false);
             populateSelect(woDeptEl, false);
             
-            woDeptEl.addEventListener('change', updateWorkOrderModalAssets);
+            if (woDeptEl) {
+                woDeptEl.addEventListener('change', updateWorkOrderModalAssets);
+            }
+        };
+
+        /* --- EVENT LISTENER SETUP --- */
+
+        const setupEventListeners = () => {
+            // Department filter
+            const deptFilter = document.getElementById('department-filter');
+            if (deptFilter) {
+                deptFilter.addEventListener('change', (e) => changeDepartment(e.target.value));
+            }
+
+            // Search input
+            const searchInput = document.getElementById('global-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => handleGlobalSearch(e.target.value));
+            }
+
+            // Modal buttons
+            const newWoBtn = document.getElementById('new-wo-btn');
+            if (newWoBtn) {
+                newWoBtn.addEventListener('click', () => toggleModal('new-wo-modal'));
+            }
+
+            const newAssetBtn = document.getElementById('new-asset-btn');
+            if (newAssetBtn) {
+                newAssetBtn.addEventListener('click', () => toggleModal('new-asset-modal'));
+            }
+
+            // Form submissions
+            const newAssetForm = document.getElementById('new-asset-form');
+            if (newAssetForm) {
+                newAssetForm.addEventListener('submit', handleNewAsset);
+            }
+
+            const newWoForm = document.getElementById('new-wo-form');
+            if (newWoForm) {
+                newWoForm.addEventListener('submit', handleNewWorkOrder);
+            }
+
+            const editWoForm = document.getElementById('edit-wo-form');
+            if (editWoForm) {
+                editWoForm.addEventListener('submit', handleEditWorkOrder);
+            }
+
+            // Cancel buttons
+            const cancelAssetBtn = document.getElementById('cancel-asset-btn');
+            if (cancelAssetBtn) {
+                cancelAssetBtn.addEventListener('click', () => toggleModal('new-asset-modal'));
+            }
+
+            const cancelWoBtn = document.getElementById('cancel-wo-btn');
+            if (cancelWoBtn) {
+                cancelWoBtn.addEventListener('click', () => toggleModal('new-wo-modal'));
+            }
+
+            const cancelEditWoBtn = document.getElementById('cancel-edit-wo-btn');
+            if (cancelEditWoBtn) {
+                cancelEditWoBtn.addEventListener('click', () => toggleModal('edit-wo-modal'));
+            }
+
+            // Dark mode toggle
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', () => {
+                    document.documentElement.classList.toggle('dark');
+                    const isDark = document.documentElement.classList.contains('dark');
+                    darkModeToggle.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}" class="w-5 h-5 inline-block mr-1"></i> Toggle ${isDark ? 'Light' : 'Dark'} Mode`;
+                    lucide.createIcons();
+                    if (window.appState.chart) {
+                        renderChart(); // Re-render chart for color updates
+                    }
+                });
+            }
         };
 
         /* --- INITIALIZATION --- */
 
         const initApp = async () => {
             populateDepartmentDropdowns();
+            setupEventListeners();
             
             try {
                 let user;
@@ -812,22 +942,29 @@
                 console.error("Firebase Authentication/Initialization Error:", error);
                 document.getElementById('user-id-display').textContent = 'AUTH ERROR';
                 showNotification("Authentication failed. Data will not sync.", 'error');
+            } finally {
+                // Hide loading indicator
+                const loadingIndicator = document.getElementById('loading-indicator');
+                if (loadingIndicator) {
+                    loadingIndicator.classList.add('hidden');
+                }
             }
             
             lucide.createIcons();
-
-            // Dark Mode Toggle
-            const toggleButton = document.getElementById('dark-mode-toggle');
-            toggleButton.addEventListener('click', () => {
-                document.documentElement.classList.toggle('dark');
-                const isDark = document.documentElement.classList.contains('dark');
-                toggleButton.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}" class="w-5 h-5 inline-block mr-1"></i> Toggle ${isDark ? 'Light' : 'Dark'} Mode`;
-                lucide.createIcons();
-                renderChart(); // Re-render chart for color updates if needed
-            });
         };
 
-        window.onload = initApp;
+        // Make functions globally available
+        window.toggleModal = toggleModal;
+        window.changeDepartment = changeDepartment;
+        window.handleGlobalSearch = handleGlobalSearch;
+        window.updateWorkOrderStatus = updateWorkOrderStatus;
+        window.openEditWorkOrderModal = openEditWorkOrderModal;
+        window.handleNewAsset = handleNewAsset;
+        window.handleNewWorkOrder = handleNewWorkOrder;
+        window.handleEditWorkOrder = handleEditWorkOrder;
+
+        // Start the application
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
