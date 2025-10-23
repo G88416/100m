@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BCC CMMS - Premium & Professional</title>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdn.sheetjs.com/sheetjs-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.2/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         /* === PRESTIGE DESIGN: DARK GOLD & NAVY THEME === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -714,6 +717,12 @@
                     <button onclick="exportData()">Export Data (JSON)</button>
                     <button onclick="document.getElementById('import-file').click()">Import Data (JSON)</button>
                     <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(event)">
+                    <button onclick="document.getElementById('excel-import').click()">Import from Excel</button>
+                    <input type="file" id="excel-import" style="display:none;" accept=".xlsx,.xls" onchange="importExcel(event)">
+                    <button onclick="document.getElementById('word-import').click()">Import from Word (Text to WO)</button>
+                    <input type="file" id="word-import" style="display:none;" accept=".docx,.doc" onchange="importWord(event)">
+                    <button onclick="document.getElementById('pdf-import').click()">Import from PDF (Text to WO)</button>
+                    <input type="file" id="pdf-import" style="display:none;" accept=".pdf" onchange="importPdf(event)">
                     <button onclick="clearAllData()" style="background: #dc3545;">Clear All Local Data (DANGER)</button>
                 </div>
 
@@ -793,6 +802,8 @@
         const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'; // e.g., 'service_cmms_report'
         const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // e.g., 'template_maintenance'
 
+        // PDF.js worker setup
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         // --- CORE APPLICATION FUNCTIONS ---
 
@@ -1760,6 +1771,199 @@
             };
             reader.readAsText(file);
         }
+
+        // Enhanced Upload Data Features
+        window.importExcel = function(event) {
+            if (!permissions[currentUser.role].create) {
+                showNotification('Permission denied to import data.', true);
+                return;
+            }
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dataArray = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(dataArray, { type: 'array' });
+
+                    let importedCount = 0;
+
+                    // Import Assets sheet
+                    if (workbook.Sheets['Assets']) {
+                        const assets = XLSX.utils.sheet_to_json(workbook.Sheets['Assets']);
+                        assets.forEach(row => {
+                            if (row.department && row.name && row.location) {
+                                const newAsset = {
+                                    id: data.nextIds.asset++,
+                                    department: row.department,
+                                    name: row.name,
+                                    serial: row.serial || '',
+                                    location: row.location
+                                };
+                                data.assets.push(newAsset);
+                                importedCount++;
+                            }
+                        });
+                    }
+
+                    // Import WorkOrders sheet (simplified: assume asset name, match by name)
+                    if (workbook.Sheets['WorkOrders']) {
+                        const wos = XLSX.utils.sheet_to_json(workbook.Sheets['WorkOrders']);
+                        wos.forEach(row => {
+                            if (row.department && row.description && row.priority) {
+                                const assetMatch = data.assets.find(a => a.name.toLowerCase().includes(row.assetName?.toLowerCase() || ''));
+                                const newWo = {
+                                    id: data.nextIds.wo++,
+                                    department: row.department,
+                                    assetId: assetMatch ? assetMatch.id : 1, // Default to first if no match
+                                    description: row.description,
+                                    priority: row.priority || 'Medium',
+                                    assignedTo: row.assignedTo || 'tech',
+                                    status: row.status || 'Open',
+                                    createdBy: currentUser.username,
+                                    createdAt: row.createdAt || new Date().toISOString().split('T')[0]
+                                };
+                                data.workOrders.push(newWo);
+                                importedCount++;
+                            }
+                        });
+                    }
+
+                    // Import Inventory sheet
+                    if (workbook.Sheets['Inventory']) {
+                        const invs = XLSX.utils.sheet_to_json(workbook.Sheets['Inventory']);
+                        invs.forEach(row => {
+                            if (row.department && row.name && row.qty !== undefined && row.reorder !== undefined) {
+                                const newInv = {
+                                    id: data.nextIds.inv++,
+                                    department: row.department,
+                                    name: row.name,
+                                    qty: parseInt(row.qty),
+                                    reorder: parseInt(row.reorder)
+                                };
+                                data.inventory.push(newInv);
+                                importedCount++;
+                            }
+                        });
+                    }
+
+                    // Import PM sheet
+                    if (workbook.Sheets['PM']) {
+                        const pms = XLSX.utils.sheet_to_json(workbook.Sheets['PM']);
+                        pms.forEach(row => {
+                            const assetMatch = data.assets.find(a => a.name.toLowerCase().includes(row.assetName?.toLowerCase() || ''));
+                            if (row.description && row.frequency && row.nextDue && assetMatch) {
+                                const newPm = {
+                                    id: data.nextIds.pm++,
+                                    assetId: assetMatch.id,
+                                    description: row.description,
+                                    frequency: row.frequency,
+                                    nextDue: row.nextDue,
+                                    department: assetMatch.department,
+                                    status: 'Active'
+                                };
+                                data.pmSchedules.push(newPm);
+                                importedCount++;
+                            }
+                        });
+                    }
+
+                    if (importedCount > 0) {
+                        saveData();
+                        renderAssets();
+                        renderWorkOrders();
+                        renderInventory();
+                        renderPmSchedules();
+                        renderDashboard();
+                        showNotification(`${importedCount} records imported from Excel!`);
+                    } else {
+                        showNotification('No valid data found in Excel sheets. Expected sheets: Assets, WorkOrders, Inventory, PM.', true);
+                    }
+                } catch (error) {
+                    showNotification('Error parsing Excel file.', true);
+                    console.error('Excel Import Error:', error);
+                }
+                document.getElementById('excel-import').value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        window.importWord = function(event) {
+            if (!permissions[currentUser.role].create) {
+                showNotification('Permission denied to import data.', true);
+                return;
+            }
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+                    .then(result => {
+                        const htmlText = result.value;
+                        const plainText = htmlText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                        document.getElementById('wo-description').value = plainText.substring(0, 1000); // Limit length
+                        showSection('work-orders');
+                        showNotification('Text extracted from Word document. Review the description and create a new Work Order.');
+                    })
+                    .catch(error => {
+                        showNotification('Error parsing Word file.', true);
+                        console.error('Word Import Error:', error);
+                    });
+            };
+            reader.readAsArrayBuffer(file);
+            document.getElementById('word-import').value = '';
+        };
+
+        window.importPdf = function(event) {
+            if (!permissions[currentUser.role].create) {
+                showNotification('Permission denied to import data.', true);
+                return;
+            }
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const typedarray = new Uint8Array(e.target.result);
+                pdfjsLib.getDocument(typedarray).promise.then(pdf => {
+                    let fullText = '';
+                    let pagesProcessed = 0;
+
+                    function processPage(pageNum) {
+                        pdf.getPage(pageNum).then(page => {
+                            page.getTextContent().then(content => {
+                                const textItems = content.items.map(item => item.str);
+                                fullText += textItems.join(' ') + '\n';
+                                pagesProcessed++;
+
+                                if (pagesProcessed === pdf.numPages) {
+                                    const limitedText = fullText.substring(0, 1000).replace(/\s+/g, ' ').trim();
+                                    document.getElementById('wo-description').value = limitedText;
+                                    showSection('work-orders');
+                                    showNotification('Text extracted from PDF. Review the description and create a new Work Order.');
+                                } else {
+                                    processPage(pagesProcessed + 1);
+                                }
+                            });
+                        });
+                    }
+
+                    if (pdf.numPages > 0) {
+                        processPage(1);
+                    } else {
+                        showNotification('No pages found in PDF.', true);
+                    }
+                }).catch(error => {
+                    showNotification('Error parsing PDF file.', true);
+                    console.error('PDF Import Error:', error);
+                });
+            };
+            reader.readAsArrayBuffer(file);
+            document.getElementById('pdf-import').value = '';
+        };
         
         window.clearAllData = function() {
             if (confirm('DANGER: Are you absolutely sure you want to clear ALL local application data? This cannot be undone!')) {
