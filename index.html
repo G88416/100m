@@ -8,6 +8,8 @@
     <script src="https://cdn.sheetjs.com/sheetjs-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.2/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
     <style>
         /* === PRESTIGE DESIGN: DARK GOLD & NAVY THEME === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -330,6 +332,42 @@
             padding: 14px;
         }
 
+        /* Google Sync Styles */
+        .google-sync-config {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+        .google-sync-config h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+        .google-sync-actions {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;
+        }
+        .google-sync-actions button {
+            padding: 10px 15px;
+            font-size: 0.9rem;
+        }
+        #google-auth-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        #google-auth-status.authenticated {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+        #google-auth-status.unauthenticated {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
         @media print {
             body { background: white; color: #000; }
             nav, header .user-info, #notification, button, input, select, textarea, #email-modal, .action-btn { display: none !important; }
@@ -355,6 +393,7 @@
             .notification { top: 10px; right: 10px; left: 10px; transform: translateY(-120%); }
             .notification.show { transform: translateY(0); }
             .user-info { position: static; margin-top: 10px; }
+            .google-sync-actions { justify-content: center; }
         }
 
         @media (max-width: 480px) {
@@ -726,6 +765,26 @@
                     <button onclick="clearAllData()" style="background: #dc3545;">Clear All Local Data (DANGER)</button>
                 </div>
 
+                <div class="google-sync-config">
+                    <h3>Google Sheets Sync</h3>
+                    <p style="color:#b0b0b0; font-size:0.9rem;">Configure and sync your data with Google Sheets. Follow the <a href="https://developers.google.com/sheets/api/quickstart/js" target="_blank" style="color:#ffd700;">Google Quickstart</a> to get your Client ID and API Key.</p>
+                    <div style="display: grid; gap: 10px; margin-bottom: 15px;">
+                        <label>Client ID:</label>
+                        <input type="text" id="gs-client-id" placeholder="YOUR_CLIENT_ID" onchange="updateGsConfig()">
+                        <label>API Key:</label>
+                        <input type="text" id="gs-api-key" placeholder="YOUR_API_KEY" onchange="updateGsConfig()">
+                        <label>Spreadsheet ID:</label>
+                        <input type="text" id="gs-spreadsheet-id" placeholder="YOUR_SPREADSHEET_ID" onchange="updateGsConfig()">
+                    </div>
+                    <div class="google-sync-actions">
+                        <button id="gs-authorize-btn" onclick="handleAuthClick()" style="display:none;">Authorize Google</button>
+                        <button id="gs-signout-btn" onclick="handleSignoutClick()" style="background:#dc3545; display:none;">Sign Out</button>
+                        <button onclick="syncToSheets()" style="background:#28a745; display:none;" id="gs-sync-to-btn">Sync to Sheets</button>
+                        <button onclick="syncFromSheets()" style="background:#17a2b8; display:none;" id="gs-sync-from-btn">Sync from Sheets</button>
+                    </div>
+                    <div id="google-auth-status" class="unauthenticated">Not authenticated</div>
+                </div>
+
                 <h3 style="margin-top: 30px; color:#ffd700;">EmailJS Configuration</h3>
                 <p>Configure EmailJS to enable email functionality for reports. You must replace the placeholders in the script with your actual keys.</p>
                 <form onsubmit="return false" style="margin-top: 15px;">
@@ -802,6 +861,16 @@
         const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'; // e.g., 'service_cmms_report'
         const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // e.g., 'template_maintenance'
 
+        // === GOOGLE SHEETS CONFIG ===
+        let CLIENT_ID = '';
+        let API_KEY = '';
+        let SPREADSHEET_ID = '';
+        const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+        const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+        let tokenClient;
+        let gapiInited = false;
+        let gisInited = false;
+
         // PDF.js worker setup
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -829,6 +898,18 @@
                 showNotification('Warning: EmailJS is not configured. Email report function will fail.');
             }
 
+            // Load Google config from localStorage if available
+            const gsConfig = localStorage.getItem('gs_config');
+            if (gsConfig) {
+                const config = JSON.parse(gsConfig);
+                CLIENT_ID = config.clientId || '';
+                API_KEY = config.apiKey || '';
+                SPREADSHEET_ID = config.spreadsheetId || '';
+                document.getElementById('gs-client-id').value = CLIENT_ID;
+                document.getElementById('gs-api-key').value = API_KEY;
+                document.getElementById('gs-spreadsheet-id').value = SPREADSHEET_ID;
+            }
+
             // Set initial date ranges for reports
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('report-start').value = new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0];
@@ -846,6 +927,52 @@
             // Pre-populate selects that rely on initial data
             populateAssetSelects();
             populateUserSelects();
+
+            // Update Google buttons visibility
+            updateGsButtons();
+        }
+
+        function updateGsConfig() {
+            CLIENT_ID = document.getElementById('gs-client-id').value.trim();
+            API_KEY = document.getElementById('gs-api-key').value.trim();
+            SPREADSHEET_ID = document.getElementById('gs-spreadsheet-id').value.trim();
+            localStorage.setItem('gs_config', JSON.stringify({ clientId: CLIENT_ID, apiKey: API_KEY, spreadsheetId: SPREADSHEET_ID }));
+            updateGsButtons();
+        }
+
+        function updateGsButtons() {
+            const hasConfig = CLIENT_ID && API_KEY && SPREADSHEET_ID;
+            const authBtn = document.getElementById('gs-authorize-btn');
+            const syncToBtn = document.getElementById('gs-sync-to-btn');
+            const syncFromBtn = document.getElementById('gs-sync-from-btn');
+            if (hasConfig) {
+                authBtn.style.display = 'inline-block';
+                if (gapi.client.getToken()) {
+                    syncToBtn.style.display = 'inline-block';
+                    syncFromBtn.style.display = 'inline-block';
+                }
+            } else {
+                authBtn.style.display = 'none';
+                syncToBtn.style.display = 'none';
+                syncFromBtn.style.display = 'none';
+            }
+        }
+
+        function updateAuthStatus(status, message = '') {
+            const el = document.getElementById('google-auth-status');
+            el.className = status ? 'authenticated' : 'unauthenticated';
+            el.textContent = status ? (message || 'Authenticated') : (message || 'Not authenticated');
+            if (status) {
+                document.getElementById('gs-signout-btn').style.display = 'inline-block';
+                document.getElementById('gs-authorize-btn').innerText = 'Refresh';
+                document.getElementById('gs-sync-to-btn').style.display = 'inline-block';
+                document.getElementById('gs-sync-from-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('gs-signout-btn').style.display = 'none';
+                document.getElementById('gs-authorize-btn').innerText = 'Authorize Google';
+                document.getElementById('gs-sync-to-btn').style.display = 'none';
+                document.getElementById('gs-sync-from-btn').style.display = 'none';
+            }
         }
 
         function saveData() { 
@@ -877,6 +1004,7 @@
             if (id === 'inventory') renderInventory();
             if (id === 'users') renderUsers();
             if (id === 'reports') renderReportsOverview();
+            if (id === 'settings') updateGsButtons();
 
             // Hide report content when moving away from the reports sections
             if (id !== 'maintenance-report') {
@@ -1964,6 +2092,229 @@
             reader.readAsArrayBuffer(file);
             document.getElementById('pdf-import').value = '';
         };
+
+        // Google Sheets Integration
+        function gapiLoaded() {
+            gapi.load('client', initializeGapiClient);
+        }
+
+        async function initializeGapiClient() {
+            if (!API_KEY) return;
+            await gapi.client.init({
+                apiKey: API_KEY,
+                discoveryDocs: [DISCOVERY_DOC],
+            });
+            gapiInited = true;
+            maybeEnableButtons();
+        }
+
+        function gisLoaded() {
+            if (!CLIENT_ID) return;
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: '',
+            });
+            gisInited = true;
+            maybeEnableButtons();
+        }
+
+        function maybeEnableButtons() {
+            if (gapiInited && gisInited) {
+                document.getElementById('gs-authorize-btn').style.display = 'inline-block';
+                updateAuthStatus(gapi.client.getToken() !== null);
+            }
+        }
+
+        window.handleAuthClick = async function() {
+            if (!tokenClient) {
+                showNotification('Google config not set. Please enter Client ID, API Key, and Spreadsheet ID.', true);
+                return;
+            }
+            tokenClient.callback = async (resp) => {
+                if (resp.error !== undefined) {
+                    throw (resp);
+                }
+                updateAuthStatus(true, 'Authenticated - Ready to sync');
+                await syncStatusCheck(); // Optional: check if can access sheet
+            };
+
+            if (gapi.client.getToken() === null) {
+                tokenClient.requestAccessToken({prompt: 'consent'});
+            } else {
+                tokenClient.requestAccessToken({prompt: ''});
+            }
+        };
+
+        window.handleSignoutClick = function() {
+            const token = gapi.client.getToken();
+            if (token !== null) {
+                google.accounts.oauth2.revoke(token.access_token);
+                gapi.client.setToken('');
+                updateAuthStatus(false, 'Signed out');
+            }
+        };
+
+        async function syncStatusCheck() {
+            try {
+                await gapi.client.sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID });
+                showNotification('Google Sheets access confirmed.');
+            } catch (err) {
+                showNotification(`Error accessing sheet: ${err.message}`, true);
+            }
+        }
+
+        window.syncToSheets = async function() {
+            if (!gapi.client.getToken()) {
+                showNotification('Please authorize first.', true);
+                return;
+            }
+            if (!SPREADSHEET_ID) {
+                showNotification('Spreadsheet ID required.', true);
+                return;
+            }
+            showNotification('Syncing to Google Sheets...');
+            try {
+                // Clear and append Assets
+                await syncSheet('Assets', [
+                    ['ID', 'Department', 'Name', 'Serial', 'Location'],
+                    ...data.assets.map(a => [a.id, a.department, a.name, a.serial || '', a.location])
+                ]);
+
+                // Clear and append WorkOrders
+                await syncSheet('WorkOrders', [
+                    ['ID', 'Department', 'AssetId', 'Description', 'Priority', 'AssignedTo', 'Status', 'CreatedBy', 'CreatedAt'],
+                    ...data.workOrders.map(w => [w.id, w.department, w.assetId, w.description, w.priority, w.assignedTo, w.status, w.createdBy, w.createdAt])
+                ]);
+
+                // Clear and append PM
+                await syncSheet('PM', [
+                    ['ID', 'AssetId', 'Description', 'Frequency', 'NextDue', 'Department', 'Status'],
+                    ...data.pmSchedules.map(p => [p.id, p.assetId, p.description, p.frequency, p.nextDue, p.department, p.status])
+                ]);
+
+                // Clear and append Inventory
+                await syncSheet('Inventory', [
+                    ['ID', 'Department', 'Name', 'Qty', 'Reorder'],
+                    ...data.inventory.map(i => [i.id, i.department, i.name, i.qty, i.reorder])
+                ]);
+
+                // Skip users for security
+                showNotification('Sync to Google Sheets completed!');
+            } catch (err) {
+                showNotification(`Sync error: ${err.message}`, true);
+                console.error(err);
+            }
+        };
+
+        window.syncFromSheets = async function() {
+            if (!gapi.client.getToken()) {
+                showNotification('Please authorize first.', true);
+                return;
+            }
+            if (!SPREADSHEET_ID) {
+                showNotification('Spreadsheet ID required.', true);
+                return;
+            }
+            showNotification('Syncing from Google Sheets...');
+            try {
+                // Load Assets
+                const assetsData = await getSheetData('Assets');
+                if (assetsData.length > 1) { // Skip header
+                    data.assets = assetsData.slice(1).map(row => ({
+                        id: parseInt(row[0]),
+                        department: row[1],
+                        name: row[2],
+                        serial: row[3] || '',
+                        location: row[4]
+                    }));
+                    data.nextIds.asset = Math.max(...data.assets.map(a => a.id), 0) + 1;
+                }
+
+                // Load WorkOrders
+                const woData = await getSheetData('WorkOrders');
+                if (woData.length > 1) {
+                    data.workOrders = woData.slice(1).map(row => ({
+                        id: parseInt(row[0]),
+                        department: row[1],
+                        assetId: parseInt(row[2]),
+                        description: row[3],
+                        priority: row[4],
+                        assignedTo: row[5],
+                        status: row[6],
+                        createdBy: row[7],
+                        createdAt: row[8]
+                    }));
+                    data.nextIds.wo = Math.max(...data.workOrders.map(w => w.id), 0) + 1;
+                }
+
+                // Load PM
+                const pmData = await getSheetData('PM');
+                if (pmData.length > 1) {
+                    data.pmSchedules = pmData.slice(1).map(row => ({
+                        id: parseInt(row[0]),
+                        assetId: parseInt(row[1]),
+                        description: row[2],
+                        frequency: row[3],
+                        nextDue: row[4],
+                        department: row[5],
+                        status: row[6]
+                    }));
+                    data.nextIds.pm = Math.max(...data.pmSchedules.map(p => p.id), 0) + 1;
+                }
+
+                // Load Inventory
+                const invData = await getSheetData('Inventory');
+                if (invData.length > 1) {
+                    data.inventory = invData.slice(1).map(row => ({
+                        id: parseInt(row[0]),
+                        department: row[1],
+                        name: row[2],
+                        qty: parseInt(row[3]),
+                        reorder: parseInt(row[4])
+                    }));
+                    data.nextIds.inv = Math.max(...data.inventory.map(i => i.id), 0) + 1;
+                }
+
+                // Retain local users
+                saveData();
+                populateAssetSelects();
+                renderWorkOrders();
+                renderAssets();
+                renderPmSchedules();
+                renderInventory();
+                renderDashboard();
+                showNotification('Sync from Google Sheets completed!');
+            } catch (err) {
+                showNotification(`Sync error: ${err.message}`, true);
+                console.error(err);
+            }
+        };
+
+        async function syncSheet(sheetName, values) {
+            const range = `${sheetName}!A:Z`;
+            // Clear existing data
+            await gapi.client.sheets.spreadsheets.values.clear({
+                spreadsheetId: SPREADSHEET_ID,
+                range: range
+            });
+            // Append new data
+            await gapi.client.sheets.spreadsheets.values.append({
+                spreadsheetId: SPREADSHEET_ID,
+                range: range,
+                valueInputOption: 'RAW',
+                resource: { values }
+            });
+        }
+
+        async function getSheetData(sheetName) {
+            const range = `${sheetName}!A:Z`;
+            const response = await gapi.client.sheets.spreadsheets.values.get({
+                spreadsheetId: SPREADSHEET_ID,
+                range: range
+            });
+            return response.result.values || [];
+        }
         
         window.clearAllData = function() {
             if (confirm('DANGER: Are you absolutely sure you want to clear ALL local application data? This cannot be undone!')) {
