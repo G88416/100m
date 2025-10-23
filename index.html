@@ -91,7 +91,7 @@
         }
 
         /* === MAIN APP === */
-        .app-container { display: none; flex: 1; }
+        .app-container { display: none; flex: 1; flex-direction: column; }
         header {
             background: linear-gradient(90deg, #0f1626, #1a1f2e);
             color: #ffd700;
@@ -137,7 +137,9 @@
             cursor: pointer;
             margin-left: 12px;
             font-weight: 600;
+            transition: background 0.3s;
         }
+        .logout-btn:hover { background: #c82333; }
 
         /* === NAVIGATION === */
         nav {
@@ -147,7 +149,7 @@
             padding: 12px 0;
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             position: sticky;
-            top: 88px;
+            top: 88px; /* Assuming header height is about 88px */
             z-index: 999;
             border-bottom: 1px solid rgba(255,215,0,0.15);
         }
@@ -211,6 +213,9 @@
             color: #fff;
             font-size: 1rem;
             transition: all 0.3s;
+            -webkit-appearance: none; /* Fix for select appearance */
+            -moz-appearance: none;
+            appearance: none;
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
@@ -244,8 +249,9 @@
 
         .action-btn { padding: 8px 12px; font-size: 0.85rem; margin: 3px; min-width: 70px; border-radius: 8px; }
         .action-btn.edit { background: #17a2b8; color: white; }
-        .action-btn.delete { background: #dc3545; }
-        .action-btn.close { background: #28a745; }
+        .action-btn.delete { background: #dc3545; color: white; }
+        .action-btn.close { background: #28a745; color: white; }
+        .action-btn:hover { transform: none; box-shadow: none; }
 
         .stats-grid {
             display: grid;
@@ -323,14 +329,18 @@
 
         @media print {
             body { background: white; color: #000; }
-            nav, header .user-info, #notification, button, input, select, textarea, #email-modal { display: none !important; }
+            nav, header .user-info, #notification, button, input, select, textarea, #email-modal, .action-btn { display: none !important; }
             section { box-shadow: none; margin: 0; padding: 15px; page-break-inside: avoid; border: none; }
             .container { padding: 0; }
             #maintenance-report-content { display: block !important; background: white; }
             h1, h2, h3 { color: #000 !important; }
             table { font-size: 11px; border: 1px solid #ccc; }
-            th { background: #f0f0f0 !important; }
+            th { background: #f0f0f0 !important; color: #000 !important; }
+            tr:nth-child(even) { background: #f9f9f9; }
             .print-header { text-align: center; margin-bottom: 25px; }
+            .stats-grid .stat-card { border: 1px solid #ccc; background: #fff !important; color: #000 !important; box-shadow: none; }
+            .stats-grid .stat-card h3 { color: #333 !important; }
+            .stats-grid .stat-card p { color: #666; }
         }
 
         @media (max-width: 768px) {
@@ -341,6 +351,7 @@
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .notification { top: 10px; right: 10px; left: 10px; transform: translateY(-120%); }
             .notification.show { transform: translateY(0); }
+            .user-info { position: static; margin-top: 10px; }
         }
 
         @media (max-width: 480px) {
@@ -350,9 +361,8 @@
         }
     </style>
 </head>
-<body>
+<body onload="initApp()">
 
-    <!-- === PRESTIGE LOGIN SCREEN === -->
     <div id="login-screen">
         <div class="login-box">
             <h2>BCC CMMS</h2>
@@ -370,15 +380,14 @@
             </form>
             <p style="margin-top:20px; font-size:0.9rem; color:#b0b0b0;">
                 <strong>Demo Access:</strong><br>
-                admin / admin123<br>
-                manager / manager123<br>
-                tech / tech123<br>
-                view / view123
+                admin / admin123 (Admin)<br>
+                manager / manager123 (Manager)<br>
+                tech / tech123 (Technician)<br>
+                view / view123 (Viewer)
             </p>
         </div>
     </div>
 
-    <!-- === MAIN APP === -->
     <div class="app-container" id="app">
         <header>
             <h1>BCC CMMS</h1>
@@ -387,23 +396,235 @@
         </header>
 
         <nav id="main-nav">
-            <button onclick="showSection('dashboard')" class="active">Dashboard</button>
-            <button onclick="showSection('work-orders')">Work Orders</button>
-            <button onclick="showSection('assets')">Assets</button>
-            <button onclick="showSection('preventive')">PM</button>
-            <button onclick="showSection('inventory')">Inventory</button>
-            <button onclick="showSection('reports')">Reports</button>
-            <button onclick="showSection('maintenance-report')">Maintenance Report</button>
-            <button onclick="showSection('users')" id="users-tab">Users</button>
-            <button onclick="showSection('settings')">Settings</button>
+            <button onclick="showSection('dashboard', this)" class="active">Dashboard</button>
+            <button onclick="showSection('work-orders', this)">Work Orders</button>
+            <button onclick="showSection('assets', this)">Assets</button>
+            <button onclick="showSection('preventive', this)">PM</button>
+            <button onclick="showSection('inventory', this)">Inventory</button>
+            <button onclick="showSection('reports', this)">Reports</button>
+            <button onclick="showSection('maintenance-report', this)">Maintenance Report</button>
+            <button onclick="showSection('users', this)" id="users-tab">Users</button>
+            <button onclick="showSection('settings', this)">Settings</button>
         </nav>
 
         <div class="container">
-            <!-- === ALL SECTIONS (same logic, premium style) === -->
-            <!-- Dashboard, Work Orders, Assets, PM, Inventory, Reports, Users, Settings -->
-            <!-- (Full code from previous version with prestige theme applied) -->
+            
+            <section id="dashboard" class="active">
+                <h2>System Overview Dashboard</h2>
+                <div class="stats-grid" id="dashboard-stats">
+                    </div>
 
-            <!-- === MAINTENANCE REPORT WITH EMAIL === -->
+                <h3 style="margin-top: 30px; color:#ffd700;">Critical Open Work Orders</h3>
+                <div class="table-container">
+                    <table id="dashboard-wo-table">
+                        <thead><tr><th>ID</th><th>Dept</th><th>Asset</th><th>Description</th><th>Priority</th><th>Status</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <section id="work-orders">
+                <h2>Work Order Management</h2>
+                
+                <div id="wo-form-container">
+                    <h3>Create New Work Order</h3>
+                    <form id="wo-form">
+                        <input type="hidden" id="wo-id">
+                        <label>Department:</label>
+                        <select id="wo-department" required>
+                            <option value="children's home">Children's Home</option>
+                            <option value="old age">Old Age Home</option>
+                            <option value="mental home">Mental Home</option>
+                            <option value="hospice">Hospice</option>
+                            <option value="bci school">BCI School</option>
+                            <option value="cfm church">CFM Church</option>
+                        </select>
+                        <label>Asset:</label>
+                        <select id="wo-asset" required>
+                            <option value="" disabled selected>Select Asset</option>
+                            </select>
+                        <label>Description:</label>
+                        <textarea id="wo-description" rows="3" required></textarea>
+                        <label>Priority:</label>
+                        <select id="wo-priority" required>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                        <label>Assigned To:</label>
+                        <select id="wo-assigned-to" required>
+                             <option value="" disabled selected>Select User</option>
+                            </select>
+                        <label id="wo-status-label" style="display:none;">Status:</label>
+                        <select id="wo-status" style="display:none;">
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                        <button type="submit" id="wo-submit-btn">Create Work Order</button>
+                    </form>
+                </div>
+
+                <h3 style="margin-top: 30px; color:#ffd700;">Existing Work Orders</h3>
+                <div class="table-container">
+                    <table id="wo-table">
+                        <thead><tr><th>ID</th><th>Dept</th><th>Asset</th><th>Description</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <section id="assets">
+                <h2>Asset Register</h2>
+
+                <div id="asset-form-container">
+                    <h3>Add New Asset</h3>
+                    <form id="asset-form">
+                        <input type="hidden" id="asset-id">
+                        <label>Department:</label>
+                        <select id="asset-department" required>
+                            <option value="children's home">Children's Home</option>
+                            <option value="old age">Old Age Home</option>
+                            <option value="mental home">Mental Home</option>
+                            <option value="hospice">Hospice</option>
+                            <option value="bci school">BCI School</option>
+                            <option value="cfm church">CFM Church</option>
+                        </select>
+                        <label>Asset Name:</label>
+                        <input type="text" id="asset-name" required>
+                        <label>Serial Number:</label>
+                        <input type="text" id="asset-serial">
+                        <label>Location (Room/Area):</label>
+                        <input type="text" id="asset-location" required>
+                        <button type="submit" id="asset-submit-btn">Add Asset</button>
+                    </form>
+                </div>
+
+                <h3 style="margin-top: 30px; color:#ffd700;">Registered Assets</h3>
+                <div class="table-container">
+                    <table id="asset-table">
+                        <thead><tr><th>ID</th><th>Dept</th><th>Name</th><th>Serial</th><th>Location</th><th>Actions</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="preventive">
+                <h2>Preventive Maintenance Schedules</h2>
+
+                <div id="pm-form-container">
+                    <h3>Create New PM Schedule</h3>
+                    <form id="pm-form">
+                        <input type="hidden" id="pm-id">
+                        <label>Asset:</label>
+                        <select id="pm-asset" required>
+                            <option value="" disabled selected>Select Asset</option>
+                            </select>
+                        <label>Task Description:</label>
+                        <textarea id="pm-description" rows="2" required></textarea>
+                        <label>Schedule Frequency:</label>
+                        <select id="pm-frequency" required>
+                            <option value="Weekly">Weekly</option>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly">Quarterly</option>
+                            <option value="Annually">Annually</option>
+                        </select>
+                        <label>Next Due Date:</label>
+                        <input type="date" id="pm-due" required>
+                        <button type="submit" id="pm-submit-btn">Create Schedule</button>
+                    </form>
+                </div>
+
+                <h3 style="margin-top: 30px; color:#ffd700;">Current PM Schedules</h3>
+                <div class="table-container">
+                    <table id="pm-table">
+                        <thead><tr><th>ID</th><th>Dept</th><th>Asset</th><th>Task</th><th>Schedule</th><th>Next Due</th><th>Actions</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="inventory">
+                <h2>Spare Parts Inventory</h2>
+
+                <div id="inv-form-container">
+                    <h3>Add/Update Inventory Item</h3>
+                    <form id="inv-form">
+                        <input type="hidden" id="inv-id">
+                        <label>Department:</label>
+                        <select id="inv-department" required>
+                            <option value="general">General</option>
+                            <option value="children's home">Children's Home</option>
+                            <option value="old age">Old Age Home</option>
+                            <option value="mental home">Mental Home</option>
+                            <option value="hospice">Hospice</option>
+                            <option value="bci school">BCI School</option>
+                            <option value="cfm church">CFM Church</option>
+                        </select>
+                        <label>Part Name:</label>
+                        <input type="text" id="inv-name" required>
+                        <label>Current Quantity:</label>
+                        <input type="number" id="inv-qty" min="0" required>
+                        <label>Reorder Point:</label>
+                        <input type="number" id="inv-reorder" min="0" required>
+                        <button type="submit" id="inv-submit-btn">Add Item</button>
+                    </form>
+                </div>
+
+                <h3 style="margin-top: 30px; color:#ffd700;">Inventory Status</h3>
+                <div class="table-container">
+                    <table id="inv-table">
+                        <thead><tr><th>ID</th><th>Dept</th><th>Name</th><th>Qty</th><th>Reorder Point</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="users">
+                <h2>User Management</h2>
+
+                <div id="user-form-container">
+                    <h3>Add New User</h3>
+                    <form id="user-form">
+                        <input type="hidden" id="user-edit-index">
+                        <label>Username:</label>
+                        <input type="text" id="user-username" required>
+                        <label>Password:</label>
+                        <input type="password" id="user-password" required>
+                        <label>Role:</label>
+                        <select id="user-role" required>
+                            <option value="admin">Admin</option>
+                            <option value="manager">Manager</option>
+                            <option value="technician">Technician</option>
+                            <option value="viewer">Viewer</option>
+                        </select>
+                        <button type="submit" id="user-submit-btn">Add User</button>
+                    </form>
+                </div>
+
+                <h3 style="margin-top: 30px; color:#ffd700;">Current Users</h3>
+                <div class="table-container">
+                    <table id="user-table">
+                        <thead><tr><th>Username</th><th>Role</th><th>Actions</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="reports">
+                <h2>Advanced Reporting Tools</h2>
+                <p style="color:#b0b0b0;">
+                    This section is for custom, on-demand reports. Use the **Maintenance Report** tab for the built-in system report, or integrate a third-party BI tool here for custom data queries.
+                </p>
+                <div id="report-output">
+                    <h4>Current System Totals</h4>
+                    <p>Total Work Orders: <span id="report-total-wo">0</span></p>
+                    <p>Total Assets: <span id="report-total-asset">0</span></p>
+                    <p>Parts Below Reorder: <span id="report-below-reorder">0</span></p>
+                </div>
+            </section>
+
             <section id="maintenance-report">
                 <h2>Generate Maintenance Report</h2>
                 <form id="report-form">
@@ -486,12 +707,32 @@
                     </div>
                 </div>
             </section>
+            
+            <section id="settings">
+                <h2>Application Settings & Data Management</h2>
+                <div class="settings-actions">
+                    <button onclick="exportData()">Export Data (JSON)</button>
+                    <button onclick="document.getElementById('import-file').click()">Import Data (JSON)</button>
+                    <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(event)">
+                    <button onclick="clearAllData()" style="background: #dc3545;">Clear All Local Data (DANGER)</button>
+                </div>
 
-            <!-- Other sections (Dashboard, Work Orders, etc.) follow same prestige styling -->
+                <h3 style="margin-top: 30px; color:#ffd700;">EmailJS Configuration</h3>
+                <p>Configure EmailJS to enable email functionality for reports. You must replace the placeholders in the script with your actual keys.</p>
+                <form onsubmit="return false" style="margin-top: 15px;">
+                    <label>User ID (Public Key):</label>
+                    <input type="text" id="settings-user-id" placeholder="YOUR_USER_ID_HERE" disabled>
+                    <label>Service ID:</label>
+                    <input type="text" id="settings-service-id" placeholder="YOUR_SERVICE_ID" disabled>
+                    <label>Template ID:</label>
+                    <input type="text" id="settings-template-id" placeholder="YOUR_TEMPLATE_ID" disabled>
+                </form>
+            </section>
+
+
         </div>
     </div>
 
-    <!-- === EMAIL MODAL === -->
     <div id="email-modal">
         <div class="email-box">
             <h3>Send Report via Email</h3>
@@ -516,29 +757,139 @@
     <div id="notification" class="notification"></div>
 
     <script>
-        // === BCC CMMS - PREMIUM EDITION ===
+        // === BCC CMMS - PREMIUM EDITION - FULLY FUNCTIONAL ===
         const storageKey = 'bcc_cmms_premium_v1';
-        let data = JSON.parse(localStorage.getItem(storageKey)) || {
-            workOrders: [], assets: [], pmSchedules: [], inventory: [],
-            users: [
-                { username: 'admin', password: 'admin123', role: 'admin' },
-                { username: 'manager', password: 'manager123', role: 'manager' },
-                { username: 'tech', password: 'tech123', role: 'technician' },
-                { username: 'view', password: 'view123', role: 'viewer' }
-            ],
-            nextIds: { wo: 1, asset: 1, pm: 1, inv: 1 }
+        let data = {
+            workOrders: [], assets: [], pmSchedules: [], inventory: [], users: [], nextIds: { wo: 1, asset: 1, pm: 1, inv: 1 }
         };
+
+        // Default Data Initialization
+        const defaultUsers = [
+            { username: 'admin', password: 'admin123', role: 'admin' },
+            { username: 'manager', password: 'manager123', role: 'manager' },
+            { username: 'tech', password: 'tech123', role: 'technician' },
+            { username: 'view', password: 'view123', role: 'viewer' }
+        ];
 
         let currentUser = null;
         let currentReportHTML = '';
+        let currentEditingWo = null;
+        let currentEditingAsset = null;
+        let currentEditingPm = null;
+        let currentEditingInv = null;
+        let currentEditingUserIndex = -1;
 
+        // === PERMISSIONS CONFIG ===
+        const permissions = {
+            admin: { create: true, edit: true, delete: true, manageUsers: true },
+            manager: { create: true, edit: true, delete: false, manageUsers: false },
+            technician: { create: true, edit: 'self', delete: false, manageUsers: false }, // Technicians can only edit/close their own WO
+            viewer: { create: false, edit: false, delete: false, manageUsers: false }
+        };
+        
         // === EMAIL.JS CONFIG (REPLACE WITH YOUR KEYS) ===
-        const EMAILJS_USER_ID = 'YOUR_USER_ID_HERE';
-        const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
-        const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-        emailjs.init(EMAILJS_USER_ID);
+        // IMPORTANT: Replace these with your actual keys from EmailJS
+        const EMAILJS_USER_ID = 'YOUR_USER_ID_HERE'; // e.g., 'user_xxxxxxxxxxxxxxxx'
+        const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'; // e.g., 'service_cmms_report'
+        const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // e.g., 'template_maintenance'
 
-        // === LOGIN - 100% WORKING ===
+
+        // --- CORE APPLICATION FUNCTIONS ---
+
+        function initApp() {
+            // Load data from localStorage or initialize with defaults
+            const savedData = localStorage.getItem(storageKey);
+            if (savedData) {
+                data = JSON.parse(savedData);
+                // Ensure default users are present if data was empty/corrupted
+                if (data.users.length === 0) data.users = defaultUsers;
+            } else {
+                data.users = defaultUsers;
+                saveData(); // Save initial structure
+            }
+
+            // Initialize EmailJS
+            if (EMAILJS_USER_ID && EMAILJS_USER_ID !== 'YOUR_USER_ID_HERE') {
+                emailjs.init(EMAILJS_USER_ID);
+                document.getElementById('settings-user-id').value = EMAILJS_USER_ID;
+                document.getElementById('settings-service-id').value = EMAILJS_SERVICE_ID;
+                document.getElementById('settings-template-id').value = EMAILJS_TEMPLATE_ID;
+            } else {
+                showNotification('Warning: EmailJS is not configured. Email report function will fail.');
+            }
+
+            // Set initial date ranges for reports
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('report-start').value = new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0];
+            document.getElementById('report-end').value = today;
+
+            // Attach event listeners
+            document.getElementById('wo-form').onsubmit = handleWorkOrderSubmit;
+            document.getElementById('asset-form').onsubmit = handleAssetSubmit;
+            document.getElementById('pm-form').onsubmit = handlePmSubmit;
+            document.getElementById('inv-form').onsubmit = handleInventorySubmit;
+            document.getElementById('user-form').onsubmit = handleUserSubmit;
+            document.getElementById('report-form').onsubmit = generateReport;
+            document.getElementById('email-form').onsubmit = handleEmailSubmit;
+
+            // Pre-populate selects that rely on initial data
+            populateAssetSelects();
+            populateUserSelects();
+        }
+
+        function saveData() { 
+            localStorage.setItem(storageKey, JSON.stringify(data)); 
+            populateAssetSelects(); // Update asset lists on data change
+            populateUserSelects(); // Update user lists on data change
+        }
+
+        function showNotification(msg, isError = false) {
+            const notif = document.getElementById('notification');
+            notif.textContent = msg;
+            notif.style.background = isError ? '#dc3545' : 'linear-gradient(90deg, #28a745, #20c997)';
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 3500);
+        }
+
+        function showSection(id, btn) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            
+            // Re-render data tables when sections are shown
+            if (id === 'dashboard') renderDashboard();
+            if (id === 'work-orders') renderWorkOrders();
+            if (id === 'assets') renderAssets();
+            if (id === 'preventive') renderPmSchedules();
+            if (id === 'inventory') renderInventory();
+            if (id === 'users') renderUsers();
+            if (id === 'reports') renderReportsOverview();
+
+            // Hide report content when moving away from the reports sections
+            if (id !== 'maintenance-report') {
+                document.getElementById('maintenance-report-content').style.display = 'none';
+            }
+        }
+
+        function applyPermissions() {
+            if (!currentUser) return;
+            const p = permissions[currentUser.role];
+
+            // Show/Hide forms (Create/Add)
+            document.getElementById('wo-form-container').style.display = p.create ? 'block' : 'none';
+            document.getElementById('asset-form-container').style.display = p.create ? 'block' : 'none';
+            document.getElementById('pm-form-container').style.display = p.create ? 'block' : 'none';
+            document.getElementById('inv-form-container').style.display = p.create ? 'block' : 'none';
+            document.getElementById('user-form-container').style.display = p.manageUsers ? 'block' : 'none';
+            
+            // Show/Hide Users tab
+            document.getElementById('users-tab').style.display = p.manageUsers ? 'block' : 'none';
+        }
+
+        // --- AUTH & SETUP ---
+
         document.getElementById('login-form').onsubmit = e => {
             e.preventDefault();
             const username = document.getElementById('username').value.trim();
@@ -555,15 +906,15 @@
                     document.getElementById('user-info').innerHTML = `${user.username} (${user.role}) <button class="logout-btn" onclick="logout()">Logout</button>`;
                     document.getElementById('generated-by').textContent = `${user.username} (${user.role})`;
                     applyPermissions();
-                    showSection('dashboard');
+                    showSection('dashboard', document.querySelector('nav button'));
                     showNotification('Welcome, ' + user.username + '!');
                 }, 300);
             } else {
-                alert('Invalid credentials. Use demo accounts.');
+                showNotification('Invalid credentials. Use demo accounts.', true);
             }
         };
 
-        function logout() {
+        window.logout = function() {
             if (confirm('Logout from BCC CMMS?')) {
                 currentUser = null;
                 document.getElementById('app').style.display = 'none';
@@ -573,81 +924,850 @@
             }
         }
 
-        // === ALL OTHER FUNCTIONS (same as before, with prestige fixes) ===
-        function applyPermissions() {
-            const p = permissions[currentUser.role];
-            ['wo', 'asset', 'pm', 'inv'].forEach(type => {
-                const container = document.getElementById(`${type}-form-container`);
-                if (container) container.style.display = p.create ? 'block' : 'none';
+        // --- DATA HELPERS ---
+
+        function populateAssetSelects() {
+            const assetSelects = [
+                document.getElementById('wo-asset'), 
+                document.getElementById('pm-asset')
+            ];
+            
+            assetSelects.forEach(select => {
+                const selectedValue = select.value;
+                select.innerHTML = '<option value="" disabled>Select Asset</option>';
+                data.assets.forEach(asset => {
+                    const option = document.createElement('option');
+                    option.value = asset.id;
+                    option.textContent = `A${asset.id} - ${asset.name} (${asset.department})`;
+                    select.appendChild(option);
+                });
+                select.value = selectedValue || "";
             });
-            document.getElementById('users-tab').style.display = p.manageUsers ? 'block' : 'none';
-            document.getElementById('user-form-container').style.display = p.manageUsers ? 'block' : 'none';
         }
 
-        function saveData() { localStorage.setItem(storageKey, JSON.stringify(data)); }
+        function populateUserSelects() {
+            const userSelects = [document.getElementById('wo-assigned-to')];
 
-        function showSection(id) {
-            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-            const btn = document.querySelector(`nav button[onclick="showSection('${id}')"]`);
-            if (btn) btn.classList.add('active');
+            userSelects.forEach(select => {
+                const selectedValue = select.value;
+                select.innerHTML = '<option value="" disabled>Select User</option>';
+                data.users.filter(u => u.role !== 'viewer').forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.username;
+                    option.textContent = `${user.username} (${user.role})`;
+                    select.appendChild(option);
+                });
+                select.value = selectedValue || "";
+            });
         }
 
-        function showNotification(msg) {
-            const notif = document.getElementById('notification');
-            notif.textContent = msg;
-            notif.classList.add('show');
-            setTimeout(() => notif.classList.remove('show'), 3500);
-        }
+        // --- CRUD LOGIC ---
 
-        // === REPORT & EMAIL (same logic) ===
-        document.getElementById('report-form').onsubmit = e => {
+        // Work Orders
+        function handleWorkOrderSubmit(e) {
             e.preventDefault();
-            // ... [same report generation logic]
+            const id = document.getElementById('wo-id').value;
+            const department = document.getElementById('wo-department').value;
+            const assetId = document.getElementById('wo-asset').value;
+            const description = document.getElementById('wo-description').value;
+            const priority = document.getElementById('wo-priority').value;
+            const assignedTo = document.getElementById('wo-assigned-to').value;
+            const status = document.getElementById('wo-status').value || 'Open';
+
+            if (id) {
+                // UPDATE
+                const wo = data.workOrders.find(w => w.id == id);
+                if (!wo) return;
+                
+                // Permission check for editing
+                const p = permissions[currentUser.role];
+                const isAllowed = p.edit === true || (p.edit === 'self' && wo.assignedTo === currentUser.username);
+                if (!isAllowed) {
+                     showNotification('Permission denied to edit this Work Order.', true);
+                     return;
+                }
+
+                wo.department = department;
+                wo.assetId = assetId;
+                wo.description = description;
+                wo.priority = priority;
+                wo.assignedTo = assignedTo;
+                wo.status = status;
+                showNotification(`Work Order WO${id} updated successfully!`);
+                document.getElementById('wo-submit-btn').textContent = 'Create Work Order';
+                document.getElementById('wo-status-label').style.display = 'none';
+                document.getElementById('wo-status').style.display = 'none';
+            } else {
+                // CREATE
+                const newWo = {
+                    id: data.nextIds.wo++,
+                    department,
+                    assetId,
+                    description,
+                    priority,
+                    assignedTo,
+                    status: 'Open',
+                    createdBy: currentUser.username,
+                    createdAt: new Date().toISOString().split('T')[0]
+                };
+                data.workOrders.push(newWo);
+                showNotification(`Work Order WO${newWo.id} created successfully!`);
+            }
+
+            document.getElementById('wo-form').reset();
+            currentEditingWo = null;
+            saveData();
+            renderWorkOrders();
+            renderDashboard(); // Update dashboard after WO change
+        }
+
+        window.editWorkOrder = function(id) {
+            const wo = data.workOrders.find(w => w.id === id);
+            if (!wo) return;
+
+            // Permission check for editing
+            const p = permissions[currentUser.role];
+            const isAllowed = p.edit === true || (p.edit === 'self' && wo.assignedTo === currentUser.username);
+            if (!isAllowed) {
+                 showNotification('Permission denied to edit this Work Order.', true);
+                 return;
+            }
+
+            currentEditingWo = wo;
+            document.getElementById('wo-id').value = wo.id;
+            document.getElementById('wo-department').value = wo.department;
+            document.getElementById('wo-asset').value = wo.assetId;
+            document.getElementById('wo-description').value = wo.description;
+            document.getElementById('wo-priority').value = wo.priority;
+            document.getElementById('wo-assigned-to').value = wo.assignedTo;
+            document.getElementById('wo-status').value = wo.status;
+            
+            document.getElementById('wo-submit-btn').textContent = `Update WO${id}`;
+            document.getElementById('wo-status-label').style.display = 'block';
+            document.getElementById('wo-status').style.display = 'block';
+            
+            document.getElementById('work-orders').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.deleteWorkOrder = function(id) {
+            if (!permissions[currentUser.role].delete) { showNotification('Permission denied.', true); return; }
+            if (confirm(`Are you sure you want to delete Work Order WO${id}?`)) {
+                data.workOrders = data.workOrders.filter(w => w.id !== id);
+                saveData();
+                renderWorkOrders();
+                renderDashboard();
+                showNotification(`Work Order WO${id} deleted.`);
+            }
+        }
+
+        window.closeWorkOrder = function(id) {
+            const wo = data.workOrders.find(w => w.id === id);
+            if (!wo) return;
+
+            // Permission check for closing (same as editing)
+            const p = permissions[currentUser.role];
+            const isAllowed = p.edit === true || (p.edit === 'self' && wo.assignedTo === currentUser.username);
+            if (!isAllowed) {
+                 showNotification('Permission denied to close this Work Order.', true);
+                 return;
+            }
+
+            if (confirm(`Are you sure you want to close Work Order WO${id}?`)) {
+                wo.status = 'Closed';
+                saveData();
+                renderWorkOrders();
+                renderDashboard();
+                showNotification(`Work Order WO${id} marked as Closed.`);
+            }
+        }
+
+        function renderWorkOrders() {
+            const tbody = document.getElementById('wo-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            const p = permissions[currentUser.role];
+
+            data.workOrders.sort((a, b) => b.id - a.id).forEach(wo => {
+                const tr = document.createElement('tr');
+                const asset = data.assets.find(a => a.id == wo.assetId) || { name: 'N/A' };
+                
+                // Conditional access for actions
+                const canEdit = p.edit === true || (p.edit === 'self' && wo.assignedTo === currentUser.username);
+                const canDelete = p.delete;
+
+                let actionsHTML = '';
+                if (canEdit) {
+                    actionsHTML += `<button class="action-btn edit" onclick="editWorkOrder(${wo.id})">Edit</button>`;
+                    if (wo.status !== 'Closed') {
+                        actionsHTML += `<button class="action-btn close" onclick="closeWorkOrder(${wo.id})">Close</button>`;
+                    }
+                }
+                if (canDelete) {
+                    actionsHTML += `<button class="action-btn delete" onclick="deleteWorkOrder(${wo.id})">Delete</button>`;
+                }
+                if (!actionsHTML) actionsHTML = 'No Actions';
+
+                tr.innerHTML = `
+                    <td>WO${wo.id}</td>
+                    <td>${wo.department}</td>
+                    <td>A${wo.assetId} - ${asset.name}</td>
+                    <td>${wo.description.substring(0, 50)}${wo.description.length > 50 ? '...' : ''}</td>
+                    <td style="color: ${wo.priority === 'High' ? '#dc3545' : wo.priority === 'Medium' ? '#ffc107' : '#17a2b8'}; font-weight: 700;">${wo.priority}</td>
+                    <td style="color: ${wo.status === 'Open' ? '#dc3545' : wo.status === 'Completed' ? '#17a2b8' : wo.status === 'Closed' ? '#28a745' : '#ffc107'}; font-weight: 700;">${wo.status}</td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Assets (similar CRUD logic for other entities)
+        function handleAssetSubmit(e) {
+            e.preventDefault();
+            if (!permissions[currentUser.role].create && !document.getElementById('asset-id').value) { showNotification('Permission denied to create assets.', true); return; }
+
+            const id = document.getElementById('asset-id').value;
+            const department = document.getElementById('asset-department').value;
+            const name = document.getElementById('asset-name').value;
+            const serial = document.getElementById('asset-serial').value;
+            const location = document.getElementById('asset-location').value;
+
+            if (id) {
+                // UPDATE
+                const asset = data.assets.find(a => a.id == id);
+                if (!asset || !permissions[currentUser.role].edit) { showNotification('Permission denied or asset not found.', true); return; }
+                asset.department = department;
+                asset.name = name;
+                asset.serial = serial;
+                asset.location = location;
+                showNotification(`Asset A${id} updated successfully!`);
+                document.getElementById('asset-submit-btn').textContent = 'Add Asset';
+            } else {
+                // CREATE
+                const newAsset = {
+                    id: data.nextIds.asset++,
+                    department,
+                    name,
+                    serial,
+                    location
+                };
+                data.assets.push(newAsset);
+                showNotification(`Asset A${newAsset.id} added successfully!`);
+            }
+
+            document.getElementById('asset-form').reset();
+            document.getElementById('asset-id').value = '';
+            currentEditingAsset = null;
+            saveData();
+            renderAssets();
+        }
+
+        window.editAsset = function(id) {
+            if (!permissions[currentUser.role].edit) { showNotification('Permission denied.', true); return; }
+            const asset = data.assets.find(a => a.id === id);
+            if (!asset) return;
+
+            currentEditingAsset = asset;
+            document.getElementById('asset-id').value = asset.id;
+            document.getElementById('asset-department').value = asset.department;
+            document.getElementById('asset-name').value = asset.name;
+            document.getElementById('asset-serial').value = asset.serial;
+            document.getElementById('asset-location').value = asset.location;
+            document.getElementById('asset-submit-btn').textContent = `Update Asset A${id}`;
+            document.getElementById('assets').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.deleteAsset = function(id) {
+            if (!permissions[currentUser.role].delete) { showNotification('Permission denied.', true); return; }
+            if (confirm(`Deleting Asset A${id} will affect all linked Work Orders and PMs. Continue?`)) {
+                data.assets = data.assets.filter(a => a.id !== id);
+                // Note: In a real app, you'd handle cascading deletes or prevent deletion if linked
+                saveData();
+                renderAssets();
+                showNotification(`Asset A${id} deleted.`);
+            }
+        }
+
+        function renderAssets() {
+            const tbody = document.getElementById('asset-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            const p = permissions[currentUser.role];
+
+            data.assets.sort((a, b) => b.id - a.id).forEach(asset => {
+                const tr = document.createElement('tr');
+                
+                let actionsHTML = '';
+                if (p.edit) actionsHTML += `<button class="action-btn edit" onclick="editAsset(${asset.id})">Edit</button>`;
+                if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deleteAsset(${asset.id})">Delete</button>`;
+                if (!actionsHTML) actionsHTML = 'No Actions';
+
+                tr.innerHTML = `
+                    <td>A${asset.id}</td>
+                    <td>${asset.department}</td>
+                    <td>${asset.name}</td>
+                    <td>${asset.serial || 'N/A'}</td>
+                    <td>${asset.location}</td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // PM Schedules
+        function handlePmSubmit(e) {
+            e.preventDefault();
+            if (!permissions[currentUser.role].create && !document.getElementById('pm-id').value) { showNotification('Permission denied to manage PMs.', true); return; }
+
+            const id = document.getElementById('pm-id').value;
+            const assetId = document.getElementById('pm-asset').value;
+            const description = document.getElementById('pm-description').value;
+            const frequency = document.getElementById('pm-frequency').value;
+            const nextDue = document.getElementById('pm-due').value;
+
+            const asset = data.assets.find(a => a.id == assetId);
+            if (!asset) { showNotification('Invalid asset selected.', true); return; }
+
+            if (id) {
+                // UPDATE
+                const pm = data.pmSchedules.find(p => p.id == id);
+                if (!pm || !permissions[currentUser.role].edit) { showNotification('Permission denied or PM not found.', true); return; }
+                pm.assetId = assetId;
+                pm.description = description;
+                pm.frequency = frequency;
+                pm.nextDue = nextDue;
+                showNotification(`PM Schedule P${id} updated successfully!`);
+                document.getElementById('pm-submit-btn').textContent = 'Create Schedule';
+            } else {
+                // CREATE
+                const newPm = {
+                    id: data.nextIds.pm++,
+                    assetId,
+                    description,
+                    frequency,
+                    nextDue,
+                    department: asset.department, // Link department for reports
+                    status: 'Active'
+                };
+                data.pmSchedules.push(newPm);
+                showNotification(`PM Schedule P${newPm.id} created successfully!`);
+            }
+
+            document.getElementById('pm-form').reset();
+            document.getElementById('pm-id').value = '';
+            currentEditingPm = null;
+            saveData();
+            renderPmSchedules();
+        }
+
+        window.editPm = function(id) {
+            if (!permissions[currentUser.role].edit) { showNotification('Permission denied.', true); return; }
+            const pm = data.pmSchedules.find(p => p.id === id);
+            if (!pm) return;
+
+            currentEditingPm = pm;
+            document.getElementById('pm-id').value = pm.id;
+            document.getElementById('pm-asset').value = pm.assetId;
+            document.getElementById('pm-description').value = pm.description;
+            document.getElementById('pm-frequency').value = pm.frequency;
+            document.getElementById('pm-due').value = pm.nextDue;
+            document.getElementById('pm-submit-btn').textContent = `Update Schedule P${id}`;
+            document.getElementById('preventive').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.deletePm = function(id) {
+            if (!permissions[currentUser.role].delete) { showNotification('Permission denied.', true); return; }
+            if (confirm(`Are you sure you want to delete PM Schedule P${id}?`)) {
+                data.pmSchedules = data.pmSchedules.filter(p => p.id !== id);
+                saveData();
+                renderPmSchedules();
+                showNotification(`PM Schedule P${id} deleted.`);
+            }
+        }
+
+        function renderPmSchedules() {
+            const tbody = document.getElementById('pm-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            const p = permissions[currentUser.role];
+
+            data.pmSchedules.sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue)).forEach(pm => {
+                const tr = document.createElement('tr');
+                const asset = data.assets.find(a => a.id == pm.assetId) || { name: 'N/A', department: 'N/A' };
+                const dueDate = new Date(pm.nextDue);
+                const isOverdue = dueDate < new Date(new Date().setHours(0,0,0,0));
+                
+                let actionsHTML = '';
+                if (p.edit) actionsHTML += `<button class="action-btn edit" onclick="editPm(${pm.id})">Edit</button>`;
+                if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deletePm(${pm.id})">Delete</button>`;
+                if (!actionsHTML) actionsHTML = 'No Actions';
+
+                tr.innerHTML = `
+                    <td>P${pm.id}</td>
+                    <td>${pm.department}</td>
+                    <td>A${pm.assetId} - ${asset.name}</td>
+                    <td>${pm.description.substring(0, 30)}...</td>
+                    <td>${pm.frequency}</td>
+                    <td style="color: ${isOverdue ? '#dc3545' : '#28a745'}; font-weight: 700;">${pm.nextDue} ${isOverdue ? '(Overdue)' : ''}</td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // Inventory
+        function handleInventorySubmit(e) {
+            e.preventDefault();
+            if (!permissions[currentUser.role].create && !document.getElementById('inv-id').value) { showNotification('Permission denied to manage inventory.', true); return; }
+
+            const id = document.getElementById('inv-id').value;
+            const department = document.getElementById('inv-department').value;
+            const name = document.getElementById('inv-name').value;
+            const qty = parseInt(document.getElementById('inv-qty').value);
+            const reorder = parseInt(document.getElementById('inv-reorder').value);
+
+            if (id) {
+                // UPDATE
+                const inv = data.inventory.find(i => i.id == id);
+                if (!inv || !permissions[currentUser.role].edit) { showNotification('Permission denied or item not found.', true); return; }
+                inv.department = department;
+                inv.name = name;
+                inv.qty = qty;
+                inv.reorder = reorder;
+                showNotification(`Inventory Item I${id} updated successfully!`);
+                document.getElementById('inv-submit-btn').textContent = 'Add Item';
+            } else {
+                // CREATE
+                const newInv = {
+                    id: data.nextIds.inv++,
+                    department,
+                    name,
+                    qty,
+                    reorder
+                };
+                data.inventory.push(newInv);
+                showNotification(`Inventory Item I${newInv.id} added successfully!`);
+            }
+
+            document.getElementById('inv-form').reset();
+            document.getElementById('inv-id').value = '';
+            currentEditingInv = null;
+            saveData();
+            renderInventory();
+        }
+
+        window.editInventory = function(id) {
+            if (!permissions[currentUser.role].edit) { showNotification('Permission denied.', true); return; }
+            const inv = data.inventory.find(i => i.id === id);
+            if (!inv) return;
+
+            currentEditingInv = inv;
+            document.getElementById('inv-id').value = inv.id;
+            document.getElementById('inv-department').value = inv.department;
+            document.getElementById('inv-name').value = inv.name;
+            document.getElementById('inv-qty').value = inv.qty;
+            document.getElementById('inv-reorder').value = inv.reorder;
+            document.getElementById('inv-submit-btn').textContent = `Update Item I${id}`;
+            document.getElementById('inventory').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.deleteInventory = function(id) {
+            if (!permissions[currentUser.role].delete) { showNotification('Permission denied.', true); return; }
+            if (confirm(`Are you sure you want to delete Inventory Item I${id}?`)) {
+                data.inventory = data.inventory.filter(i => i.id !== id);
+                saveData();
+                renderInventory();
+                showNotification(`Inventory Item I${id} deleted.`);
+            }
+        }
+
+        function renderInventory() {
+            const tbody = document.getElementById('inv-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            const p = permissions[currentUser.role];
+
+            data.inventory.sort((a, b) => b.id - a.id).forEach(inv => {
+                const tr = document.createElement('tr');
+                const isLow = inv.qty <= inv.reorder;
+                const status = isLow ? 'Low Stock' : 'OK';
+                
+                let actionsHTML = '';
+                if (p.edit) actionsHTML += `<button class="action-btn edit" onclick="editInventory(${inv.id})">Edit</button>`;
+                if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deleteInventory(${inv.id})">Delete</button>`;
+                if (!actionsHTML) actionsHTML = 'No Actions';
+
+                tr.innerHTML = `
+                    <td>I${inv.id}</td>
+                    <td>${inv.department}</td>
+                    <td>${inv.name}</td>
+                    <td>${inv.qty}</td>
+                    <td>${inv.reorder}</td>
+                    <td style="color: ${isLow ? '#dc3545' : '#28a745'}; font-weight: 700;">${status}</td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // Users
+        function handleUserSubmit(e) {
+            e.preventDefault();
+            if (!permissions[currentUser.role].manageUsers) { showNotification('Permission denied to manage users.', true); return; }
+
+            const index = document.getElementById('user-edit-index').value;
+            const username = document.getElementById('user-username').value.trim();
+            const password = document.getElementById('user-password').value;
+            const role = document.getElementById('user-role').value;
+
+            if (index !== '-1') {
+                // UPDATE
+                const idx = parseInt(index);
+                data.users[idx].username = username;
+                data.users[idx].password = password;
+                data.users[idx].role = role;
+                showNotification(`User ${username} updated successfully!`);
+                document.getElementById('user-submit-btn').textContent = 'Add User';
+            } else {
+                // CREATE
+                const existing = data.users.find(u => u.username === username);
+                if (existing) {
+                    showNotification('Username already exists.', true);
+                    return;
+                }
+                const newUser = { username, password, role };
+                data.users.push(newUser);
+                showNotification(`User ${username} added successfully!`);
+            }
+
+            document.getElementById('user-form').reset();
+            document.getElementById('user-edit-index').value = '-1';
+            currentEditingUserIndex = -1;
+            saveData();
+            renderUsers();
+        }
+
+        window.editUser = function(index) {
+            if (!permissions[currentUser.role].manageUsers) { showNotification('Permission denied.', true); return; }
+            const user = data.users[index];
+            if (!user) return;
+
+            currentEditingUserIndex = index;
+            document.getElementById('user-edit-index').value = index;
+            document.getElementById('user-username').value = user.username;
+            document.getElementById('user-password').value = user.password;
+            document.getElementById('user-role').value = user.role;
+            document.getElementById('user-submit-btn').textContent = `Update User ${user.username}`;
+            document.getElementById('users').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.deleteUser = function(index) {
+            if (!permissions[currentUser.role].manageUsers) { showNotification('Permission denied.', true); return; }
+            const user = data.users[index];
+            if (!user) return;
+            if (user.username === currentUser.username) { showNotification("Cannot delete yourself.", true); return; }
+
+            if (confirm(`Are you sure you want to delete user ${user.username}?`)) {
+                data.users.splice(index, 1);
+                saveData();
+                renderUsers();
+                showNotification(`User ${user.username} deleted.`);
+            }
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('user-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            const p = permissions[currentUser.role];
+            
+            data.users.forEach((user, index) => {
+                const tr = document.createElement('tr');
+                
+                let actionsHTML = '';
+                if (p.manageUsers) {
+                    actionsHTML += `<button class="action-btn edit" onclick="editUser(${index})">Edit</button>`;
+                    if (user.username !== 'admin') { // Prevent deleting the default admin
+                        actionsHTML += `<button class="action-btn delete" onclick="deleteUser(${index})">Delete</button>`;
+                    }
+                }
+                if (!actionsHTML) actionsHTML = 'No Actions';
+
+                tr.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.role}</td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // --- DASHBOARD & OVERVIEW ---
+
+        function renderDashboard() {
+            const stats = {
+                totalWO: data.workOrders.length,
+                openWO: data.workOrders.filter(w => w.status === 'Open').length,
+                highPriority: data.workOrders.filter(w => w.status !== 'Closed' && w.priority === 'High').length,
+                totalAssets: data.assets.length,
+                overduePM: data.pmSchedules.filter(p => new Date(p.nextDue) < new Date(new Date().setHours(0,0,0,0))).length,
+                lowInventory: data.inventory.filter(i => i.qty <= i.reorder).length
+            };
+
+            const statsContainer = document.getElementById('dashboard-stats');
+            statsContainer.innerHTML = `
+                <div class="stat-card"><h3>${stats.totalWO}</h3><p>Total WOs</p></div>
+                <div class="stat-card" style="border-color: #dc3545;"><h3 style="color:#dc3545;">${stats.openWO}</h3><p>Open WOs</p></div>
+                <div class="stat-card" style="border-color: #ffc107;"><h3 style="color:#ffc107;">${stats.highPriority}</h3><p>High Priority</p></div>
+                <div class="stat-card"><h3>${stats.totalAssets}</h3><p>Total Assets</p></div>
+                <div class="stat-card" style="border-color: #dc3545;"><h3 style="color:#dc3545;">${stats.overduePM}</h3><p>Overdue PMs</p></div>
+                <div class="stat-card" style="border-color: #ffc107;"><h3 style="color:#ffc107;">${stats.lowInventory}</h3><p>Low Inventory</p></div>
+            `;
+
+            // Critical Open Work Orders
+            const tbody = document.getElementById('dashboard-wo-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            data.workOrders
+                .filter(w => w.status === 'Open' && w.priority === 'High')
+                .sort((a, b) => b.id - a.id)
+                .slice(0, 5)
+                .forEach(wo => {
+                    const tr = document.createElement('tr');
+                    const asset = data.assets.find(a => a.id == wo.assetId) || { name: 'N/A' };
+                    tr.innerHTML = `
+                        <td>WO${wo.id}</td>
+                        <td>${wo.department}</td>
+                        <td>A${wo.assetId} - ${asset.name}</td>
+                        <td>${wo.description.substring(0, 40)}...</td>
+                        <td style="color: #dc3545; font-weight: 700;">${wo.priority}</td>
+                        <td style="color: #dc3545; font-weight: 700;">${wo.status}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+        }
+        
+        function renderReportsOverview() {
+            const totalWO = data.workOrders.length;
+            const totalAsset = data.assets.length;
+            const belowReorder = data.inventory.filter(i => i.qty <= i.reorder).length;
+            
+            document.getElementById('report-total-wo').textContent = totalWO;
+            document.getElementById('report-total-asset').textContent = totalAsset;
+            document.getElementById('report-below-reorder').textContent = belowReorder;
+        }
+
+
+        // --- REPORT & EMAIL LOGIC ---
+
+        function generateReport(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('report-title').value;
+            const departmentFilter = document.getElementById('report-department').value;
+            const startDate = document.getElementById('report-start').value;
+            const endDate = document.getElementById('report-end').value;
+            const reportType = document.getElementById('report-type-full').value;
+            
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            end.setDate(end.getDate() + 1); // Make end date inclusive
+
+            // 1. Filter Data
+            const filteredWO = data.workOrders.filter(wo => {
+                const woDate = new Date(wo.createdAt);
+                const deptMatch = !departmentFilter || wo.department === departmentFilter;
+                const dateMatch = woDate >= start && woDate <= end;
+                return deptMatch && dateMatch;
+            });
+
+            const filteredPM = data.pmSchedules.filter(pm => {
+                const pmDate = new Date(pm.nextDue);
+                const asset = data.assets.find(a => a.id == pm.assetId);
+                const deptMatch = !departmentFilter || (asset && asset.department === departmentFilter);
+                // PM reporting is often based on the due date being within the range
+                const dateMatch = pmDate >= start && pmDate <= end; 
+                return deptMatch && dateMatch;
+            });
+            
+            const filteredAssets = data.assets.filter(asset => !departmentFilter || asset.department === departmentFilter);
+            const filteredInv = data.inventory.filter(inv => !departmentFilter || inv.department === departmentFilter || inv.department === 'general');
+
+
+            // 2. Generate Summary Stats
+            const summaryStats = {
+                'Total WOs': filteredWO.length,
+                'Completed WOs': filteredWO.filter(w => w.status === 'Completed' || w.status === 'Closed').length,
+                'Open WOs': filteredWO.filter(w => w.status === 'Open').length,
+                'Total PM Schedules': filteredPM.length,
+                'Overdue PMs': filteredPM.filter(p => new Date(p.nextDue) < new Date(new Date().setHours(0,0,0,0))).length,
+                'Total Assets': filteredAssets.length
+            };
+
+            const summaryHtml = Object.entries(summaryStats).map(([key, value]) => `
+                <div class="stat-card"><h3>${value}</h3><p>${key}</p></div>
+            `).join('');
+            document.getElementById('report-summary').innerHTML = summaryHtml;
+
+            // 3. Populate Tables
+            function populateTable(dataArray, tableId, columns, formatter) {
+                const tbody = document.getElementById(tableId).querySelector('tbody');
+                tbody.innerHTML = '';
+                if (reportType === 'summary' && tableId !== 'report-inv-table') return; // Skip detailed tables for summary report
+
+                dataArray.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = columns.map(col => `<td>${formatter(item, col)}</td>`).join('');
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // WO Table
+            populateTable(filteredWO, 'report-wo-table', ['id', 'department', 'description', 'asset', 'priority', 'status'], (wo, col) => {
+                const asset = data.assets.find(a => a.id == wo.assetId) || { name: 'N/A' };
+                if (col === 'id') return `WO${wo.id}`;
+                if (col === 'asset') return `A${wo.assetId} - ${asset.name}`;
+                if (col === 'description') return wo.description.substring(0, 50) + (wo.description.length > 50 ? '...' : '');
+                return wo[col];
+            });
+            
+            // PM Table
+            populateTable(filteredPM, 'report-pm-table', ['id', 'department', 'asset', 'frequency', 'nextDue', 'status'], (pm, col) => {
+                const asset = data.assets.find(a => a.id == pm.assetId) || { name: 'N/A', department: 'N/A' };
+                if (col === 'id') return `P${pm.id}`;
+                if (col === 'department') return asset.department;
+                if (col === 'asset') return `A${pm.assetId} - ${asset.name}`;
+                if (col === 'status') return new Date(pm.nextDue) < new Date(new Date().setHours(0,0,0,0)) ? 'Overdue' : 'Scheduled';
+                return pm[col];
+            });
+            
+            // Asset Table (Full list, filtered by department only)
+            populateTable(filteredAssets, 'report-assets-table', ['id', 'department', 'name', 'serial', 'location'], (asset, col) => {
+                if (col === 'id') return `A${asset.id}`;
+                return asset[col];
+            });
+
+            // Inventory Table (Full list, filtered by department only)
+            populateTable(filteredInv, 'report-inv-table', ['id', 'department', 'name', 'qty', 'reorder', 'status'], (inv, col) => {
+                if (col === 'id') return `I${inv.id}`;
+                if (col === 'status') return inv.qty <= inv.reorder ? 'Low Stock' : 'OK';
+                return inv[col];
+            });
+
+
+            // 4. Update Report Metadata
+            document.getElementById('print-title').textContent = title;
+            document.getElementById('generated-date').textContent = `${startDate} to ${endDate}`;
+            const generatedTime = new Date().toLocaleString();
+            document.getElementById('generated-time').textContent = generatedTime;
+            document.getElementById('generated-by').textContent = `${currentUser.username} (${currentUser.role})`;
+
             document.getElementById('maintenance-report-content').style.display = 'block';
-            currentReportHTML = document.getElementById('maintenance-report-content').outerHTML;
+            
+            // Store the full report content (which includes the populated tables) for emailing
+            // We need to clone and strip the non-printable elements for a cleaner email HTML
+            const reportContentDiv = document.getElementById('maintenance-report-content').cloneNode(true);
+            reportContentDiv.querySelectorAll('.action-btn').forEach(el => el.remove());
+            reportContentDiv.querySelectorAll('th').forEach(th => th.style.backgroundColor = '#f0f0f0');
+            reportContentDiv.querySelectorAll('.stats-grid .stat-card').forEach(card => card.style.boxShadow = 'none');
+
+            // Wrap in a basic style block for email readability
+            currentReportHTML = `<div style="font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ddd;">
+                ${reportContentDiv.innerHTML}
+            </div>`;
+            
             showNotification('Report Generated!');
-        };
+        }
 
         window.openEmailModal = () => {
-            if (!currentReportHTML) { showNotification('Generate report first!'); return; }
+            if (!currentReportHTML) { showNotification('Please generate the report first!', true); return; }
             document.getElementById('email-modal').style.display = 'flex';
         };
+
         window.closeEmailModal = () => {
             document.getElementById('email-modal').style.display = 'none';
             document.getElementById('email-form').reset();
         };
 
-        document.getElementById('email-form').onsubmit = e => {
+        function handleEmailSubmit(e) {
             e.preventDefault();
+            if (EMAILJS_USER_ID === 'YOUR_USER_ID_HERE') {
+                showNotification('EmailJS is not configured. Please check your settings.', true);
+                return;
+            }
+
             const to = document.getElementById('email-to').value;
             const subject = document.getElementById('email-subject').value;
             const message = document.getElementById('email-message').value;
 
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            // This is the data that goes to the EmailJS template
+            const templateParams = {
                 to_email: to,
                 subject: subject,
                 message: message,
-                report_html: currentReportHTML
-            }).then(() => {
-                showNotification('Report sent successfully!');
-                closeEmailModal();
-            }, (error) => {
-                console.error(error);
-                showNotification('Email failed. Check EmailJS setup.');
-            });
-        };
+                report_title: document.getElementById('print-title').textContent,
+                report_date_range: document.getElementById('generated-date').textContent,
+                report_content: currentReportHTML // Inject the generated HTML
+            };
+            
+            showNotification('Sending email...');
+
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(() => {
+                    showNotification('Report sent successfully!');
+                    closeEmailModal();
+                }, (error) => {
+                    console.error('Email failed to send:', error);
+                    showNotification('Email failed. Check EmailJS console for errors.', true);
+                });
+        }
 
         window.printReport = () => window.print();
 
-        // === INITIALIZE ===
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('pm-due').value = today;
-            document.getElementById('report-start').value = new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0];
-            document.getElementById('report-end').value = today;
-        });
+        // --- DATA UTILITIES (Settings) ---
+
+        window.exportData = function() {
+            const dataStr = JSON.stringify(data, null, 4);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bcc_cmms_data_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('Data exported successfully!');
+        }
+
+        window.importData = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData.workOrders && importedData.assets) { // Basic check
+                        data = importedData;
+                        // Ensure default users are retained if data.users is missing or empty
+                        if (!data.users || data.users.length === 0) data.users = defaultUsers;
+                        
+                        saveData();
+                        showNotification('Data imported successfully! Please log in again.');
+                        logout(); // Force re-login to re-initialize everything safely
+                    } else {
+                        showNotification('Invalid CMMS data structure in file.', true);
+                    }
+                } catch (error) {
+                    showNotification('Error reading or parsing JSON file.', true);
+                    console.error('Import Error:', error);
+                }
+                document.getElementById('import-file').value = ''; // Clear file input
+            };
+            reader.readAsText(file);
+        }
+        
+        window.clearAllData = function() {
+            if (confirm('DANGER: Are you absolutely sure you want to clear ALL local application data? This cannot be undone!')) {
+                localStorage.removeItem(storageKey);
+                showNotification('All local data cleared. Restarting application.', true);
+                setTimeout(() => window.location.reload(), 2000);
+            }
+        }
     </script>
 </body>
 </html>
