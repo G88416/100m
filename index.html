@@ -1360,34 +1360,91 @@
                     return;
                 }
 
-                try {
-                    let fileData;
-                    if (file.type.startsWith('image/')) {
-                        showNotification('Compressing image...');
-                        const compressedBlob = await compressImage(file);
-                        fileData = await new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = () => resolve(reader.result);
-                            reader.onerror = reject;
-                            reader.readAsDataURL(compressedBlob);
-                        });
-                    } else {
-                        fileData = await new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = () => resolve(reader.result);
-                            reader.onerror = reject;
-                            reader.readAsDataURL(file);
-                        });
+                const isExcel = file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls');
+
+                if (!id && isExcel) {
+                    // Bulk import from Excel
+                    if (!department) {
+                        showNotification('Please select a department for bulk import.', true);
+                        return;
                     }
-                    attachment = {
-                        name: file.name,
-                        type: file.type,
-                        data: fileData
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const dataArray = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(dataArray, { type: 'array' });
+                            const sheetName = 'Assets';
+                            if (!workbook.SheetNames.includes(sheetName)) {
+                                showNotification(`No "${sheetName}" sheet found in the Excel file. Expected columns: department, name, location (serial optional).`, true);
+                                return;
+                            }
+                            const assetsSheet = workbook.Sheets[sheetName];
+                            const bulkAssets = XLSX.utils.sheet_to_json(assetsSheet);
+                            let added = 0;
+                            bulkAssets.forEach(row => {
+                                if (row.name && row.location) {
+                                    const newAsset = {
+                                        id: data.nextIds.asset++,
+                                        department: row.department || department,
+                                        name: row.name,
+                                        serial: row.serial || '',
+                                        location: row.location,
+                                        attachment: null
+                                    };
+                                    data.assets.push(newAsset);
+                                    added++;
+                                }
+                            });
+                            if (added > 0) {
+                                saveData();
+                                renderAssets();
+                                showNotification(`${added} assets registered automatically from Excel!`);
+                            } else {
+                                showNotification('No valid assets found in the Excel sheet. Ensure rows have "name" and "location" columns.', true);
+                            }
+                            // Reset form after bulk import
+                            document.getElementById('asset-form').reset();
+                            document.getElementById('asset-upload').value = '';
+                            document.getElementById('asset-preview').innerHTML = '';
+                            document.getElementById('asset-preview').style.display = 'none';
+                            currentEditingAsset = null;
+                        } catch (err) {
+                            showNotification('Error parsing Excel file: ' + err.message, true);
+                        }
                     };
-                    showNotification('Attachment processed successfully.');
-                } catch (error) {
-                    showNotification('Error processing attachment: ' + error.message, true);
+                    reader.readAsArrayBuffer(file);
                     return;
+                } else {
+                    // Single file as attachment (image, PDF, Word, or Excel during edit)
+                    try {
+                        let fileData;
+                        if (file.type.startsWith('image/')) {
+                            showNotification('Compressing image...');
+                            const compressedBlob = await compressImage(file);
+                            fileData = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(compressedBlob);
+                            });
+                        } else {
+                            fileData = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                            });
+                        }
+                        attachment = {
+                            name: file.name,
+                            type: file.type,
+                            data: fileData
+                        };
+                        showNotification('Attachment processed successfully.');
+                    } catch (error) {
+                        showNotification('Error processing attachment: ' + error.message, true);
+                        return;
+                    }
                 }
             }
 
@@ -1408,7 +1465,7 @@
                 showNotification(`Asset A${id} updated successfully!`);
                 document.getElementById('asset-submit-btn').textContent = 'Add Asset';
             } else {
-                // CREATE
+                // CREATE single
                 const newAsset = {
                     id: data.nextIds.asset++,
                     department,
