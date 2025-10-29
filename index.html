@@ -380,6 +380,11 @@
             border-radius: 8px;
             border: 1px solid rgba(255,215,0,0.3);
         }
+        .file-info {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            margin-top: 5px;
+        }
 
         @media print {
             body { background: white; color: #000; }
@@ -552,8 +557,8 @@
                         <input type="text" id="asset-serial">
                         <label>Location (Room/Area):</label>
                         <input type="text" id="asset-location" required>
-                        <label>Upload Image (optional, <5MB, auto-compressed):</label>
-                        <input type="file" id="asset-upload" accept="image/*">
+                        <label>Upload Attachment (optional, <5MB): Images, PDF, Excel, Word</label>
+                        <input type="file" id="asset-upload" accept="image/*,.pdf,.xlsx,.xls,.docx,.doc">
                         <div id="asset-preview"></div>
                         <button type="submit" id="asset-submit-btn">Add Asset</button>
                     </form>
@@ -904,6 +909,19 @@
                 saveData(); // Save initial structure
             }
 
+            // Migrate legacy image to attachment
+            data.assets.forEach(asset => {
+                if (asset.image && typeof asset.image === 'string' && !asset.attachment) {
+                    asset.attachment = { 
+                        name: `asset_${asset.id}.jpg`, 
+                        type: 'image/jpeg', 
+                        data: asset.image 
+                    };
+                    delete asset.image;
+                }
+            });
+            saveData();
+
             // Initialize EmailJS
             if (EMAILJS_USER_ID && EMAILJS_USER_ID !== 'YOUR_USER_ID_HERE') {
                 emailjs.init(EMAILJS_USER_ID);
@@ -941,7 +959,7 @@
             document.getElementById('email-form').onsubmit = handleEmailSubmit;
 
             // Asset upload preview
-            document.getElementById('asset-upload').addEventListener('change', previewAssetImage);
+            document.getElementById('asset-upload').addEventListener('change', previewAssetAttachment);
 
             // Pre-populate selects that rely on initial data
             populateAssetSelects();
@@ -951,17 +969,25 @@
             updateGsButtons();
         }
 
-        function previewAssetImage(e) {
+        function previewAssetAttachment(e) {
             const file = e.target.files[0];
-            if (!file || !file.type.startsWith('image/')) return;
+            if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const preview = document.getElementById('asset-preview');
-                preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
-                preview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+            const preview = document.getElementById('asset-preview');
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                const size = (file.size / 1024).toFixed(2);
+                preview.innerHTML = `
+                    <p style="font-weight: 600; color: #ffd700;">${file.name}</p>
+                    <p class="file-info">${file.type} (${size} KB)</p>
+                `;
+            }
+            preview.style.display = 'block';
         }
 
         async function compressImage(file, maxWidth = 800, quality = 0.8) {
@@ -1325,7 +1351,7 @@
             const location = document.getElementById('asset-location').value;
 
             const fileInput = document.getElementById('asset-upload');
-            let fileData = '';
+            let attachment = null;
 
             if (fileInput.files && fileInput.files[0]) {
                 const file = fileInput.files[0];
@@ -1335,17 +1361,32 @@
                 }
 
                 try {
-                    showNotification('Compressing image...');
-                    const compressedBlob = await compressImage(file);
-                    fileData = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(compressedBlob);
-                    });
-                    showNotification('Image compressed successfully.');
+                    let fileData;
+                    if (file.type.startsWith('image/')) {
+                        showNotification('Compressing image...');
+                        const compressedBlob = await compressImage(file);
+                        fileData = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(compressedBlob);
+                        });
+                    } else {
+                        fileData = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                        });
+                    }
+                    attachment = {
+                        name: file.name,
+                        type: file.type,
+                        data: fileData
+                    };
+                    showNotification('Attachment processed successfully.');
                 } catch (error) {
-                    showNotification('Error processing image: ' + error.message, true);
+                    showNotification('Error processing attachment: ' + error.message, true);
                     return;
                 }
             }
@@ -1361,8 +1402,8 @@
                 asset.name = name;
                 asset.serial = serial;
                 asset.location = location;
-                if (fileData) {
-                    asset.image = fileData;
+                if (attachment) {
+                    asset.attachment = attachment;
                 }
                 showNotification(`Asset A${id} updated successfully!`);
                 document.getElementById('asset-submit-btn').textContent = 'Add Asset';
@@ -1374,7 +1415,7 @@
                     name,
                     serial,
                     location,
-                    image: fileData
+                    attachment
                 };
                 data.assets.push(newAsset);
                 showNotification(`Asset A${newAsset.id} added successfully!`);
@@ -1406,10 +1447,22 @@
             document.getElementById('asset-location').value = asset.location;
             document.getElementById('asset-submit-btn').textContent = `Update Asset A${id}`;
 
-            // Show preview if image exists
+            // Show preview if attachment exists
             const preview = document.getElementById('asset-preview');
-            if (asset.image) {
-                preview.innerHTML = `<img src="${asset.image}" alt="Current Image"> <p style="font-size:0.9rem; color:#b0b0b0;">Current image. Upload new to replace.</p>`;
+            if (asset.attachment) {
+                if (asset.attachment.type.startsWith('image/')) {
+                    preview.innerHTML = `
+                        <img src="${asset.attachment.data}" alt="Current Attachment">
+                        <p class="file-info">Current: ${asset.attachment.name} (${asset.attachment.type})</p>
+                        <p style="font-size:0.8rem; color:#b0b0b0;">Upload new to replace.</p>
+                    `;
+                } else {
+                    preview.innerHTML = `
+                        <p style="font-weight: 600; color: #ffd700;">${asset.attachment.name}</p>
+                        <p class="file-info">${asset.attachment.type}</p>
+                        <p style="font-size:0.8rem; color:#b0b0b0;">Upload new to replace.</p>
+                    `;
+                }
                 preview.style.display = 'block';
             } else {
                 preview.style.display = 'none';
@@ -1420,24 +1473,50 @@
 
         window.viewAssetFile = function(id) {
             const asset = data.assets.find(a => a.id === id);
-            if (!asset || !asset.image) {
-                showNotification('No file attached to this asset.', true);
+            if (!asset || !asset.attachment) {
+                showNotification('No attachment for this asset.', true);
                 return;
             }
 
             const newWindow = window.open('', '_blank', 'width=800,height=600');
-            newWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Asset Image - A${id}</title>
-                    <style>body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; } img { max-width: 100%; max-height: 100%; border-radius: 8px; }</style>
-                </head>
-                <body>
-                    <img src="${asset.image}" alt="Asset Image">
-                </body>
-                </html>
-            `);
+            const att = asset.attachment;
+            if (att.type.startsWith('image/')) {
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Asset Attachment - A${id}</title>
+                        <style>body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; } img { max-width: 100%; max-height: 100%; border-radius: 8px; }</style>
+                    </head>
+                    <body>
+                        <img src="${att.data}" alt="Asset Attachment">
+                    </body>
+                    </html>
+                `);
+            } else if (att.type === 'application/pdf') {
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Asset PDF - A${id}</title>
+                        <style>body { margin: 0; padding: 0; height: 100vh; } embed { width: 100%; height: 100%; }</style>
+                    </head>
+                    <body>
+                        <embed src="${att.data}" type="application/pdf">
+                    </body>
+                    </html>
+                `);
+            } else {
+                // For other files, trigger download
+                const a = document.createElement('a');
+                a.href = att.data;
+                a.download = att.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                newWindow.close();
+                return;
+            }
             newWindow.document.close();
         };
 
@@ -1468,7 +1547,7 @@
                 if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deleteAsset(${asset.id})">Delete</button>`;
                 if (!actionsHTML) actionsHTML = 'No Actions';
 
-                const attachmentHTML = asset.image ? `<button class="action-btn view-file" onclick="viewAssetFile(${asset.id})">View</button>` : 'None';
+                const attachmentHTML = asset.attachment ? `<button class="action-btn view-file" onclick="viewAssetFile(${asset.id})">View</button>` : 'None';
 
                 tr.innerHTML = `
                     <td>A${asset.id}</td>
@@ -2350,7 +2429,7 @@
             }
             showNotification('Syncing to Google Sheets...');
             try {
-                // Clear and append Assets
+                // Clear and append Assets (skip attachments as they are binary)
                 await syncSheet('Assets', [
                     ['ID', 'Department', 'Name', 'Serial', 'Location'],
                     ...data.assets.map(a => [a.id, a.department, a.name, a.serial || '', a.location])
@@ -2401,7 +2480,8 @@
                         department: row[1],
                         name: row[2],
                         serial: row[3] || '',
-                        location: row[4]
+                        location: row[4],
+                        attachment: null // Reset attachments on sync from sheets
                     }));
                     data.nextIds.asset = Math.max(...data.assets.map(a => a.id), 0) + 1;
                 }
