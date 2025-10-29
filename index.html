@@ -560,6 +560,8 @@
                         <label>Upload Attachment (optional, <5MB): Images, PDF, Excel, Word</label>
                         <input type="file" id="asset-upload" accept="image/*,.pdf,.xlsx,.xls,.docx,.doc">
                         <div id="asset-preview"></div>
+                        <label>Bulk Import Assets from Excel (optional):</label>
+                        <input type="file" id="asset-bulk-upload" accept=".xlsx,.xls">
                         <button type="submit" id="asset-submit-btn">Add Asset</button>
                     </form>
                 </div>
@@ -961,6 +963,9 @@
             // Asset upload preview
             document.getElementById('asset-upload').addEventListener('change', previewAssetAttachment);
 
+            // New: Bulk asset import listener
+            document.getElementById('asset-bulk-upload').addEventListener('change', handleBulkAssetImport);
+
             // Pre-populate selects that rely on initial data
             populateAssetSelects();
             populateUserSelects();
@@ -988,6 +993,68 @@
                 `;
             }
             preview.style.display = 'block';
+        }
+
+        // New: Dedicated bulk asset import function
+        function handleBulkAssetImport(e) {
+            if (!permissions[currentUser.role].create) {
+                showNotification('Permission denied to import assets.', true);
+                e.target.value = ''; // Clear input
+                return;
+            }
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const department = document.getElementById('asset-department').value;
+            if (!department) {
+                showNotification('Please select a department for bulk import.', true);
+                e.target.value = '';
+                return;
+            }
+
+            showNotification('Processing Excel file for bulk asset registration...');
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const dataArray = new Uint8Array(ev.target.result);
+                    const workbook = XLSX.read(dataArray, { type: 'array' });
+                    const sheetName = 'Assets';
+                    if (!workbook.SheetNames.includes(sheetName)) {
+                        showNotification(`No "${sheetName}" sheet found in the Excel file. Expected columns: department, name, location (serial optional).`, true);
+                        e.target.value = '';
+                        return;
+                    }
+                    const assetsSheet = workbook.Sheets[sheetName];
+                    const bulkAssets = XLSX.utils.sheet_to_json(assetsSheet);
+                    let added = 0;
+                    bulkAssets.forEach(row => {
+                        if (row.name && row.location) {
+                            const newAsset = {
+                                id: data.nextIds.asset++,
+                                department: row.department || department,
+                                name: row.name,
+                                serial: row.serial || '',
+                                location: row.location,
+                                attachment: null
+                            };
+                            data.assets.push(newAsset);
+                            added++;
+                        }
+                    });
+                    if (added > 0) {
+                        saveData();
+                        renderAssets();
+                        showNotification(`${added} assets registered automatically from Excel!`);
+                    } else {
+                        showNotification('No valid assets found in the Excel sheet. Ensure rows have "name" and "location" columns.', true);
+                    }
+                } catch (err) {
+                    showNotification('Error parsing Excel file: ' + err.message, true);
+                }
+                e.target.value = ''; // Clear input after processing
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         async function compressImage(file, maxWidth = 800, quality = 0.8) {
@@ -1360,91 +1427,35 @@
                     return;
                 }
 
-                const isExcel = file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls');
-
-                if (!id && isExcel) {
-                    // Bulk import from Excel
-                    if (!department) {
-                        showNotification('Please select a department for bulk import.', true);
-                        return;
+                // Process as single attachment (no bulk logic here anymore)
+                try {
+                    let fileData;
+                    if (file.type.startsWith('image/')) {
+                        showNotification('Compressing image...');
+                        const compressedBlob = await compressImage(file);
+                        fileData = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(compressedBlob);
+                        });
+                    } else {
+                        fileData = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                        });
                     }
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const dataArray = new Uint8Array(e.target.result);
-                            const workbook = XLSX.read(dataArray, { type: 'array' });
-                            const sheetName = 'Assets';
-                            if (!workbook.SheetNames.includes(sheetName)) {
-                                showNotification(`No "${sheetName}" sheet found in the Excel file. Expected columns: department, name, location (serial optional).`, true);
-                                return;
-                            }
-                            const assetsSheet = workbook.Sheets[sheetName];
-                            const bulkAssets = XLSX.utils.sheet_to_json(assetsSheet);
-                            let added = 0;
-                            bulkAssets.forEach(row => {
-                                if (row.name && row.location) {
-                                    const newAsset = {
-                                        id: data.nextIds.asset++,
-                                        department: row.department || department,
-                                        name: row.name,
-                                        serial: row.serial || '',
-                                        location: row.location,
-                                        attachment: null
-                                    };
-                                    data.assets.push(newAsset);
-                                    added++;
-                                }
-                            });
-                            if (added > 0) {
-                                saveData();
-                                renderAssets();
-                                showNotification(`${added} assets registered automatically from Excel!`);
-                            } else {
-                                showNotification('No valid assets found in the Excel sheet. Ensure rows have "name" and "location" columns.', true);
-                            }
-                            // Reset form after bulk import
-                            document.getElementById('asset-form').reset();
-                            document.getElementById('asset-upload').value = '';
-                            document.getElementById('asset-preview').innerHTML = '';
-                            document.getElementById('asset-preview').style.display = 'none';
-                            currentEditingAsset = null;
-                        } catch (err) {
-                            showNotification('Error parsing Excel file: ' + err.message, true);
-                        }
+                    attachment = {
+                        name: file.name,
+                        type: file.type,
+                        data: fileData
                     };
-                    reader.readAsArrayBuffer(file);
+                    showNotification('Attachment processed successfully.');
+                } catch (error) {
+                    showNotification('Error processing attachment: ' + error.message, true);
                     return;
-                } else {
-                    // Single file as attachment (image, PDF, Word, or Excel during edit)
-                    try {
-                        let fileData;
-                        if (file.type.startsWith('image/')) {
-                            showNotification('Compressing image...');
-                            const compressedBlob = await compressImage(file);
-                            fileData = await new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onload = () => resolve(reader.result);
-                                reader.onerror = reject;
-                                reader.readAsDataURL(compressedBlob);
-                            });
-                        } else {
-                            fileData = await new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onload = () => resolve(reader.result);
-                                reader.onerror = reject;
-                                reader.readAsDataURL(file);
-                            });
-                        }
-                        attachment = {
-                            name: file.name,
-                            type: file.type,
-                            data: fileData
-                        };
-                        showNotification('Attachment processed successfully.');
-                    } catch (error) {
-                        showNotification('Error processing attachment: ' + error.message, true);
-                        return;
-                    }
                 }
             }
 
