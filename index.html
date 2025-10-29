@@ -256,6 +256,7 @@
         .action-btn.edit { background: #17a2b8; color: white; }
         .action-btn.delete { background: #dc3545; color: white; }
         .action-btn.close { background: #28a745; color: white; }
+        .action-btn.view-file { background: #6f42c1; color: white; }
         .action-btn:hover { transform: none; box-shadow: none; }
 
         .stats-grid {
@@ -366,6 +367,18 @@
             background: rgba(220, 53, 69, 0.2);
             color: #dc3545;
             border: 1px solid #dc3545;
+        }
+
+        /* Asset Preview Styles */
+        #asset-preview {
+            margin-top: 10px;
+            text-align: center;
+        }
+        #asset-preview img {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,215,0,0.3);
         }
 
         @media print {
@@ -539,6 +552,9 @@
                         <input type="text" id="asset-serial">
                         <label>Location (Room/Area):</label>
                         <input type="text" id="asset-location" required>
+                        <label>Upload Image (optional, <5MB, auto-compressed):</label>
+                        <input type="file" id="asset-upload" accept="image/*">
+                        <div id="asset-preview"></div>
                         <button type="submit" id="asset-submit-btn">Add Asset</button>
                     </form>
                 </div>
@@ -546,7 +562,7 @@
                 <h3 style="margin-top: 30px; color:#ffd700;">Registered Assets</h3>
                 <div class="table-container">
                     <table id="asset-table">
-                        <thead><tr><th>ID</th><th>Dept</th><th>Name</th><th>Serial</th><th>Location</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>ID</th><th>Dept</th><th>Name</th><th>Serial</th><th>Location</th><th>Attachment</th><th>Actions</th></tr></thead>
                         <tbody></tbody>
                     </table>
                 </div>
@@ -924,12 +940,48 @@
             document.getElementById('report-form').onsubmit = generateReport;
             document.getElementById('email-form').onsubmit = handleEmailSubmit;
 
+            // Asset upload preview
+            document.getElementById('asset-upload').addEventListener('change', previewAssetImage);
+
             // Pre-populate selects that rely on initial data
             populateAssetSelects();
             populateUserSelects();
 
             // Update Google buttons visibility
             updateGsButtons();
+        }
+
+        function previewAssetImage(e) {
+            const file = e.target.files[0];
+            if (!file || !file.type.startsWith('image/')) return;
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const preview = document.getElementById('asset-preview');
+                preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function compressImage(file, maxWidth = 800, quality = 0.8) {
+            return new Promise((resolve, reject) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = () => {
+                    const ratio = Math.min(maxWidth / img.width, img.height / img.height);
+                    canvas.width = img.width * ratio;
+                    canvas.height = img.height * ratio;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob((blob) => {
+                        if (!blob) reject(new Error('Compression failed'));
+                        resolve(blob);
+                    }, 'image/jpeg', quality);
+                };
+                img.onerror = reject;
+                img.src = URL.createObjectURL(file);
+            });
         }
 
         function updateGsConfig() {
@@ -1259,9 +1311,12 @@
         }
 
         // Assets (similar CRUD logic for other entities)
-        function handleAssetSubmit(e) {
+        async function handleAssetSubmit(e) {
             e.preventDefault();
-            if (!permissions[currentUser.role].create && !document.getElementById('asset-id').value) { showNotification('Permission denied to create assets.', true); return; }
+            if (!permissions[currentUser.role].create && !document.getElementById('asset-id').value) { 
+                showNotification('Permission denied to create assets.', true); 
+                return; 
+            }
 
             const id = document.getElementById('asset-id').value;
             const department = document.getElementById('asset-department').value;
@@ -1269,14 +1324,46 @@
             const serial = document.getElementById('asset-serial').value;
             const location = document.getElementById('asset-location').value;
 
+            const fileInput = document.getElementById('asset-upload');
+            let fileData = '';
+
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    showNotification('File too large. Maximum size is 5MB.', true);
+                    return;
+                }
+
+                try {
+                    showNotification('Compressing image...');
+                    const compressedBlob = await compressImage(file);
+                    fileData = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(compressedBlob);
+                    });
+                    showNotification('Image compressed successfully.');
+                } catch (error) {
+                    showNotification('Error processing image: ' + error.message, true);
+                    return;
+                }
+            }
+
             if (id) {
                 // UPDATE
                 const asset = data.assets.find(a => a.id == id);
-                if (!asset || !permissions[currentUser.role].edit) { showNotification('Permission denied or asset not found.', true); return; }
+                if (!asset || !permissions[currentUser.role].edit) { 
+                    showNotification('Permission denied or asset not found.', true); 
+                    return; 
+                }
                 asset.department = department;
                 asset.name = name;
                 asset.serial = serial;
                 asset.location = location;
+                if (fileData) {
+                    asset.image = fileData;
+                }
                 showNotification(`Asset A${id} updated successfully!`);
                 document.getElementById('asset-submit-btn').textContent = 'Add Asset';
             } else {
@@ -1286,7 +1373,8 @@
                     department,
                     name,
                     serial,
-                    location
+                    location,
+                    image: fileData
                 };
                 data.assets.push(newAsset);
                 showNotification(`Asset A${newAsset.id} added successfully!`);
@@ -1294,13 +1382,19 @@
 
             document.getElementById('asset-form').reset();
             document.getElementById('asset-id').value = '';
+            document.getElementById('asset-upload').value = '';
+            document.getElementById('asset-preview').innerHTML = '';
+            document.getElementById('asset-preview').style.display = 'none';
             currentEditingAsset = null;
             saveData();
             renderAssets();
         }
 
         window.editAsset = function(id) {
-            if (!permissions[currentUser.role].edit) { showNotification('Permission denied.', true); return; }
+            if (!permissions[currentUser.role].edit) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
             const asset = data.assets.find(a => a.id === id);
             if (!asset) return;
 
@@ -1311,11 +1405,47 @@
             document.getElementById('asset-serial').value = asset.serial;
             document.getElementById('asset-location').value = asset.location;
             document.getElementById('asset-submit-btn').textContent = `Update Asset A${id}`;
+
+            // Show preview if image exists
+            const preview = document.getElementById('asset-preview');
+            if (asset.image) {
+                preview.innerHTML = `<img src="${asset.image}" alt="Current Image"> <p style="font-size:0.9rem; color:#b0b0b0;">Current image. Upload new to replace.</p>`;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+
             document.getElementById('assets').scrollIntoView({ behavior: 'smooth' });
         }
 
+        window.viewAssetFile = function(id) {
+            const asset = data.assets.find(a => a.id === id);
+            if (!asset || !asset.image) {
+                showNotification('No file attached to this asset.', true);
+                return;
+            }
+
+            const newWindow = window.open('', '_blank', 'width=800,height=600');
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Asset Image - A${id}</title>
+                    <style>body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; } img { max-width: 100%; max-height: 100%; border-radius: 8px; }</style>
+                </head>
+                <body>
+                    <img src="${asset.image}" alt="Asset Image">
+                </body>
+                </html>
+            `);
+            newWindow.document.close();
+        };
+
         window.deleteAsset = function(id) {
-            if (!permissions[currentUser.role].delete) { showNotification('Permission denied.', true); return; }
+            if (!permissions[currentUser.role].delete) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
             if (confirm(`Deleting Asset A${id} will affect all linked Work Orders and PMs. Continue?`)) {
                 data.assets = data.assets.filter(a => a.id !== id);
                 // Note: In a real app, you'd handle cascading deletes or prevent deletion if linked
@@ -1338,12 +1468,15 @@
                 if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deleteAsset(${asset.id})">Delete</button>`;
                 if (!actionsHTML) actionsHTML = 'No Actions';
 
+                const attachmentHTML = asset.image ? `<button class="action-btn view-file" onclick="viewAssetFile(${asset.id})">View</button>` : 'None';
+
                 tr.innerHTML = `
                     <td>A${asset.id}</td>
                     <td>${asset.department}</td>
                     <td>${asset.name}</td>
                     <td>${asset.serial || 'N/A'}</td>
                     <td>${asset.location}</td>
+                    <td>${attachmentHTML}</td>
                     <td>${actionsHTML}</td>
                 `;
                 tbody.appendChild(tr);
@@ -1353,7 +1486,10 @@
         // PM Schedules
         function handlePmSubmit(e) {
             e.preventDefault();
-            if (!permissions[currentUser.role].create && !document.getElementById('pm-id').value) { showNotification('Permission denied to manage PMs.', true); return; }
+            if (!permissions[currentUser.role].create && !document.getElementById('pm-id').value) { 
+                showNotification('Permission denied to manage PMs.', true); 
+                return; 
+            }
 
             const id = document.getElementById('pm-id').value;
             const assetId = document.getElementById('pm-asset').value;
@@ -1362,12 +1498,18 @@
             const nextDue = document.getElementById('pm-due').value;
 
             const asset = data.assets.find(a => a.id == assetId);
-            if (!asset) { showNotification('Invalid asset selected.', true); return; }
+            if (!asset) { 
+                showNotification('Invalid asset selected.', true); 
+                return; 
+            }
 
             if (id) {
                 // UPDATE
                 const pm = data.pmSchedules.find(p => p.id == id);
-                if (!pm || !permissions[currentUser.role].edit) { showNotification('Permission denied or PM not found.', true); return; }
+                if (!pm || !permissions[currentUser.role].edit) { 
+                    showNotification('Permission denied or PM not found.', true); 
+                    return; 
+                }
                 pm.assetId = assetId;
                 pm.description = description;
                 pm.frequency = frequency;
@@ -1397,7 +1539,10 @@
         }
 
         window.editPm = function(id) {
-            if (!permissions[currentUser.role].edit) { showNotification('Permission denied.', true); return; }
+            if (!permissions[currentUser.role].edit) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
             const pm = data.pmSchedules.find(p => p.id === id);
             if (!pm) return;
 
@@ -1412,7 +1557,10 @@
         }
 
         window.deletePm = function(id) {
-            if (!permissions[currentUser.role].delete) { showNotification('Permission denied.', true); return; }
+            if (!permissions[currentUser.role].delete) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
             if (confirm(`Are you sure you want to delete PM Schedule P${id}?`)) {
                 data.pmSchedules = data.pmSchedules.filter(p => p.id !== id);
                 saveData();
@@ -1453,7 +1601,10 @@
         // Inventory
         function handleInventorySubmit(e) {
             e.preventDefault();
-            if (!permissions[currentUser.role].create && !document.getElementById('inv-id').value) { showNotification('Permission denied to manage inventory.', true); return; }
+            if (!permissions[currentUser.role].create && !document.getElementById('inv-id').value) { 
+                showNotification('Permission denied to manage inventory.', true); 
+                return; 
+            }
 
             const id = document.getElementById('inv-id').value;
             const department = document.getElementById('inv-department').value;
@@ -1464,7 +1615,10 @@
             if (id) {
                 // UPDATE
                 const inv = data.inventory.find(i => i.id == id);
-                if (!inv || !permissions[currentUser.role].edit) { showNotification('Permission denied or item not found.', true); return; }
+                if (!inv || !permissions[currentUser.role].edit) { 
+                    showNotification('Permission denied or item not found.', true); 
+                    return; 
+                }
                 inv.department = department;
                 inv.name = name;
                 inv.qty = qty;
@@ -1492,7 +1646,10 @@
         }
 
         window.editInventory = function(id) {
-            if (!permissions[currentUser.role].edit) { showNotification('Permission denied.', true); return; }
+            if (!permissions[currentUser.role].edit) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
             const inv = data.inventory.find(i => i.id === id);
             if (!inv) return;
 
@@ -1507,7 +1664,10 @@
         }
 
         window.deleteInventory = function(id) {
-            if (!permissions[currentUser.role].delete) { showNotification('Permission denied.', true); return; }
+            if (!permissions[currentUser.role].delete) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
             if (confirm(`Are you sure you want to delete Inventory Item I${id}?`)) {
                 data.inventory = data.inventory.filter(i => i.id !== id);
                 saveData();
@@ -1547,7 +1707,10 @@
         // Users
         function handleUserSubmit(e) {
             e.preventDefault();
-            if (!permissions[currentUser.role].manageUsers) { showNotification('Permission denied to manage users.', true); return; }
+            if (!permissions[currentUser.role].manageUsers) { 
+                showNotification('Permission denied to manage users.', true); 
+                return; 
+            }
 
             const index = document.getElementById('user-edit-index').value;
             const username = document.getElementById('user-username').value.trim();
@@ -1582,7 +1745,10 @@
         }
 
         window.editUser = function(index) {
-            if (!permissions[currentUser.role].manageUsers) { showNotification('Permission denied.', true); return; }
+            if (!permissions[currentUser.role].manageUsers) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
             const user = data.users[index];
             if (!user) return;
 
@@ -1596,10 +1762,16 @@
         }
 
         window.deleteUser = function(index) {
-            if (!permissions[currentUser.role].manageUsers) { showNotification('Permission denied.', true); return; }
+            if (!permissions[currentUser.role].manageUsers) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
             const user = data.users[index];
             if (!user) return;
-            if (user.username === currentUser.username) { showNotification("Cannot delete yourself.", true); return; }
+            if (user.username === currentUser.username) { 
+                showNotification("Cannot delete yourself.", true); 
+                return; 
+            }
 
             if (confirm(`Are you sure you want to delete user ${user.username}?`)) {
                 data.users.splice(index, 1);
@@ -1812,7 +1984,10 @@
         }
 
         window.openEmailModal = () => {
-            if (!currentReportHTML) { showNotification('Please generate the report first!', true); return; }
+            if (!currentReportHTML) { 
+                showNotification('Please generate the report first!', true); 
+                return; 
+            }
             document.getElementById('email-modal').style.display = 'flex';
         };
 
