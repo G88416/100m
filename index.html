@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCC CMMS - Premium & Professional</title>
+    <title>BCC CMMS - Premium & Professional Enhanced</title>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdn.sheetjs.com/sheetjs-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.2/mammoth.browser.min.js"></script>
@@ -11,7 +11,7 @@
     <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
     <style>
-        /* === PRESTIGE DESIGN: DARK GOLD & NAVY THEME === */
+        /* === ENHANCED UI: ELEGANT DARK GOLD & NAVY THEME WITH MODERN ANIMATIONS === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -23,401 +23,550 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            transition: all 0.3s ease;
         }
 
-        /* === LOGIN SCREEN - LUXURY === */
+        /* === ENHANCED LOGIN SCREEN - LUXURY WITH GLOW === */
         #login-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 22, 38, 0.92);
+            background: rgba(15, 22, 38, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             transition: opacity 0.5s ease;
         }
         .login-box {
             background: linear-gradient(145deg, #1a1f2e, #0f1626);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(255,215,0,0.1);
+            padding: 50px;
+            border-radius: 25px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 40px rgba(255,215,0,0.15);
             width: 90%;
-            max-width: 420px;
+            max-width: 450px;
             text-align: center;
-            border: 1px solid rgba(255,215,0,0.2);
-            animation: loginPop 0.6s ease;
+            border: 2px solid rgba(255,215,0,0.25);
+            animation: loginPop 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
         }
-        @keyframes loginPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,215,0,0.05), transparent);
+            transform: rotate(45deg); animation: shine 3s infinite;
+        }
+        @keyframes loginPop { from { transform: scale(0.8) rotate(-5deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+        @keyframes shine { 0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); } 100% { transform: translateX(100%) translateY(100%) rotate(45deg); } }
         .login-box h2 {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             color: #ffd700;
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            font-size: 2.3rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 3px 10px rgba(0,0,0,0.5), 0 0 20px rgba(255,215,0,0.3);
+            position: relative; z-index: 1;
         }
         .login-box input, .login-box select {
             width: 100%;
-            padding: 16px;
-            margin: 12px 0;
+            padding: 18px;
+            margin: 15px 0;
             border: 2px solid rgba(255,215,0,0.3);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            background: rgba(255,255,255,0.1);
             color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
         }
         .login-box input:focus, .login-box select:focus {
             outline: none;
             border-color: #ffd700;
-            background: rgba(255,215,0,0.08);
-            box-shadow: 0 0 0 4px rgba(255,215,0,0.15);
+            background: rgba(255,215,0,0.1);
+            box-shadow: 0 0 0 5px rgba(255,215,0,0.2), inset 0 0 10px rgba(255,215,0,0.1);
+            transform: scale(1.02);
         }
         .login-box button {
             background: linear-gradient(90deg, #ffd700, #ffed4e);
             color: #1a1f2e;
             border: none;
-            padding: 16px;
-            border-radius: 12px;
+            padding: 18px;
+            border-radius: 15px;
             width: 100%;
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-weight: 800;
+            font-size: 1.2rem;
             cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s;
+            margin-top: 20px;
+            transition: all 0.4s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+            letter-spacing: 1.5px;
+            box-shadow: 0 6px 20px rgba(255,215,0,0.4);
+            position: relative; z-index: 1;
         }
         .login-box button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255,215,0,0.4);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(255,215,0,0.5);
         }
 
-        /* === MAIN APP === */
+        /* === ENHANCED MAIN APP WITH SMOOTH TRANSITIONS === */
         .app-container { display: none; flex: 1; flex-direction: column; }
         header {
             background: linear-gradient(90deg, #0f1626, #1a1f2e);
             color: #ffd700;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            border-bottom: 1px solid rgba(255,215,0,0.2);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.6);
+            border-bottom: 2px solid rgba(255,215,0,0.25);
+            animation: headerGlow 2s ease-in-out infinite alternate;
         }
+        @keyframes headerGlow { from { box-shadow: 0 6px 25px rgba(0,0,0,0.6); } to { box-shadow: 0 6px 25px rgba(255,215,0,0.1); } }
         header h1 {
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-            margin-bottom: 5px;
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-shadow: 0 3px 12px rgba(0,0,0,0.6), 0 0 25px rgba(255,215,0,0.4);
+            margin-bottom: 8px;
         }
         header p {
-            font-size: 1rem;
-            opacity: 0.9;
+            font-size: 1.1rem;
+            opacity: 0.95;
             font-style: italic;
+            letter-spacing: 1px;
         }
         .user-info {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 0.95rem;
-            background: rgba(255,215,0,0.15);
+            top: 25px;
+            right: 25px;
+            font-size: 1rem;
+            background: linear-gradient(145deg, rgba(255,215,0,0.2), rgba(255,215,0,0.1));
             color: #ffd700;
-            padding: 8px 16px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,215,0,0.3);
-            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 35px;
+            border: 2px solid rgba(255,215,0,0.4);
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
+        .user-info:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,215,0,0.3); }
         .logout-btn {
-            background: #dc3545;
+            background: linear-gradient(90deg, #dc3545, #c82333);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 0.85rem;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
             cursor: pointer;
-            margin-left: 12px;
-            font-weight: 600;
-            transition: background 0.3s;
+            margin-left: 15px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220,53,69,0.4);
         }
-        .logout-btn:hover { background: #c82333; }
+        .logout-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(220,53,69,0.5); }
 
-        /* === NAVIGATION === */
+        /* === ENHANCED NAVIGATION WITH SCROLL INDICATOR === */
         nav {
             background: linear-gradient(90deg, #1a1f2e, #0f1626);
             overflow-x: auto;
             white-space: nowrap;
-            padding: 12px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            padding: 15px 0;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
             position: sticky;
-            top: 88px; /* Assuming header height is about 88px */
+            top: 100px;
             z-index: 999;
-            border-bottom: 1px solid rgba(255,215,0,0.15);
+            border-bottom: 2px solid rgba(255,215,0,0.2);
+            scrollbar-width: thin; scrollbar-color: #ffd700 transparent;
         }
+        nav::-webkit-scrollbar { height: 6px; }
+        nav::-webkit-scrollbar-track { background: transparent; }
+        nav::-webkit-scrollbar-thumb { background: #ffd700; border-radius: 3px; }
         nav button {
             background: none;
             border: none;
             color: #e0e0e0;
-            padding: 12px 20px;
+            padding: 15px 25px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
             min-width: max-content;
-            transition: all 0.3s;
-            border-radius: 12px;
-            margin: 0 6px;
+            transition: all 0.4s ease;
+            border-radius: 15px;
+            margin: 0 8px;
+            position: relative;
+            overflow: hidden;
         }
+        nav button::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,215,0,0.2), transparent); transition: left 0.5s;
+        }
+        nav button:hover::before, nav button.active::before { left: 100%; }
         nav button:hover, nav button.active {
-            background: rgba(255,215,0,0.2);
+            background: linear-gradient(145deg, rgba(255,215,0,0.25), rgba(255,215,0,0.15));
             color: #ffd700;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255,215,0,0.2);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(255,215,0,0.3);
         }
 
         .container { 
-            max-width: 1300px; 
+            max-width: 1400px; 
             margin: 0 auto; 
-            padding: 20px; 
+            padding: 25px; 
             flex: 1;
         }
 
         section {
             display: none;
-            padding: 28px;
+            padding: 35px;
             background: linear-gradient(145deg, #1a1f2e, #0f1626);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,215,0,0.08);
-            margin-top: 25px;
-            animation: fadeIn 0.4s ease;
-            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 20px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 25px rgba(255,215,0,0.1);
+            margin-top: 30px;
+            animation: fadeInUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 2px solid rgba(255,215,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        section::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #ffd700, #ffed4e);
         }
         section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         h2 {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             color: #ffd700;
-            font-size: 1.7rem;
+            font-size: 2rem;
+            font-weight: 800;
+            border-bottom: 3px solid rgba(255,215,0,0.4);
+            padding-bottom: 12px;
+            letter-spacing: 1.5px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        h3 {
+            color: #ffd700;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
             font-weight: 700;
-            border-bottom: 2px solid rgba(255,215,0,0.3);
-            padding-bottom: 10px;
             letter-spacing: 1px;
         }
 
-        form { display: grid; gap: 15px; max-width: 700px; margin: 0 auto; }
-        label { font-weight: 600; font-size: 1rem; color: #ffd700; }
+        form { display: grid; gap: 18px; max-width: 800px; margin: 0 auto; }
+        label { font-weight: 700; font-size: 1.1rem; color: #ffd700; margin-bottom: 5px; display: block; }
         input, select, textarea {
-            padding: 14px;
+            padding: 16px;
             border: 2px solid rgba(255,215,0,0.3);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            background: rgba(255,255,255,0.1);
             color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s;
-            -webkit-appearance: none; /* Fix for select appearance */
-            -moz-appearance: none;
-            appearance: none;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: #ffd700;
-            background: rgba(255,215,0,0.08);
-            box-shadow: 0 0 0 4px rgba(255,215,0,0.15);
+            background: rgba(255,215,0,0.1);
+            box-shadow: 0 0 0 5px rgba(255,215,0,0.2), inset 0 0 10px rgba(255,215,0,0.1);
+            transform: scale(1.02);
         }
         button {
             background: linear-gradient(90deg, #ffd700, #ffed4e);
             color: #1a1f2e;
             border: none;
-            padding: 14px 20px;
-            border-radius: 12px;
+            padding: 16px 25px;
+            border-radius: 15px;
             cursor: pointer;
-            font-weight: 700;
-            transition: all 0.3s;
-            font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+            font-weight: 800;
+            transition: all 0.4s ease;
+            font-size: 1.1rem;
+            box-shadow: 0 6px 20px rgba(255,215,0,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255,215,0,0.4);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(255,215,0,0.5);
         }
 
-        .table-container { overflow-x: auto; border-radius: 12px; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th, td { border: 1px solid rgba(255,215,0,0.2); padding: 14px 12px; text-align: left; font-size: 0.95rem; }
-        th { background: rgba(255,215,0,0.15); font-weight: 700; color: #ffd700; }
-        tr:nth-child(even) { background: rgba(255,255,255,0.03); }
-        tr:hover { background: rgba(255,215,0,0.1); }
+        .table-container { overflow-x: auto; border-radius: 15px; margin-top: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { border: 1px solid rgba(255,215,0,0.25); padding: 16px 14px; text-align: left; font-size: 1rem; transition: background 0.3s; }
+        th { background: linear-gradient(145deg, rgba(255,215,0,0.2), rgba(255,215,0,0.1)); font-weight: 800; color: #ffd700; }
+        tr:nth-child(even) { background: rgba(255,255,255,0.04); }
+        tr:hover { background: rgba(255,215,0,0.15); transform: scale(1.01); }
 
-        .action-btn { padding: 8px 12px; font-size: 0.85rem; margin: 3px; min-width: 70px; border-radius: 8px; }
-        .action-btn.edit { background: #17a2b8; color: white; }
-        .action-btn.delete { background: #dc3545; color: white; }
-        .action-btn.close { background: #28a745; color: white; }
-        .action-btn.view-file { background: #6f42c1; color: white; }
-        .action-btn:hover { transform: none; box-shadow: none; }
+        .action-btn { 
+            padding: 10px 15px; font-size: 0.95rem; margin: 4px; min-width: 80px; border-radius: 10px; 
+            transition: all 0.3s ease; font-weight: 700; cursor: pointer; border: none;
+        }
+        .action-btn.edit { background: linear-gradient(90deg, #17a2b8, #138496); color: white; }
+        .action-btn.delete { background: linear-gradient(90deg, #dc3545, #c82333); color: white; }
+        .action-btn.close { background: linear-gradient(90deg, #28a745, #20c997); color: white; }
+        .action-btn.view-file { background: linear-gradient(90deg, #6f42c1, #5a32a3); color: white; }
+        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
         }
         .stat-card {
             background: linear-gradient(145deg, #1a1f2e, #0f1626);
-            padding: 20px;
-            border-radius: 14px;
+            padding: 25px;
+            border-radius: 18px;
             text-align: center;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,215,0,0.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,215,0,0.25);
+            transition: all 0.4s ease;
+            position: relative; overflow: hidden;
         }
-        .stat-card h3 { font-size: 2.4rem; color: #ffd700; margin-bottom: 8px; font-weight: 700; }
-        .stat-card p { font-size: 1rem; color: #b0b0b0; }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #ffd700;
+        }
+        .stat-card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 40px rgba(255,215,0,0.2); }
+        .stat-card h3 { font-size: 2.8rem; color: #ffd700; margin-bottom: 10px; font-weight: 900; }
+        .stat-card p { font-size: 1.1rem; color: #b0b0b0; font-weight: 600; }
 
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 30px;
+            right: 30px;
             background: linear-gradient(90deg, #28a745, #20c997);
             color: white;
-            padding: 14px 24px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            padding: 16px 28px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             z-index: 2000;
             transform: translateX(120%);
-            transition: transform 0.4s ease;
-            font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-weight: 700;
+            border: 2px solid rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
         }
         .notification.show { transform: translateX(0); }
+        .notification.error { background: linear-gradient(90deg, #dc3545, #c82333); }
 
-        .settings-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+        .settings-actions { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 25px; justify-content: center; }
+        .settings-actions button { min-width: 150px; }
 
         #report-output {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(255,215,0,0.08);
-            border-radius: 12px;
-            border-left: 5px solid #ffd700;
+            margin-top: 25px;
+            padding: 25px;
+            background: linear-gradient(145deg, rgba(255,215,0,0.1), rgba(255,215,0,0.05));
+            border-radius: 15px;
+            border-left: 6px solid #ffd700;
             color: #e0e0e0;
+            box-shadow: inset 0 0 20px rgba(255,215,0,0.05);
         }
 
-        /* === EMAIL MODAL === */
+        /* === ENHANCED EMAIL MODAL WITH ANIMATIONS === */
         #email-modal {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 22, 38, 0.95);
+            background: rgba(15, 22, 38, 0.97);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 3000;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
+            animation: modalFade 0.3s ease;
         }
+        @keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
         .email-box {
             background: linear-gradient(145deg, #1a1f2e, #0f1626);
-            padding: 30px;
-            border-radius: 18px;
+            padding: 35px;
+            border-radius: 20px;
             width: 90%;
-            max-width: 520px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,215,0,0.2);
+            max-width: 550px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 40px rgba(255,215,0,0.2);
+            border: 2px solid rgba(255,215,0,0.25);
+            animation: modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-        .email-box h3 { margin-bottom: 20px; color: #ffd700; font-size: 1.6rem; }
+        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .email-box h3 { margin-bottom: 25px; color: #ffd700; font-size: 1.8rem; font-weight: 800; }
         .email-actions {
-            display: flex; gap: 12px; margin-top: 20px;
+            display: flex; gap: 15px; margin-top: 25px;
         }
         .email-actions button {
             flex: 1;
-            padding: 14px;
+            padding: 16px;
+            font-size: 1.1rem;
         }
 
-        /* Google Sync Styles */
+        /* === ENHANCED GOOGLE SYNC WITH BETTER LAYOUT === */
         .google-sync-config {
-            background: rgba(255,255,255,0.05);
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 20px;
-            border: 1px solid rgba(255,215,0,0.2);
+            background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 25px;
+            border: 2px solid rgba(255,215,0,0.25);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
         .google-sync-config h3 {
             color: #ffd700;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
         }
         .google-sync-actions {
-            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;
+            display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; justify-content: center;
         }
         .google-sync-actions button {
-            padding: 10px 15px;
-            font-size: 0.9rem;
+            padding: 12px 20px;
+            font-size: 1rem;
+            min-width: 140px;
         }
         #google-auth-status {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-        #google-auth-status.authenticated {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border: 1px solid #28a745;
-        }
-        #google-auth-status.unauthenticated {
-            background: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
-            border: 1px solid #dc3545;
-        }
-
-        /* Asset Preview Styles */
-        #asset-preview {
-            margin-top: 10px;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
             text-align: center;
         }
+        #google-auth-status.authenticated {
+            background: linear-gradient(145deg, rgba(40, 167, 69, 0.2), rgba(40, 167, 69, 0.1));
+            color: #28a745;
+            border: 2px solid #28a745;
+        }
+        #google-auth-status.unauthenticated {
+            background: linear-gradient(145deg, rgba(220, 53, 69, 0.2), rgba(220, 53, 69, 0.1));
+            color: #dc3545;
+            border: 2px solid #dc3545;
+        }
+
+        /* === ENHANCED ASSET PREVIEW WITH ZOOM === */
+        #asset-preview {
+            margin-top: 15px;
+            text-align: center;
+            position: relative;
+        }
         #asset-preview img {
-            max-width: 200px;
-            max-height: 150px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,215,0,0.3);
+            max-width: 250px;
+            max-height: 200px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,215,0,0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
+        #asset-preview img:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(255,215,0,0.3); }
         .file-info {
-            font-size: 0.9rem;
+            font-size: 1rem;
             color: #b0b0b0;
-            margin-top: 5px;
+            margin-top: 8px;
+            font-weight: 600;
         }
+
+        /* === NEW ASSET VIEWER MODAL - ENHANCED VIEWER FOR UPLOADED ASSETS WITH UPLOAD === */
+        #asset-viewer-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 22, 38, 0.98);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 4000;
+            backdrop-filter: blur(15px);
+        }
+        .viewer-box {
+            background: linear-gradient(145deg, #1a1f2e, #0f1626);
+            padding: 40px;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 50px rgba(255,215,0,0.25);
+            border: 3px solid rgba(255,215,0,0.3);
+            position: relative;
+            animation: viewerSlide 0.5s ease;
+        }
+        @keyframes viewerSlide { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .viewer-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,215,0,0.2);
+        }
+        .viewer-header h3 { color: #ffd700; font-size: 1.8rem; font-weight: 800; }
+        .close-viewer { background: none; border: none; color: #ffd700; font-size: 2rem; cursor: pointer; transition: color 0.3s; }
+        .close-viewer:hover { color: #dc3545; transform: rotate(90deg); }
+        .viewer-content { text-align: center; }
+        .viewer-content img { max-width: 100%; max-height: 500px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .viewer-content embed { width: 100%; height: 600px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .viewer-upload {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 2px dashed rgba(255,215,0,0.3);
+            text-align: center;
+            display: none;
+        }
+        .viewer-upload label {
+            color: #ffd700;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            color: #1a1f2e;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .viewer-upload label:hover { transform: scale(1.05); }
+        .viewer-upload input { display: none; }
+        .viewer-actions {
+            display: flex; gap: 15px; justify-content: center; margin-top: 25px; flex-wrap: wrap;
+        }
+        .viewer-actions button {
+            padding: 12px 20px; min-width: 120px; font-size: 1rem;
+        }
+        .add-to-wo-btn { background: linear-gradient(90deg, #28a745, #20c997); color: white; }
+        .download-btn { background: linear-gradient(90deg, #17a2b8, #138496); color: white; }
+        .upload-btn { background: linear-gradient(90deg, #ffd700, #ffed4e); color: #1a1f2e; }
+        .viewer-meta {
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-top: 20px; text-align: left;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+        .viewer-meta p { margin: 5px 0; color: #b0b0b0; font-size: 0.95rem; }
 
         @media print {
             body { background: white; color: #000; }
-            nav, header .user-info, #notification, button, input, select, textarea, #email-modal, .action-btn { display: none !important; }
-            section { box-shadow: none; margin: 0; padding: 15px; page-break-inside: avoid; border: none; }
+            nav, header .user-info, #notification, button, input, select, textarea, #email-modal, .action-btn, #asset-viewer-modal { display: none !important; }
+            section { box-shadow: none; margin: 0; padding: 20px; page-break-inside: avoid; border: none; }
             .container { padding: 0; }
             #maintenance-report-content { display: block !important; background: white; }
             h1, h2, h3 { color: #000 !important; }
-            table { font-size: 11px; border: 1px solid #ccc; }
+            table { font-size: 12px; border: 1px solid #ccc; }
             th { background: #f0f0f0 !important; color: #000 !important; }
             tr:nth-child(even) { background: #f9f9f9; }
-            .print-header { text-align: center; margin-bottom: 25px; }
+            .print-header { text-align: center; margin-bottom: 30px; }
             .stats-grid .stat-card { border: 1px solid #ccc; background: #fff !important; color: #000 !important; box-shadow: none; }
             .stats-grid .stat-card h3 { color: #333 !important; }
             .stats-grid .stat-card p { color: #666; }
         }
 
         @media (max-width: 768px) {
-            .login-box, .email-box { padding: 25px; }
-            header h1 { font-size: 1.8rem; }
-            .container { padding: 15px; }
-            section { padding: 20px; }
+            .login-box, .email-box, .viewer-box { padding: 30px; }
+            header h1 { font-size: 2rem; }
+            .container { padding: 20px; }
+            section { padding: 25px; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
-            .notification { top: 10px; right: 10px; left: 10px; transform: translateY(-120%); }
+            .notification { top: 15px; right: 15px; left: 15px; transform: translateY(-120%); }
             .notification.show { transform: translateY(0); }
-            .user-info { position: static; margin-top: 10px; }
+            .user-info { position: static; margin-top: 15px; text-align: center; }
             .google-sync-actions { justify-content: center; }
+            nav button { padding: 12px 18px; font-size: 1rem; margin: 0 4px; }
+            .action-btn { display: block; width: 100%; margin: 5px 0; }
         }
 
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr; }
-            .action-btn { display: block; width: 100%; margin: 5px 0; }
-            th, td { padding: 10px 8px; font-size: 0.85rem; }
+            th, td { padding: 12px 10px; font-size: 0.9rem; }
+            .email-actions { flex-direction: column; }
+            .viewer-actions { flex-direction: column; }
         }
     </style>
 </head>
@@ -425,7 +574,7 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <h2>BCC CMMS</h2>
+            <h2>BCC CMMS Enhanced</h2>
             <form id="login-form">
                 <input type="text" id="username" placeholder="Username" required>
                 <input type="password" id="password" placeholder="Password" required>
@@ -438,7 +587,7 @@
                 </select>
                 <button type="submit">Secure Login</button>
             </form>
-            <p style="margin-top:20px; font-size:0.9rem; color:#b0b0b0;">
+            <p style="margin-top:25px; font-size:1rem; color:#b0b0b0;">
                 <strong>Demo Access:</strong><br>
                 admin / admin123 (Admin)<br>
                 manager / manager123 (Manager)<br>
@@ -450,8 +599,8 @@
 
     <div class="app-container" id="app">
         <header>
-            <h1>BCC CMMS</h1>
-            <p>Premium Maintenance Management System</p>
+            <h1>BCC CMMS Enhanced</h1>
+            <p>Premium & Professional Maintenance Management System</p>
             <div class="user-info" id="user-info"></div>
         </header>
 
@@ -474,7 +623,7 @@
                 <div class="stats-grid" id="dashboard-stats">
                     </div>
 
-                <h3 style="margin-top: 30px; color:#ffd700;">Critical Open Work Orders</h3>
+                <h3 style="margin-top: 35px; color:#ffd700;">Critical Open Work Orders</h3>
                 <div class="table-container">
                     <table id="dashboard-wo-table">
                         <thead><tr><th>ID</th><th>Dept</th><th>Asset</th><th>Description</th><th>Priority</th><th>Status</th></tr></thead>
@@ -526,7 +675,7 @@
                     </form>
                 </div>
 
-                <h3 style="margin-top: 30px; color:#ffd700;">Existing Work Orders</h3>
+                <h3 style="margin-top: 35px; color:#ffd700;">Existing Work Orders</h3>
                 <div class="table-container">
                     <table id="wo-table">
                         <thead><tr><th>ID</th><th>Dept</th><th>Asset</th><th>Description</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
@@ -566,7 +715,7 @@
                     </form>
                 </div>
 
-                <h3 style="margin-top: 30px; color:#ffd700;">Registered Assets</h3>
+                <h3 style="margin-top: 35px; color:#ffd700;">Registered Assets</h3>
                 <div class="table-container">
                     <table id="asset-table">
                         <thead><tr><th>ID</th><th>Dept</th><th>Name</th><th>Serial</th><th>Location</th><th>Attachment</th><th>Actions</th></tr></thead>
@@ -601,7 +750,7 @@
                     </form>
                 </div>
 
-                <h3 style="margin-top: 30px; color:#ffd700;">Current PM Schedules</h3>
+                <h3 style="margin-top: 35px; color:#ffd700;">Current PM Schedules</h3>
                 <div class="table-container">
                     <table id="pm-table">
                         <thead><tr><th>ID</th><th>Dept</th><th>Asset</th><th>Task</th><th>Schedule</th><th>Next Due</th><th>Actions</th></tr></thead>
@@ -637,7 +786,7 @@
                     </form>
                 </div>
 
-                <h3 style="margin-top: 30px; color:#ffd700;">Inventory Status</h3>
+                <h3 style="margin-top: 35px; color:#ffd700;">Inventory Status</h3>
                 <div class="table-container">
                     <table id="inv-table">
                         <thead><tr><th>ID</th><th>Dept</th><th>Name</th><th>Qty</th><th>Reorder Point</th><th>Status</th><th>Actions</th></tr></thead>
@@ -668,7 +817,7 @@
                     </form>
                 </div>
 
-                <h3 style="margin-top: 30px; color:#ffd700;">Current Users</h3>
+                <h3 style="margin-top: 35px; color:#ffd700;">Current Users</h3>
                 <div class="table-container">
                     <table id="user-table">
                         <thead><tr><th>Username</th><th>Role</th><th>Actions</th></tr></thead>
@@ -708,7 +857,7 @@
                     </select>
 
                     <label>Date Range:</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <input type="date" id="report-start" required>
                         <input type="date" id="report-end" required>
                     </div>
@@ -719,14 +868,14 @@
                         <option value="detailed">Detailed (All Records)</option>
                     </select>
 
-                    <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+                    <div style="margin-top: 25px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
                         <button type="submit">Generate Report</button>
-                        <button type="button" onclick="printReport()" style="background:#28a745;">Print / PDF</button>
-                        <button type="button" onclick="openEmailModal()" style="background:#6f42c1;">Email Report</button>
+                        <button type="button" onclick="printReport()" style="background: linear-gradient(90deg, #28a745, #20c997);">Print / PDF</button>
+                        <button type="button" onclick="openEmailModal()" style="background: linear-gradient(90deg, #6f42c1, #5a32a3);">Email Report</button>
                     </div>
                 </form>
 
-                <div id="maintenance-report-content" style="margin-top: 25px; display: none;">
+                <div id="maintenance-report-content" style="margin-top: 30px; display: none;">
                     <div class="print-header">
                         <h1 id="print-title">BCC Monthly Maintenance Report</h1>
                         <p id="print-date-range">Generated on: <span id="generated-date"></span></p>
@@ -734,7 +883,7 @@
 
                     <div class="stats-grid" id="report-summary"></div>
 
-                    <h3 style="margin-top: 30px; color:#ffd700;">Work Orders</h3>
+                    <h3 style="margin-top: 35px; color:#ffd700;">Work Orders</h3>
                     <div class="table-container">
                         <table id="report-wo-table">
                             <thead><tr><th>ID</th><th>Dept</th><th>Description</th><th>Asset</th><th>Priority</th><th>Status</th></tr></thead>
@@ -742,7 +891,7 @@
                         </table>
                     </div>
 
-                    <h3 style="margin-top: 30px; color:#ffd700;">Preventive Maintenance</h3>
+                    <h3 style="margin-top: 35px; color:#ffd700;">Preventive Maintenance</h3>
                     <div class="table-container">
                         <table id="report-pm-table">
                             <thead><tr><th>ID</th><th>Dept</th><th>Asset</th><th>Schedule</th><th>Next Due</th><th>Status</th></tr></thead>
@@ -750,7 +899,7 @@
                         </table>
                     </div>
 
-                    <h3 style="margin-top: 30px; color:#ffd700;">Assets</h3>
+                    <h3 style="margin-top: 35px; color:#ffd700;">Assets</h3>
                     <div class="table-container">
                         <table id="report-assets-table">
                             <thead><tr><th>ID</th><th>Dept</th><th>Name</th><th>Serial</th><th>Location</th></tr></thead>
@@ -758,7 +907,7 @@
                         </table>
                     </div>
 
-                    <h3 style="margin-top: 30px; color:#ffd700;">Inventory Status</h3>
+                    <h3 style="margin-top: 35px; color:#ffd700;">Inventory Status</h3>
                     <div class="table-container">
                         <table id="report-inv-table">
                             <thead><tr><th>ID</th><th>Dept</th><th>Name</th><th>Qty</th><th>Reorder</th><th>Status</th></tr></thead>
@@ -766,7 +915,7 @@
                         </table>
                     </div>
 
-                    <div style="margin-top: 35px; font-style: italic; color: #b0b0b0; border-top: 1px solid rgba(255,215,0,0.2); padding-top: 15px;">
+                    <div style="margin-top: 40px; font-style: italic; color: #b0b0b0; border-top: 2px solid rgba(255,215,0,0.25); padding-top: 20px; text-align: center;">
                         <p>Report generated by: <strong id="generated-by" style="color:#ffd700;"></strong></p>
                         <p>Date: <span id="generated-time"></span></p>
                     </div>
@@ -785,13 +934,13 @@
                     <input type="file" id="word-import" style="display:none;" accept=".docx,.doc" onchange="importWord(event)">
                     <button onclick="document.getElementById('pdf-import').click()">Import from PDF (Text to WO)</button>
                     <input type="file" id="pdf-import" style="display:none;" accept=".pdf" onchange="importPdf(event)">
-                    <button onclick="clearAllData()" style="background: #dc3545;">Clear All Local Data (DANGER)</button>
+                    <button onclick="clearAllData()" style="background: linear-gradient(90deg, #dc3545, #c82333);">Clear All Local Data (DANGER)</button>
                 </div>
 
                 <div class="google-sync-config">
                     <h3>Google Sheets Sync</h3>
-                    <p style="color:#b0b0b0; font-size:0.9rem;">Configure and sync your data with Google Sheets. Follow the <a href="https://developers.google.com/sheets/api/quickstart/js" target="_blank" style="color:#ffd700;">Google Quickstart</a> to get your Client ID and API Key.</p>
-                    <div style="display: grid; gap: 10px; margin-bottom: 15px;">
+                    <p style="color:#b0b0b0; font-size:1rem;">Configure and sync your data with Google Sheets. Follow the <a href="https://developers.google.com/sheets/api/quickstart/js" target="_blank" style="color:#ffd700;">Google Quickstart</a> to get your Client ID and API Key.</p>
+                    <div style="display: grid; gap: 12px; margin-bottom: 20px;">
                         <label>Client ID:</label>
                         <input type="text" id="gs-client-id" placeholder="YOUR_CLIENT_ID" onchange="updateGsConfig()">
                         <label>API Key:</label>
@@ -801,16 +950,16 @@
                     </div>
                     <div class="google-sync-actions">
                         <button id="gs-authorize-btn" onclick="handleAuthClick()" style="display:none;">Authorize Google</button>
-                        <button id="gs-signout-btn" onclick="handleSignoutClick()" style="background:#dc3545; display:none;">Sign Out</button>
-                        <button onclick="syncToSheets()" style="background:#28a745; display:none;" id="gs-sync-to-btn">Sync to Sheets</button>
-                        <button onclick="syncFromSheets()" style="background:#17a2b8; display:none;" id="gs-sync-from-btn">Sync from Sheets</button>
+                        <button id="gs-signout-btn" onclick="handleSignoutClick()" style="background: linear-gradient(90deg, #dc3545, #c82333); display:none;">Sign Out</button>
+                        <button onclick="syncToSheets()" style="background: linear-gradient(90deg, #28a745, #20c997); display:none;" id="gs-sync-to-btn">Sync to Sheets</button>
+                        <button onclick="syncFromSheets()" style="background: linear-gradient(90deg, #17a2b8, #138496); display:none;" id="gs-sync-from-btn">Sync from Sheets</button>
                     </div>
                     <div id="google-auth-status" class="unauthenticated">Not authenticated</div>
                 </div>
 
-                <h3 style="margin-top: 30px; color:#ffd700;">EmailJS Configuration</h3>
+                <h3 style="margin-top: 35px; color:#ffd700;">EmailJS Configuration</h3>
                 <p>Configure EmailJS to enable email functionality for reports. You must replace the placeholders in the script with your actual keys.</p>
-                <form onsubmit="return false" style="margin-top: 15px;">
+                <form onsubmit="return false" style="margin-top: 20px;">
                     <label>User ID (Public Key):</label>
                     <input type="text" id="settings-user-id" placeholder="YOUR_USER_ID_HERE" disabled>
                     <label>Service ID:</label>
@@ -824,6 +973,7 @@
         </div>
     </div>
 
+    <!-- ENHANCED EMAIL MODAL -->
     <div id="email-modal">
         <div class="email-box">
             <h3>Send Report via Email</h3>
@@ -838,18 +988,40 @@
                 <textarea id="email-message" rows="4" placeholder="Please find the latest maintenance report attached..."></textarea>
 
                 <div class="email-actions">
-                    <button type="submit" style="background:#28a745;">Send Email</button>
-                    <button type="button" onclick="closeEmailModal()" style="background:#6c757d;">Cancel</button>
+                    <button type="submit" style="background: linear-gradient(90deg, #28a745, #20c997);">Send Email</button>
+                    <button type="button" onclick="closeEmailModal()" style="background: linear-gradient(90deg, #6c757d, #5a6268);">Cancel</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- ENHANCED ASSET VIEWER MODAL WITH UPLOAD -->
+    <div id="asset-viewer-modal">
+        <div class="viewer-box">
+            <div class="viewer-header">
+                <h3 id="viewer-title">Asset Viewer</h3>
+                <button class="close-viewer" onclick="closeAssetViewer()">&times;</button>
+            </div>
+            <div class="viewer-content" id="viewer-content"></div>
+            <div class="viewer-upload" id="viewer-upload">
+                <label for="viewer-file-upload">Upload New File (<5MB)</label>
+                <input type="file" id="viewer-file-upload" accept="image/*,.pdf,.xlsx,.xls,.docx,.doc" onchange="handleViewerUpload(event)">
+                <p style="color:#b0b0b0; font-size:0.9rem; margin-top:10px;">Replace current attachment.</p>
+            </div>
+            <div class="viewer-actions">
+                <button class="add-to-wo-btn" onclick="addViewedAssetToWO()">Add to Work Order</button>
+                <button class="download-btn" onclick="downloadViewedAsset()">Download File</button>
+                <button class="upload-btn" id="upload-trigger" onclick="document.getElementById('viewer-file-upload').click()" style="display:none;">Upload New File</button>
+            </div>
+            <div class="viewer-meta" id="viewer-meta"></div>
         </div>
     </div>
 
     <div id="notification" class="notification"></div>
 
     <script>
-        // === BCC CMMS - PREMIUM EDITION - FULLY FUNCTIONAL ===
-        const storageKey = 'bcc_cmms_premium_v1';
+        // === BCC CMMS - PREMIUM ENHANCED EDITION - FULLY FUNCTIONAL WITH ASSET VIEWER UPLOAD ===
+        const storageKey = 'bcc_cmms_premium_v1_enhanced';
         let data = {
             workOrders: [], assets: [], pmSchedules: [], inventory: [], users: [], nextIds: { wo: 1, asset: 1, pm: 1, inv: 1 }
         };
@@ -869,20 +1041,20 @@
         let currentEditingPm = null;
         let currentEditingInv = null;
         let currentEditingUserIndex = -1;
+        let currentViewedAsset = null; // For the viewer
 
         // === PERMISSIONS CONFIG ===
         const permissions = {
-            admin: { create: true, edit: true, delete: true, manageUsers: true },
-            manager: { create: true, edit: true, delete: false, manageUsers: false },
-            technician: { create: true, edit: 'self', delete: false, manageUsers: false }, // Technicians can only edit/close their own WO
-            viewer: { create: false, edit: false, delete: false, manageUsers: false }
+            admin: { create: true, edit: true, delete: true, manageUsers: true, viewAssets: true },
+            manager: { create: true, edit: true, delete: false, manageUsers: false, viewAssets: true },
+            technician: { create: true, edit: 'self', delete: false, manageUsers: false, viewAssets: true },
+            viewer: { create: false, edit: false, delete: false, manageUsers: false, viewAssets: true }
         };
         
         // === EMAIL.JS CONFIG (REPLACE WITH YOUR KEYS) ===
-        // IMPORTANT: Replace these with your actual keys from EmailJS
-        const EMAILJS_USER_ID = 'YOUR_USER_ID_HERE'; // e.g., 'user_xxxxxxxxxxxxxxxx'
-        const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'; // e.g., 'service_cmms_report'
-        const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // e.g., 'template_maintenance'
+        const EMAILJS_USER_ID = 'YOUR_USER_ID_HERE';
+        const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
+        const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
 
         // === GOOGLE SHEETS CONFIG ===
         let CLIENT_ID = '';
@@ -900,15 +1072,13 @@
         // --- CORE APPLICATION FUNCTIONS ---
 
         function initApp() {
-            // Load data from localStorage or initialize with defaults
             const savedData = localStorage.getItem(storageKey);
             if (savedData) {
                 data = JSON.parse(savedData);
-                // Ensure default users are present if data was empty/corrupted
                 if (data.users.length === 0) data.users = defaultUsers;
             } else {
                 data.users = defaultUsers;
-                saveData(); // Save initial structure
+                saveData();
             }
 
             // Migrate legacy image to attachment
@@ -934,7 +1104,7 @@
                 showNotification('Warning: EmailJS is not configured. Email report function will fail.');
             }
 
-            // Load Google config from localStorage if available
+            // Load Google config
             const gsConfig = localStorage.getItem('gs_config');
             if (gsConfig) {
                 const config = JSON.parse(gsConfig);
@@ -946,7 +1116,7 @@
                 document.getElementById('gs-spreadsheet-id').value = SPREADSHEET_ID;
             }
 
-            // Set initial date ranges for reports
+            // Set initial date ranges
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('report-start').value = new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0];
             document.getElementById('report-end').value = today;
@@ -963,14 +1133,14 @@
             // Asset upload preview
             document.getElementById('asset-upload').addEventListener('change', previewAssetAttachment);
 
-            // New: Bulk asset import listener
+            // Bulk asset import
             document.getElementById('asset-bulk-upload').addEventListener('change', handleBulkAssetImport);
 
-            // Pre-populate selects that rely on initial data
+            // Pre-populate selects
             populateAssetSelects();
             populateUserSelects();
 
-            // Update Google buttons visibility
+            // Update Google buttons
             updateGsButtons();
         }
 
@@ -982,24 +1152,36 @@
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
-                    preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
+                    preview.innerHTML = `<img src="${ev.target.result}" alt="Preview" onclick="zoomImage(this.src)">`;
                 };
                 reader.readAsDataURL(file);
             } else {
                 const size = (file.size / 1024).toFixed(2);
                 preview.innerHTML = `
-                    <p style="font-weight: 600; color: #ffd700;">${file.name}</p>
+                    <p style="font-weight: 700; color: #ffd700;">${file.name}</p>
                     <p class="file-info">${file.type} (${size} KB)</p>
                 `;
             }
             preview.style.display = 'block';
         }
 
-        // New: Dedicated bulk asset import function
+        function zoomImage(src) {
+            const img = new Image();
+            img.src = src;
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '100%';
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:5000;';
+            modal.onclick = () => document.body.removeChild(modal);
+            modal.appendChild(img);
+            document.body.appendChild(modal);
+        }
+
+        // Bulk asset import (unchanged)
         function handleBulkAssetImport(e) {
             if (!permissions[currentUser.role].create) {
                 showNotification('Permission denied to import assets.', true);
-                e.target.value = ''; // Clear input
+                e.target.value = '';
                 return;
             }
             const file = e.target.files[0];
@@ -1021,7 +1203,7 @@
                     const workbook = XLSX.read(dataArray, { type: 'array' });
                     const sheetName = 'Assets';
                     if (!workbook.SheetNames.includes(sheetName)) {
-                        showNotification(`No "${sheetName}" sheet found in the Excel file. Expected columns: department, name, location (serial optional).`, true);
+                        showNotification(`No "${sheetName}" sheet found. Expected columns: department, name, location (serial optional).`, true);
                         e.target.value = '';
                         return;
                     }
@@ -1045,14 +1227,14 @@
                     if (added > 0) {
                         saveData();
                         renderAssets();
-                        showNotification(`${added} assets registered automatically from Excel!`);
+                        showNotification(`${added} assets registered from Excel!`);
                     } else {
-                        showNotification('No valid assets found in the Excel sheet. Ensure rows have "name" and "location" columns.', true);
+                        showNotification('No valid assets found. Ensure "name" and "location" columns exist.', true);
                     }
                 } catch (err) {
-                    showNotification('Error parsing Excel file: ' + err.message, true);
+                    showNotification('Error parsing Excel: ' + err.message, true);
                 }
-                e.target.value = ''; // Clear input after processing
+                e.target.value = '';
             };
             reader.readAsArrayBuffer(file);
         }
@@ -1067,15 +1249,63 @@
                     canvas.width = img.width * ratio;
                     canvas.height = img.height * ratio;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    canvas.toBlob((blob) => {
-                        if (!blob) reject(new Error('Compression failed'));
-                        resolve(blob);
-                    }, 'image/jpeg', quality);
+                    canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('Compression failed')), 'image/jpeg', quality);
                 };
                 img.onerror = reject;
                 img.src = URL.createObjectURL(file);
             });
         }
+
+        // NEW: Handle Upload in Viewer
+        window.handleViewerUpload = async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('File too large. Maximum 5MB.', true);
+                e.target.value = '';
+                return;
+            }
+            if (!currentViewedAsset) {
+                showNotification('No asset selected for upload.', true);
+                e.target.value = '';
+                return;
+            }
+            if (!permissions[currentUser.role].edit) {
+                showNotification('Permission denied to upload files.', true);
+                e.target.value = '';
+                return;
+            }
+
+            showNotification('Processing upload...');
+            try {
+                let fileData;
+                if (file.type.startsWith('image/')) {
+                    const compressedBlob = await compressImage(file);
+                    fileData = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(compressedBlob);
+                    });
+                } else {
+                    fileData = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                }
+                currentViewedAsset.attachment = { name: file.name, type: file.type, data: fileData };
+                saveData();
+                renderAssets();
+                showNotification(`File uploaded successfully for Asset A${currentViewedAsset.id}!`);
+                // Refresh viewer content
+                openAssetViewer(currentViewedAsset.id);
+            } catch (error) {
+                showNotification('Error uploading file: ' + error.message, true);
+            }
+            e.target.value = '';
+        };
 
         function updateGsConfig() {
             CLIENT_ID = document.getElementById('gs-client-id').value.trim();
@@ -1122,16 +1352,16 @@
 
         function saveData() { 
             localStorage.setItem(storageKey, JSON.stringify(data)); 
-            populateAssetSelects(); // Update asset lists on data change
-            populateUserSelects(); // Update user lists on data change
+            populateAssetSelects();
+            populateUserSelects();
         }
 
         function showNotification(msg, isError = false) {
             const notif = document.getElementById('notification');
             notif.textContent = msg;
-            notif.style.background = isError ? '#dc3545' : 'linear-gradient(90deg, #28a745, #20c997)';
+            notif.className = `notification ${isError ? 'error' : ''}`;
             notif.classList.add('show');
-            setTimeout(() => notif.classList.remove('show'), 3500);
+            setTimeout(() => notif.classList.remove('show'), 4000);
         }
 
         function showSection(id, btn) {
@@ -1141,7 +1371,7 @@
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             
-            // Re-render data tables when sections are shown
+            // Re-render data tables
             if (id === 'dashboard') renderDashboard();
             if (id === 'work-orders') renderWorkOrders();
             if (id === 'assets') renderAssets();
@@ -1151,7 +1381,6 @@
             if (id === 'reports') renderReportsOverview();
             if (id === 'settings') updateGsButtons();
 
-            // Hide report content when moving away from the reports sections
             if (id !== 'maintenance-report') {
                 document.getElementById('maintenance-report-content').style.display = 'none';
             }
@@ -1161,15 +1390,16 @@
             if (!currentUser) return;
             const p = permissions[currentUser.role];
 
-            // Show/Hide forms (Create/Add)
             document.getElementById('wo-form-container').style.display = p.create ? 'block' : 'none';
             document.getElementById('asset-form-container').style.display = p.create ? 'block' : 'none';
             document.getElementById('pm-form-container').style.display = p.create ? 'block' : 'none';
             document.getElementById('inv-form-container').style.display = p.create ? 'block' : 'none';
             document.getElementById('user-form-container').style.display = p.manageUsers ? 'block' : 'none';
             
-            // Show/Hide Users tab
-            document.getElementById('users-tab').style.display = p.manageUsers ? 'block' : 'none';
+            document.getElementById('users-tab').style.display = p.manageUsers ? 'inline-block' : 'none';
+
+            // For viewers, ensure view buttons are shown in asset table
+            renderAssets(); // Re-render to apply view permissions
         }
 
         // --- AUTH & SETUP ---
@@ -1191,15 +1421,15 @@
                     document.getElementById('generated-by').textContent = `${user.username} (${user.role})`;
                     applyPermissions();
                     showSection('dashboard', document.querySelector('nav button'));
-                    showNotification('Welcome, ' + user.username + '!');
-                }, 300);
+                    showNotification('Welcome to Enhanced BCC CMMS, ' + user.username + '!');
+                }, 400);
             } else {
                 showNotification('Invalid credentials. Use demo accounts.', true);
             }
         };
 
         window.logout = function() {
-            if (confirm('Logout from BCC CMMS?')) {
+            if (confirm('Logout from BCC CMMS Enhanced?')) {
                 currentUser = null;
                 document.getElementById('app').style.display = 'none';
                 document.getElementById('login-screen').style.display = 'flex';
@@ -1211,11 +1441,7 @@
         // --- DATA HELPERS ---
 
         function populateAssetSelects() {
-            const assetSelects = [
-                document.getElementById('wo-asset'), 
-                document.getElementById('pm-asset')
-            ];
-            
+            const assetSelects = [document.getElementById('wo-asset'), document.getElementById('pm-asset')];
             assetSelects.forEach(select => {
                 const selectedValue = select.value;
                 select.innerHTML = '<option value="" disabled>Select Asset</option>';
@@ -1231,11 +1457,10 @@
 
         function populateUserSelects() {
             const userSelects = [document.getElementById('wo-assigned-to')];
-
             userSelects.forEach(select => {
                 const selectedValue = select.value;
                 select.innerHTML = '<option value="" disabled>Select User</option>';
-                data.users.filter(u => u.role !== 'viewer').forEach(user => {
+                data.users.filter(u => u.role !== 'viewer').forEach(user => { // Exclude viewers from assignment
                     const option = document.createElement('option');
                     option.value = user.username;
                     option.textContent = `${user.username} (${user.role})`;
@@ -1245,32 +1470,35 @@
             });
         }
 
-        // --- CRUD LOGIC ---
-
-        // Work Orders
+        // Work Orders (CRUD logic remains the same, but enhanced notifications)
         function handleWorkOrderSubmit(e) {
             e.preventDefault();
+            if (!permissions[currentUser.role].create && !document.getElementById('wo-id').value) { 
+                showNotification('Permission denied to create work orders.', true); 
+                return; 
+            }
+
             const id = document.getElementById('wo-id').value;
             const department = document.getElementById('wo-department').value;
-            const assetId = document.getElementById('wo-asset').value;
+            const assetId = parseInt(document.getElementById('wo-asset').value);
             const description = document.getElementById('wo-description').value;
             const priority = document.getElementById('wo-priority').value;
             const assignedTo = document.getElementById('wo-assigned-to').value;
             const status = document.getElementById('wo-status').value || 'Open';
 
+            const asset = data.assets.find(a => a.id === assetId);
+            if (!asset) { 
+                showNotification('Invalid asset selected.', true); 
+                return; 
+            }
+
             if (id) {
                 // UPDATE
                 const wo = data.workOrders.find(w => w.id == id);
-                if (!wo) return;
-                
-                // Permission check for editing
-                const p = permissions[currentUser.role];
-                const isAllowed = p.edit === true || (p.edit === 'self' && wo.assignedTo === currentUser.username);
-                if (!isAllowed) {
-                     showNotification('Permission denied to edit this Work Order.', true);
-                     return;
+                if (!wo || (permissions[currentUser.role].edit === 'self' && wo.assignedTo !== currentUser.username)) { 
+                    showNotification('Permission denied or WO not found.', true); 
+                    return; 
                 }
-
                 wo.department = department;
                 wo.assetId = assetId;
                 wo.description = description;
@@ -1279,8 +1507,10 @@
                 wo.status = status;
                 showNotification(`Work Order WO${id} updated successfully!`);
                 document.getElementById('wo-submit-btn').textContent = 'Create Work Order';
-                document.getElementById('wo-status-label').style.display = 'none';
-                document.getElementById('wo-status').style.display = 'none';
+                if (status === 'Closed') {
+                    const closeBtn = document.querySelector(`button.close[data-wo-id="${id}"]`);
+                    if (closeBtn) closeBtn.textContent = 'Closed';
+                }
             } else {
                 // CREATE
                 const newWo = {
@@ -1290,120 +1520,25 @@
                     description,
                     priority,
                     assignedTo,
-                    status: 'Open',
+                    status,
                     createdBy: currentUser.username,
                     createdAt: new Date().toISOString().split('T')[0]
                 };
                 data.workOrders.push(newWo);
-                showNotification(`Work Order WO${newWo.id} created successfully!`);
+                showNotification(`Work Order WO${newWo.id} created and assigned to ${assignedTo}!`);
             }
 
             document.getElementById('wo-form').reset();
+            document.getElementById('wo-id').value = '';
+            document.getElementById('wo-status').style.display = 'none';
+            document.getElementById('wo-status-label').style.display = 'none';
             currentEditingWo = null;
             saveData();
             renderWorkOrders();
-            renderDashboard(); // Update dashboard after WO change
+            renderDashboard();
         }
 
-        window.editWorkOrder = function(id) {
-            const wo = data.workOrders.find(w => w.id === id);
-            if (!wo) return;
-
-            // Permission check for editing
-            const p = permissions[currentUser.role];
-            const isAllowed = p.edit === true || (p.edit === 'self' && wo.assignedTo === currentUser.username);
-            if (!isAllowed) {
-                 showNotification('Permission denied to edit this Work Order.', true);
-                 return;
-            }
-
-            currentEditingWo = wo;
-            document.getElementById('wo-id').value = wo.id;
-            document.getElementById('wo-department').value = wo.department;
-            document.getElementById('wo-asset').value = wo.assetId;
-            document.getElementById('wo-description').value = wo.description;
-            document.getElementById('wo-priority').value = wo.priority;
-            document.getElementById('wo-assigned-to').value = wo.assignedTo;
-            document.getElementById('wo-status').value = wo.status;
-            
-            document.getElementById('wo-submit-btn').textContent = `Update WO${id}`;
-            document.getElementById('wo-status-label').style.display = 'block';
-            document.getElementById('wo-status').style.display = 'block';
-            
-            document.getElementById('work-orders').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        window.deleteWorkOrder = function(id) {
-            if (!permissions[currentUser.role].delete) { showNotification('Permission denied.', true); return; }
-            if (confirm(`Are you sure you want to delete Work Order WO${id}?`)) {
-                data.workOrders = data.workOrders.filter(w => w.id !== id);
-                saveData();
-                renderWorkOrders();
-                renderDashboard();
-                showNotification(`Work Order WO${id} deleted.`);
-            }
-        }
-
-        window.closeWorkOrder = function(id) {
-            const wo = data.workOrders.find(w => w.id === id);
-            if (!wo) return;
-
-            // Permission check for closing (same as editing)
-            const p = permissions[currentUser.role];
-            const isAllowed = p.edit === true || (p.edit === 'self' && wo.assignedTo === currentUser.username);
-            if (!isAllowed) {
-                 showNotification('Permission denied to close this Work Order.', true);
-                 return;
-            }
-
-            if (confirm(`Are you sure you want to close Work Order WO${id}?`)) {
-                wo.status = 'Closed';
-                saveData();
-                renderWorkOrders();
-                renderDashboard();
-                showNotification(`Work Order WO${id} marked as Closed.`);
-            }
-        }
-
-        function renderWorkOrders() {
-            const tbody = document.getElementById('wo-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            const p = permissions[currentUser.role];
-
-            data.workOrders.sort((a, b) => b.id - a.id).forEach(wo => {
-                const tr = document.createElement('tr');
-                const asset = data.assets.find(a => a.id == wo.assetId) || { name: 'N/A' };
-                
-                // Conditional access for actions
-                const canEdit = p.edit === true || (p.edit === 'self' && wo.assignedTo === currentUser.username);
-                const canDelete = p.delete;
-
-                let actionsHTML = '';
-                if (canEdit) {
-                    actionsHTML += `<button class="action-btn edit" onclick="editWorkOrder(${wo.id})">Edit</button>`;
-                    if (wo.status !== 'Closed') {
-                        actionsHTML += `<button class="action-btn close" onclick="closeWorkOrder(${wo.id})">Close</button>`;
-                    }
-                }
-                if (canDelete) {
-                    actionsHTML += `<button class="action-btn delete" onclick="deleteWorkOrder(${wo.id})">Delete</button>`;
-                }
-                if (!actionsHTML) actionsHTML = 'No Actions';
-
-                tr.innerHTML = `
-                    <td>WO${wo.id}</td>
-                    <td>${wo.department}</td>
-                    <td>A${wo.assetId} - ${asset.name}</td>
-                    <td>${wo.description.substring(0, 50)}${wo.description.length > 50 ? '...' : ''}</td>
-                    <td style="color: ${wo.priority === 'High' ? '#dc3545' : wo.priority === 'Medium' ? '#ffc107' : '#17a2b8'}; font-weight: 700;">${wo.priority}</td>
-                    <td style="color: ${wo.status === 'Open' ? '#dc3545' : wo.status === 'Completed' ? '#17a2b8' : wo.status === 'Closed' ? '#28a745' : '#ffc107'}; font-weight: 700;">${wo.status}</td>
-                    <td>${actionsHTML}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // Assets (similar CRUD logic for other entities)
+        // ENHANCED ASSET FUNCTIONS WITH VIEWER INTEGRATION AND UPLOAD
         async function handleAssetSubmit(e) {
             e.preventDefault();
             if (!permissions[currentUser.role].create && !document.getElementById('asset-id').value) { 
@@ -1422,12 +1557,11 @@
 
             if (fileInput.files && fileInput.files[0]) {
                 const file = fileInput.files[0];
-                if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                    showNotification('File too large. Maximum size is 5MB.', true);
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('File too large. Maximum 5MB.', true);
                     return;
                 }
 
-                // Process as single attachment (no bulk logic here anymore)
                 try {
                     let fileData;
                     if (file.type.startsWith('image/')) {
@@ -1447,12 +1581,8 @@
                             reader.readAsDataURL(file);
                         });
                     }
-                    attachment = {
-                        name: file.name,
-                        type: file.type,
-                        data: fileData
-                    };
-                    showNotification('Attachment processed successfully.');
+                    attachment = { name: file.name, type: file.type, data: fileData };
+                    showNotification('Attachment processed!');
                 } catch (error) {
                     showNotification('Error processing attachment: ' + error.message, true);
                     return;
@@ -1460,7 +1590,6 @@
             }
 
             if (id) {
-                // UPDATE
                 const asset = data.assets.find(a => a.id == id);
                 if (!asset || !permissions[currentUser.role].edit) { 
                     showNotification('Permission denied or asset not found.', true); 
@@ -1470,23 +1599,13 @@
                 asset.name = name;
                 asset.serial = serial;
                 asset.location = location;
-                if (attachment) {
-                    asset.attachment = attachment;
-                }
-                showNotification(`Asset A${id} updated successfully!`);
+                if (attachment) asset.attachment = attachment;
+                showNotification(`Asset A${id} updated!`);
                 document.getElementById('asset-submit-btn').textContent = 'Add Asset';
             } else {
-                // CREATE single
-                const newAsset = {
-                    id: data.nextIds.asset++,
-                    department,
-                    name,
-                    serial,
-                    location,
-                    attachment
-                };
+                const newAsset = { id: data.nextIds.asset++, department, name, serial, location, attachment };
                 data.assets.push(newAsset);
-                showNotification(`Asset A${newAsset.id} added successfully!`);
+                showNotification(`Asset A${newAsset.id} added!`);
             }
 
             document.getElementById('asset-form').reset();
@@ -1498,6 +1617,101 @@
             saveData();
             renderAssets();
         }
+
+        // NEW: Open Asset Viewer Modal with Upload Support
+        window.openAssetViewer = function(id) {
+            if (!permissions[currentUser.role].viewAssets) {
+                showNotification('Permission denied to view assets.', true);
+                return;
+            }
+            const asset = data.assets.find(a => a.id === id);
+            if (!asset) {
+                showNotification('Asset not found.', true);
+                return;
+            }
+            currentViewedAsset = asset;
+            document.getElementById('viewer-title').textContent = `Asset A${asset.id}: ${asset.name}`;
+            const content = document.getElementById('viewer-content');
+            const meta = document.getElementById('viewer-meta');
+            const uploadSection = document.getElementById('viewer-upload');
+            const uploadTrigger = document.getElementById('upload-trigger');
+
+            // Show/hide upload based on edit permission
+            if (permissions[currentUser.role].edit) {
+                uploadSection.style.display = 'block';
+                uploadTrigger.style.display = 'inline-block';
+            } else {
+                uploadSection.style.display = 'none';
+                uploadTrigger.style.display = 'none';
+            }
+
+            if (asset.attachment) {
+                const att = asset.attachment;
+                if (att.type.startsWith('image/')) {
+                    content.innerHTML = `<img src="${att.data}" alt="${att.name}" onclick="zoomImage(this.src)">`;
+                } else if (att.type === 'application/pdf') {
+                    content.innerHTML = `<embed src="${att.data}" type="application/pdf">`;
+                } else {
+                    content.innerHTML = `<p style="font-size:1.2rem; color:#ffd700;">${att.name}</p><p style="color:#b0b0b0;">${att.type} - Open in external viewer or download.</p>`;
+                }
+                meta.innerHTML = `
+                    <p><strong>Name:</strong> ${asset.name}</p>
+                    <p><strong>Department:</strong> ${asset.department}</p>
+                    <p><strong>Serial:</strong> ${asset.serial || 'N/A'}</p>
+                    <p><strong>Location:</strong> ${asset.location}</p>
+                    <p><strong>Attachment:</strong> ${att.name} (${att.type})</p>
+                `;
+            } else {
+                content.innerHTML = '<p style="color:#b0b0b0; font-size:1.2rem;">No attachment available for this asset.</p>';
+                meta.innerHTML = `
+                    <p><strong>Name:</strong> ${asset.name}</p>
+                    <p><strong>Department:</strong> ${asset.department}</p>
+                    <p><strong>Serial:</strong> ${asset.serial || 'N/A'}</p>
+                    <p><strong>Location:</strong> ${asset.location}</p>
+                    <p><strong>Attachment:</strong> None</p>
+                `;
+            }
+
+            document.getElementById('asset-viewer-modal').style.display = 'flex';
+        };
+
+        // NEW: Close Asset Viewer
+        window.closeAssetViewer = function() {
+            document.getElementById('asset-viewer-modal').style.display = 'none';
+            document.getElementById('viewer-file-upload').value = '';
+            currentViewedAsset = null;
+        };
+
+        // NEW: Add Viewed Asset to Work Order
+        window.addViewedAssetToWO = function() {
+            if (!currentViewedAsset) return;
+            if (!permissions[currentUser.role].create) {
+                showNotification('Permission denied to create work orders.', true);
+                return;
+            }
+            // Pre-fill WO form with asset
+            document.getElementById('wo-asset').value = currentViewedAsset.id;
+            document.getElementById('wo-department').value = currentViewedAsset.department;
+            showSection('work-orders');
+            showNotification(`Asset A${currentViewedAsset.id} pre-selected for new Work Order. Add description and submit.`);
+            closeAssetViewer();
+        };
+
+        // NEW: Download Viewed Asset
+        window.downloadViewedAsset = function() {
+            if (!currentViewedAsset || !currentViewedAsset.attachment) {
+                showNotification('No file to download.', true);
+                return;
+            }
+            const att = currentViewedAsset.attachment;
+            const a = document.createElement('a');
+            a.href = att.data;
+            a.download = att.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showNotification(`Downloaded: ${att.name}`);
+        };
 
         window.editAsset = function(id) {
             if (!permissions[currentUser.role].edit) { 
@@ -1515,21 +1729,12 @@
             document.getElementById('asset-location').value = asset.location;
             document.getElementById('asset-submit-btn').textContent = `Update Asset A${id}`;
 
-            // Show preview if attachment exists
             const preview = document.getElementById('asset-preview');
             if (asset.attachment) {
                 if (asset.attachment.type.startsWith('image/')) {
-                    preview.innerHTML = `
-                        <img src="${asset.attachment.data}" alt="Current Attachment">
-                        <p class="file-info">Current: ${asset.attachment.name} (${asset.attachment.type})</p>
-                        <p style="font-size:0.8rem; color:#b0b0b0;">Upload new to replace.</p>
-                    `;
+                    preview.innerHTML = `<img src="${asset.attachment.data}" alt="Current" onclick="zoomImage(this.src)">`;
                 } else {
-                    preview.innerHTML = `
-                        <p style="font-weight: 600; color: #ffd700;">${asset.attachment.name}</p>
-                        <p class="file-info">${asset.attachment.type}</p>
-                        <p style="font-size:0.8rem; color:#b0b0b0;">Upload new to replace.</p>
-                    `;
+                    preview.innerHTML = `<p style="font-weight: 700; color: #ffd700;">${asset.attachment.name}</p><p class="file-info">${asset.attachment.type}</p>`;
                 }
                 preview.style.display = 'block';
             } else {
@@ -1539,63 +1744,13 @@
             document.getElementById('assets').scrollIntoView({ behavior: 'smooth' });
         }
 
-        window.viewAssetFile = function(id) {
-            const asset = data.assets.find(a => a.id === id);
-            if (!asset || !asset.attachment) {
-                showNotification('No attachment for this asset.', true);
-                return;
-            }
-
-            const newWindow = window.open('', '_blank', 'width=800,height=600');
-            const att = asset.attachment;
-            if (att.type.startsWith('image/')) {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Asset Attachment - A${id}</title>
-                        <style>body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; } img { max-width: 100%; max-height: 100%; border-radius: 8px; }</style>
-                    </head>
-                    <body>
-                        <img src="${att.data}" alt="Asset Attachment">
-                    </body>
-                    </html>
-                `);
-            } else if (att.type === 'application/pdf') {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Asset PDF - A${id}</title>
-                        <style>body { margin: 0; padding: 0; height: 100vh; } embed { width: 100%; height: 100%; }</style>
-                    </head>
-                    <body>
-                        <embed src="${att.data}" type="application/pdf">
-                    </body>
-                    </html>
-                `);
-            } else {
-                // For other files, trigger download
-                const a = document.createElement('a');
-                a.href = att.data;
-                a.download = att.name;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                newWindow.close();
-                return;
-            }
-            newWindow.document.close();
-        };
-
         window.deleteAsset = function(id) {
             if (!permissions[currentUser.role].delete) { 
                 showNotification('Permission denied.', true); 
                 return; 
             }
-            if (confirm(`Deleting Asset A${id} will affect all linked Work Orders and PMs. Continue?`)) {
+            if (confirm(`Deleting Asset A${id} will affect linked records. Continue?`)) {
                 data.assets = data.assets.filter(a => a.id !== id);
-                // Note: In a real app, you'd handle cascading deletes or prevent deletion if linked
                 saveData();
                 renderAssets();
                 showNotification(`Asset A${id} deleted.`);
@@ -1611,11 +1766,12 @@
                 const tr = document.createElement('tr');
                 
                 let actionsHTML = '';
+                if (p.viewAssets) actionsHTML += `<button class="action-btn view-file" onclick="openAssetViewer(${asset.id})">View</button>`;
                 if (p.edit) actionsHTML += `<button class="action-btn edit" onclick="editAsset(${asset.id})">Edit</button>`;
                 if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deleteAsset(${asset.id})">Delete</button>`;
                 if (!actionsHTML) actionsHTML = 'No Actions';
 
-                const attachmentHTML = asset.attachment ? `<button class="action-btn view-file" onclick="viewAssetFile(${asset.id})">View</button>` : 'None';
+                const attachmentHTML = asset.attachment ? `<button class="action-btn view-file" onclick="openAssetViewer(${asset.id})">View File</button>` : 'None';
 
                 tr.innerHTML = `
                     <td>A${asset.id}</td>
@@ -1629,557 +1785,268 @@
                 tbody.appendChild(tr);
             });
         }
-        
-        // PM Schedules
-        function handlePmSubmit(e) {
-            e.preventDefault();
-            if (!permissions[currentUser.role].create && !document.getElementById('pm-id').value) { 
-                showNotification('Permission denied to manage PMs.', true); 
-                return; 
-            }
 
-            const id = document.getElementById('pm-id').value;
-            const assetId = document.getElementById('pm-asset').value;
-            const description = document.getElementById('pm-description').value;
-            const frequency = document.getElementById('pm-frequency').value;
-            const nextDue = document.getElementById('pm-due').value;
+        // Placeholder for other functions (PM, Inventory, Users, Reports, etc.) - they remain the same as previous version
+        // For completeness, include stubs or assume they are implemented similarly
 
-            const asset = data.assets.find(a => a.id == assetId);
-            if (!asset) { 
-                showNotification('Invalid asset selected.', true); 
-                return; 
-            }
-
-            if (id) {
-                // UPDATE
-                const pm = data.pmSchedules.find(p => p.id == id);
-                if (!pm || !permissions[currentUser.role].edit) { 
-                    showNotification('Permission denied or PM not found.', true); 
-                    return; 
-                }
-                pm.assetId = assetId;
-                pm.description = description;
-                pm.frequency = frequency;
-                pm.nextDue = nextDue;
-                showNotification(`PM Schedule P${id} updated successfully!`);
-                document.getElementById('pm-submit-btn').textContent = 'Create Schedule';
-            } else {
-                // CREATE
-                const newPm = {
-                    id: data.nextIds.pm++,
-                    assetId,
-                    description,
-                    frequency,
-                    nextDue,
-                    department: asset.department, // Link department for reports
-                    status: 'Active'
-                };
-                data.pmSchedules.push(newPm);
-                showNotification(`PM Schedule P${newPm.id} created successfully!`);
-            }
-
-            document.getElementById('pm-form').reset();
-            document.getElementById('pm-id').value = '';
-            currentEditingPm = null;
-            saveData();
-            renderPmSchedules();
-        }
-
-        window.editPm = function(id) {
-            if (!permissions[currentUser.role].edit) { 
-                showNotification('Permission denied.', true); 
-                return; 
-            }
-            const pm = data.pmSchedules.find(p => p.id === id);
-            if (!pm) return;
-
-            currentEditingPm = pm;
-            document.getElementById('pm-id').value = pm.id;
-            document.getElementById('pm-asset').value = pm.assetId;
-            document.getElementById('pm-description').value = pm.description;
-            document.getElementById('pm-frequency').value = pm.frequency;
-            document.getElementById('pm-due').value = pm.nextDue;
-            document.getElementById('pm-submit-btn').textContent = `Update Schedule P${id}`;
-            document.getElementById('preventive').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        window.deletePm = function(id) {
-            if (!permissions[currentUser.role].delete) { 
-                showNotification('Permission denied.', true); 
-                return; 
-            }
-            if (confirm(`Are you sure you want to delete PM Schedule P${id}?`)) {
-                data.pmSchedules = data.pmSchedules.filter(p => p.id !== id);
-                saveData();
-                renderPmSchedules();
-                showNotification(`PM Schedule P${id} deleted.`);
-            }
+        function renderWorkOrders() {
+            // Implementation as in original
         }
 
         function renderPmSchedules() {
-            const tbody = document.getElementById('pm-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            const p = permissions[currentUser.role];
-
-            data.pmSchedules.sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue)).forEach(pm => {
-                const tr = document.createElement('tr');
-                const asset = data.assets.find(a => a.id == pm.assetId) || { name: 'N/A', department: 'N/A' };
-                const dueDate = new Date(pm.nextDue);
-                const isOverdue = dueDate < new Date(new Date().setHours(0,0,0,0));
-                
-                let actionsHTML = '';
-                if (p.edit) actionsHTML += `<button class="action-btn edit" onclick="editPm(${pm.id})">Edit</button>`;
-                if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deletePm(${pm.id})">Delete</button>`;
-                if (!actionsHTML) actionsHTML = 'No Actions';
-
-                tr.innerHTML = `
-                    <td>P${pm.id}</td>
-                    <td>${pm.department}</td>
-                    <td>A${pm.assetId} - ${asset.name}</td>
-                    <td>${pm.description.substring(0, 30)}...</td>
-                    <td>${pm.frequency}</td>
-                    <td style="color: ${isOverdue ? '#dc3545' : '#28a745'}; font-weight: 700;">${pm.nextDue} ${isOverdue ? '(Overdue)' : ''}</td>
-                    <td>${actionsHTML}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-        
-        // Inventory
-        function handleInventorySubmit(e) {
-            e.preventDefault();
-            if (!permissions[currentUser.role].create && !document.getElementById('inv-id').value) { 
-                showNotification('Permission denied to manage inventory.', true); 
-                return; 
-            }
-
-            const id = document.getElementById('inv-id').value;
-            const department = document.getElementById('inv-department').value;
-            const name = document.getElementById('inv-name').value;
-            const qty = parseInt(document.getElementById('inv-qty').value);
-            const reorder = parseInt(document.getElementById('inv-reorder').value);
-
-            if (id) {
-                // UPDATE
-                const inv = data.inventory.find(i => i.id == id);
-                if (!inv || !permissions[currentUser.role].edit) { 
-                    showNotification('Permission denied or item not found.', true); 
-                    return; 
-                }
-                inv.department = department;
-                inv.name = name;
-                inv.qty = qty;
-                inv.reorder = reorder;
-                showNotification(`Inventory Item I${id} updated successfully!`);
-                document.getElementById('inv-submit-btn').textContent = 'Add Item';
-            } else {
-                // CREATE
-                const newInv = {
-                    id: data.nextIds.inv++,
-                    department,
-                    name,
-                    qty,
-                    reorder
-                };
-                data.inventory.push(newInv);
-                showNotification(`Inventory Item I${newInv.id} added successfully!`);
-            }
-
-            document.getElementById('inv-form').reset();
-            document.getElementById('inv-id').value = '';
-            currentEditingInv = null;
-            saveData();
-            renderInventory();
-        }
-
-        window.editInventory = function(id) {
-            if (!permissions[currentUser.role].edit) { 
-                showNotification('Permission denied.', true); 
-                return; 
-            }
-            const inv = data.inventory.find(i => i.id === id);
-            if (!inv) return;
-
-            currentEditingInv = inv;
-            document.getElementById('inv-id').value = inv.id;
-            document.getElementById('inv-department').value = inv.department;
-            document.getElementById('inv-name').value = inv.name;
-            document.getElementById('inv-qty').value = inv.qty;
-            document.getElementById('inv-reorder').value = inv.reorder;
-            document.getElementById('inv-submit-btn').textContent = `Update Item I${id}`;
-            document.getElementById('inventory').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        window.deleteInventory = function(id) {
-            if (!permissions[currentUser.role].delete) { 
-                showNotification('Permission denied.', true); 
-                return; 
-            }
-            if (confirm(`Are you sure you want to delete Inventory Item I${id}?`)) {
-                data.inventory = data.inventory.filter(i => i.id !== id);
-                saveData();
-                renderInventory();
-                showNotification(`Inventory Item I${id} deleted.`);
-            }
+            // Implementation as in original
         }
 
         function renderInventory() {
-            const tbody = document.getElementById('inv-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            const p = permissions[currentUser.role];
-
-            data.inventory.sort((a, b) => b.id - a.id).forEach(inv => {
-                const tr = document.createElement('tr');
-                const isLow = inv.qty <= inv.reorder;
-                const status = isLow ? 'Low Stock' : 'OK';
-                
-                let actionsHTML = '';
-                if (p.edit) actionsHTML += `<button class="action-btn edit" onclick="editInventory(${inv.id})">Edit</button>`;
-                if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deleteInventory(${inv.id})">Delete</button>`;
-                if (!actionsHTML) actionsHTML = 'No Actions';
-
-                tr.innerHTML = `
-                    <td>I${inv.id}</td>
-                    <td>${inv.department}</td>
-                    <td>${inv.name}</td>
-                    <td>${inv.qty}</td>
-                    <td>${inv.reorder}</td>
-                    <td style="color: ${isLow ? '#dc3545' : '#28a745'}; font-weight: 700;">${status}</td>
-                    <td>${actionsHTML}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-        
-        // Users
-        function handleUserSubmit(e) {
-            e.preventDefault();
-            if (!permissions[currentUser.role].manageUsers) { 
-                showNotification('Permission denied to manage users.', true); 
-                return; 
-            }
-
-            const index = document.getElementById('user-edit-index').value;
-            const username = document.getElementById('user-username').value.trim();
-            const password = document.getElementById('user-password').value;
-            const role = document.getElementById('user-role').value;
-
-            if (index !== '-1') {
-                // UPDATE
-                const idx = parseInt(index);
-                data.users[idx].username = username;
-                data.users[idx].password = password;
-                data.users[idx].role = role;
-                showNotification(`User ${username} updated successfully!`);
-                document.getElementById('user-submit-btn').textContent = 'Add User';
-            } else {
-                // CREATE
-                const existing = data.users.find(u => u.username === username);
-                if (existing) {
-                    showNotification('Username already exists.', true);
-                    return;
-                }
-                const newUser = { username, password, role };
-                data.users.push(newUser);
-                showNotification(`User ${username} added successfully!`);
-            }
-
-            document.getElementById('user-form').reset();
-            document.getElementById('user-edit-index').value = '-1';
-            currentEditingUserIndex = -1;
-            saveData();
-            renderUsers();
-        }
-
-        window.editUser = function(index) {
-            if (!permissions[currentUser.role].manageUsers) { 
-                showNotification('Permission denied.', true); 
-                return; 
-            }
-            const user = data.users[index];
-            if (!user) return;
-
-            currentEditingUserIndex = index;
-            document.getElementById('user-edit-index').value = index;
-            document.getElementById('user-username').value = user.username;
-            document.getElementById('user-password').value = user.password;
-            document.getElementById('user-role').value = user.role;
-            document.getElementById('user-submit-btn').textContent = `Update User ${user.username}`;
-            document.getElementById('users').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        window.deleteUser = function(index) {
-            if (!permissions[currentUser.role].manageUsers) { 
-                showNotification('Permission denied.', true); 
-                return; 
-            }
-            const user = data.users[index];
-            if (!user) return;
-            if (user.username === currentUser.username) { 
-                showNotification("Cannot delete yourself.", true); 
-                return; 
-            }
-
-            if (confirm(`Are you sure you want to delete user ${user.username}?`)) {
-                data.users.splice(index, 1);
-                saveData();
-                renderUsers();
-                showNotification(`User ${user.username} deleted.`);
-            }
+            // Implementation as in original
         }
 
         function renderUsers() {
-            const tbody = document.getElementById('user-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            const p = permissions[currentUser.role];
-            
-            data.users.forEach((user, index) => {
-                const tr = document.createElement('tr');
-                
-                let actionsHTML = '';
-                if (p.manageUsers) {
-                    actionsHTML += `<button class="action-btn edit" onclick="editUser(${index})">Edit</button>`;
-                    if (user.username !== 'admin') { // Prevent deleting the default admin
-                        actionsHTML += `<button class="action-btn delete" onclick="deleteUser(${index})">Delete</button>`;
-                    }
-                }
-                if (!actionsHTML) actionsHTML = 'No Actions';
-
-                tr.innerHTML = `
-                    <td>${user.username}</td>
-                    <td>${user.role}</td>
-                    <td>${actionsHTML}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+            // Implementation as in original
         }
-        
-        // --- DASHBOARD & OVERVIEW ---
 
         function renderDashboard() {
-            const stats = {
-                totalWO: data.workOrders.length,
-                openWO: data.workOrders.filter(w => w.status === 'Open').length,
-                highPriority: data.workOrders.filter(w => w.status !== 'Closed' && w.priority === 'High').length,
-                totalAssets: data.assets.length,
-                overduePM: data.pmSchedules.filter(p => new Date(p.nextDue) < new Date(new Date().setHours(0,0,0,0))).length,
-                lowInventory: data.inventory.filter(i => i.qty <= i.reorder).length
-            };
-
-            const statsContainer = document.getElementById('dashboard-stats');
-            statsContainer.innerHTML = `
-                <div class="stat-card"><h3>${stats.totalWO}</h3><p>Total WOs</p></div>
-                <div class="stat-card" style="border-color: #dc3545;"><h3 style="color:#dc3545;">${stats.openWO}</h3><p>Open WOs</p></div>
-                <div class="stat-card" style="border-color: #ffc107;"><h3 style="color:#ffc107;">${stats.highPriority}</h3><p>High Priority</p></div>
-                <div class="stat-card"><h3>${stats.totalAssets}</h3><p>Total Assets</p></div>
-                <div class="stat-card" style="border-color: #dc3545;"><h3 style="color:#dc3545;">${stats.overduePM}</h3><p>Overdue PMs</p></div>
-                <div class="stat-card" style="border-color: #ffc107;"><h3 style="color:#ffc107;">${stats.lowInventory}</h3><p>Low Inventory</p></div>
-            `;
-
-            // Critical Open Work Orders
-            const tbody = document.getElementById('dashboard-wo-table').querySelector('tbody');
-            tbody.innerHTML = '';
-            data.workOrders
-                .filter(w => w.status === 'Open' && w.priority === 'High')
-                .sort((a, b) => b.id - a.id)
-                .slice(0, 5)
-                .forEach(wo => {
-                    const tr = document.createElement('tr');
-                    const asset = data.assets.find(a => a.id == wo.assetId) || { name: 'N/A' };
-                    tr.innerHTML = `
-                        <td>WO${wo.id}</td>
-                        <td>${wo.department}</td>
-                        <td>A${wo.assetId} - ${asset.name}</td>
-                        <td>${wo.description.substring(0, 40)}...</td>
-                        <td style="color: #dc3545; font-weight: 700;">${wo.priority}</td>
-                        <td style="color: #dc3545; font-weight: 700;">${wo.status}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
+            // Implementation as in original
         }
-        
+
         function renderReportsOverview() {
-            const totalWO = data.workOrders.length;
-            const totalAsset = data.assets.length;
-            const belowReorder = data.inventory.filter(i => i.qty <= i.reorder).length;
-            
-            document.getElementById('report-total-wo').textContent = totalWO;
-            document.getElementById('report-total-asset').textContent = totalAsset;
-            document.getElementById('report-below-reorder').textContent = belowReorder;
+            // Implementation as in original
         }
-
-
-        // --- REPORT & EMAIL LOGIC ---
 
         function generateReport(e) {
-            e.preventDefault();
-
-            const title = document.getElementById('report-title').value;
-            const departmentFilter = document.getElementById('report-department').value;
-            const startDate = document.getElementById('report-start').value;
-            const endDate = document.getElementById('report-end').value;
-            const reportType = document.getElementById('report-type-full').value;
-            
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            end.setDate(end.getDate() + 1); // Make end date inclusive
-
-            // 1. Filter Data
-            const filteredWO = data.workOrders.filter(wo => {
-                const woDate = new Date(wo.createdAt);
-                const deptMatch = !departmentFilter || wo.department === departmentFilter;
-                const dateMatch = woDate >= start && woDate <= end;
-                return deptMatch && dateMatch;
-            });
-
-            const filteredPM = data.pmSchedules.filter(pm => {
-                const pmDate = new Date(pm.nextDue);
-                const asset = data.assets.find(a => a.id == pm.assetId);
-                const deptMatch = !departmentFilter || (asset && asset.department === departmentFilter);
-                // PM reporting is often based on the due date being within the range
-                const dateMatch = pmDate >= start && pmDate <= end; 
-                return deptMatch && dateMatch;
-            });
-            
-            const filteredAssets = data.assets.filter(asset => !departmentFilter || asset.department === departmentFilter);
-            const filteredInv = data.inventory.filter(inv => !departmentFilter || inv.department === departmentFilter || inv.department === 'general');
-
-
-            // 2. Generate Summary Stats
-            const summaryStats = {
-                'Total WOs': filteredWO.length,
-                'Completed WOs': filteredWO.filter(w => w.status === 'Completed' || w.status === 'Closed').length,
-                'Open WOs': filteredWO.filter(w => w.status === 'Open').length,
-                'Total PM Schedules': filteredPM.length,
-                'Overdue PMs': filteredPM.filter(p => new Date(p.nextDue) < new Date(new Date().setHours(0,0,0,0))).length,
-                'Total Assets': filteredAssets.length
-            };
-
-            const summaryHtml = Object.entries(summaryStats).map(([key, value]) => `
-                <div class="stat-card"><h3>${value}</h3><p>${key}</p></div>
-            `).join('');
-            document.getElementById('report-summary').innerHTML = summaryHtml;
-
-            // 3. Populate Tables
-            function populateTable(dataArray, tableId, columns, formatter) {
-                const tbody = document.getElementById(tableId).querySelector('tbody');
-                tbody.innerHTML = '';
-                if (reportType === 'summary' && tableId !== 'report-inv-table') return; // Skip detailed tables for summary report
-
-                dataArray.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = columns.map(col => `<td>${formatter(item, col)}</td>`).join('');
-                    tbody.appendChild(tr);
-                });
-            }
-
-            // WO Table
-            populateTable(filteredWO, 'report-wo-table', ['id', 'department', 'description', 'asset', 'priority', 'status'], (wo, col) => {
-                const asset = data.assets.find(a => a.id == wo.assetId) || { name: 'N/A' };
-                if (col === 'id') return `WO${wo.id}`;
-                if (col === 'asset') return `A${wo.assetId} - ${asset.name}`;
-                if (col === 'description') return wo.description.substring(0, 50) + (wo.description.length > 50 ? '...' : '');
-                return wo[col];
-            });
-            
-            // PM Table
-            populateTable(filteredPM, 'report-pm-table', ['id', 'department', 'asset', 'frequency', 'nextDue', 'status'], (pm, col) => {
-                const asset = data.assets.find(a => a.id == pm.assetId) || { name: 'N/A', department: 'N/A' };
-                if (col === 'id') return `P${pm.id}`;
-                if (col === 'department') return asset.department;
-                if (col === 'asset') return `A${pm.assetId} - ${asset.name}`;
-                if (col === 'status') return new Date(pm.nextDue) < new Date(new Date().setHours(0,0,0,0)) ? 'Overdue' : 'Scheduled';
-                return pm[col];
-            });
-            
-            // Asset Table (Full list, filtered by department only)
-            populateTable(filteredAssets, 'report-assets-table', ['id', 'department', 'name', 'serial', 'location'], (asset, col) => {
-                if (col === 'id') return `A${asset.id}`;
-                return asset[col];
-            });
-
-            // Inventory Table (Full list, filtered by department only)
-            populateTable(filteredInv, 'report-inv-table', ['id', 'department', 'name', 'qty', 'reorder', 'status'], (inv, col) => {
-                if (col === 'id') return `I${inv.id}`;
-                if (col === 'status') return inv.qty <= inv.reorder ? 'Low Stock' : 'OK';
-                return inv[col];
-            });
-
-
-            // 4. Update Report Metadata
-            document.getElementById('print-title').textContent = title;
-            document.getElementById('generated-date').textContent = `${startDate} to ${endDate}`;
-            const generatedTime = new Date().toLocaleString();
-            document.getElementById('generated-time').textContent = generatedTime;
-            document.getElementById('generated-by').textContent = `${currentUser.username} (${currentUser.role})`;
-
-            document.getElementById('maintenance-report-content').style.display = 'block';
-            
-            // Store the full report content (which includes the populated tables) for emailing
-            // We need to clone and strip the non-printable elements for a cleaner email HTML
-            const reportContentDiv = document.getElementById('maintenance-report-content').cloneNode(true);
-            reportContentDiv.querySelectorAll('.action-btn').forEach(el => el.remove());
-            reportContentDiv.querySelectorAll('th').forEach(th => th.style.backgroundColor = '#f0f0f0');
-            reportContentDiv.querySelectorAll('.stats-grid .stat-card').forEach(card => card.style.boxShadow = 'none');
-
-            // Wrap in a basic style block for email readability
-            currentReportHTML = `<div style="font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ddd;">
-                ${reportContentDiv.innerHTML}
-            </div>`;
-            
-            showNotification('Report Generated!');
+            // Implementation as in original
         }
 
-        window.openEmailModal = () => {
-            if (!currentReportHTML) { 
-                showNotification('Please generate the report first!', true); 
-                return; 
-            }
-            document.getElementById('email-modal').style.display = 'flex';
-        };
+        function printReport() {
+            window.print();
+        }
 
-        window.closeEmailModal = () => {
-            document.getElementById('email-modal').style.display = 'none';
-            document.getElementById('email-form').reset();
-        };
+        function openEmailModal() {
+            // Implementation as in original
+        }
+
+        function closeEmailModal() {
+            // Implementation as in original
+        }
 
         function handleEmailSubmit(e) {
-            e.preventDefault();
-            if (EMAILJS_USER_ID === 'YOUR_USER_ID_HERE') {
-                showNotification('EmailJS is not configured. Please check your settings.', true);
-                return;
-            }
-
-            const to = document.getElementById('email-to').value;
-            const subject = document.getElementById('email-subject').value;
-            const message = document.getElementById('email-message').value;
-
-            // This is the data that goes to the EmailJS template
-            const templateParams = {
-                to_email: to,
-                subject: subject,
-                message: message,
-                report_title: document.getElementById('print-title').textContent,
-                report_date_range: document.getElementById('generated-date').textContent,
-                report_content: currentReportHTML // Inject the generated HTML
-            };
-            
-            showNotification('Sending email...');
-
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-                .then(() => {
-                    showNotification('Report sent successfully!');
-                    closeEmailModal();
-                }, (error) => {
-                    console.error('Email failed to send:', error);
-                    showNotification('Email failed. Check EmailJS console for errors.', true);
-                });
+            // Implementation as in original
         }
 
-        window.printReport = () => window.print();
+        // Google Sheets functions (unchanged)
+        function gapiLoaded() {
+            gapi.load('client', initializeGapiClient);
+        }
 
-        // --- DATA UTILITIES (Settings) ---
+        async function initializeGapiClient() {
+            if (!API_KEY) return;
+            await gapi.client.init({
+                apiKey: API_KEY,
+                discoveryDocs: [DISCOVERY_DOC],
+            });
+            gapiInited = true;
+            maybeEnableButtons();
+        }
 
+        function gisLoaded() {
+            if (!CLIENT_ID) return;
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: '',
+            });
+            gisInited = true;
+            maybeEnableButtons();
+        }
+
+        function maybeEnableButtons() {
+            if (gapiInited && gisInited) {
+                document.getElementById('gs-authorize-btn').style.display = 'inline-block';
+                updateAuthStatus(gapi.client.getToken() !== null);
+            }
+        }
+
+        window.handleAuthClick = async function() {
+            if (!tokenClient) {
+                showNotification('Google config not set. Please enter Client ID, API Key, and Spreadsheet ID.', true);
+                return;
+            }
+            tokenClient.callback = async (resp) => {
+                if (resp.error !== undefined) {
+                    throw (resp);
+                }
+                updateAuthStatus(true, 'Authenticated - Ready to sync');
+            };
+
+            if (gapi.client.getToken() === null) {
+                tokenClient.requestAccessToken({prompt: 'consent'});
+            } else {
+                tokenClient.requestAccessToken({prompt: ''});
+            }
+        };
+
+        window.handleSignoutClick = function() {
+            const token = gapi.client.getToken();
+            if (token !== null) {
+                google.accounts.oauth2.revoke(token.access_token);
+                gapi.client.setToken('');
+                updateAuthStatus(false, 'Signed out');
+            }
+        };
+        window.syncToSheets = async function() {
+            if (!gapi.client.getToken()) {
+                showNotification('Please authorize first.', true);
+                return;
+            }
+            if (!SPREADSHEET_ID) {
+                showNotification('Spreadsheet ID required.', true);
+                return;
+            }
+            showNotification('Syncing to Google Sheets...');
+            try {
+                // Clear and append Assets (skip attachments as they are binary)
+                await syncSheet('Assets', [
+                    ['ID', 'Department', 'Name', 'Serial', 'Location'],
+                    ...data.assets.map(a => [a.id, a.department, a.name, a.serial || '', a.location])
+                ]);
+
+                // Clear and append Work Orders
+                await syncSheet('WorkOrders', [
+                    ['ID', 'Department', 'AssetId', 'Description', 'Priority', 'AssignedTo', 'Status', 'CreatedBy', 'CreatedAt'],
+                    ...data.workOrders.map(w => [w.id, w.department, w.assetId, w.description, w.priority, w.assignedTo, w.status, w.createdBy, w.createdAt])
+                ]);
+
+                // Clear and append PM
+                await syncSheet('PM', [
+                    ['ID', 'AssetId', 'Description', 'Frequency', 'NextDue', 'Department', 'Status'],
+                    ...data.pmSchedules.map(p => [p.id, p.assetId, p.description, p.frequency, p.nextDue, p.department, p.status])
+                ]);
+
+                // Clear and append Inventory
+                await syncSheet('Inventory', [
+                    ['ID', 'Department', 'Name', 'Qty', 'Reorder'],
+                    ...data.inventory.map(i => [i.id, i.department, i.name, i.qty, i.reorder])
+                ]);
+
+                // Skip users for security
+                showNotification('Sync to Google Sheets completed!');
+            } catch (err) {
+                showNotification(`Sync error: ${err.message}`, true);
+                console.error(err);
+            }
+        };
+
+        window.syncFromSheets = async function() {
+            if (!gapi.client.getToken()) {
+                showNotification('Please authorize first.', true);
+                return;
+            }
+            if (!SPREADSHEET_ID) {
+                showNotification('Spreadsheet ID required.', true);
+                return;
+            }
+            showNotification('Syncing from Google Sheets...');
+            try {
+                // Load Assets
+                const assetsData = await getSheetData('Assets');
+                if (assetsData.length > 1) { // Skip header
+                    data.assets = assetsData.slice(1).map(row => ({
+                        id: parseInt(row[0]),
+                        department: row[1],
+                        name: row[2],
+                        serial: row[3] || '',
+                        location: row[4],
+                        attachment: null // Reset attachments on sync from sheets
+                    }));
+                    data.nextIds.asset = Math.max(...data.assets.map(a => a.id), 0) + 1;
+                }
+
+                // Load Work Orders
+                const woData = await getSheetData('WorkOrders');
+                if (woData.length > 1) {
+                    data.workOrders = woData.slice(1).map(row => ({
+                        id: parseInt(row[0]),
+                        department: row[1],
+                        assetId: parseInt(row[2]),
+                        description: row[3],
+                        priority: row[4],
+                        assignedTo: row[5],
+                        status: row[6],
+                        createdBy: row[7],
+                        createdAt: row[8]
+                    }));
+                    data.nextIds.wo = Math.max(...data.workOrders.map(w => w.id), 0) + 1;
+                }
+
+                // Load PM
+                const pmData = await getSheetData('PM');
+                if (pmData.length > 1) {
+                    data.pmSchedules = pmData.slice(1).map(row => ({
+                        id: parseInt(row[0]),
+                        assetId: parseInt(row[1]),
+                        description: row[2],
+                        frequency: row[3],
+                        nextDue: row[4],
+                        department: row[5],
+                        status: row[6]
+                    }));
+                    data.nextIds.pm = Math.max(...data.pmSchedules.map(p => p.id), 0) + 1;
+                }
+
+                // Load Inventory
+                const invData = await getSheetData('Inventory');
+                if (invData.length > 1) {
+                    data.inventory = invData.slice(1).map(row => ({
+                        id: parseInt(row[0]),
+                        department: row[1],
+                        name: row[2],
+                        qty: parseInt(row[3]),
+                        reorder: parseInt(row[4])
+                    }));
+                    data.nextIds.inv = Math.max(...data.inventory.map(i => i.id), 0) + 1;
+                }
+
+                // Retain local users
+                saveData();
+                populateAssetSelects();
+                renderWorkOrders();
+                renderAssets();
+                renderPmSchedules();
+                renderInventory();
+                renderDashboard();
+                showNotification('Sync from Google Sheets completed!');
+            } catch (err) {
+                showNotification(`Sync error: ${err.message}`, true);
+                console.error(err);
+            }
+        };
+
+        async function syncSheet(sheetName, values) {
+            const range = `${sheetName}!A:Z`;
+            // Clear existing data
+            await gapi.client.sheets.spreadsheets.values.clear({
+                spreadsheetId: SPREADSHEET_ID,
+                range: range
+            });
+            // Append new data
+            await gapi.client.sheets.spreadsheets.values.append({
+                spreadsheetId: SPREADSHEET_ID,
+                range: range,
+                valueInputOption: 'RAW',
+                resource: { values }
+            });
+        }
+
+        async function getSheetData(sheetName) {
+            const range = `${sheetName}!A:Z`;
+            const response = await gapi.client.sheets.spreadsheets.values.get({
+                spreadsheetId: SPREADSHEET_ID,
+                range: range
+            });
+            return response.result.values || [];
+        }
+
+        // Data utilities
         window.exportData = function() {
             const dataStr = JSON.stringify(data, null, 4);
             const blob = new Blob([dataStr], { type: 'application/json' });
@@ -2192,7 +2059,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             showNotification('Data exported successfully!');
-        }
+        };
 
         window.importData = function(event) {
             const file = event.target.files[0];
@@ -2220,9 +2087,8 @@
                 document.getElementById('import-file').value = ''; // Clear file input
             };
             reader.readAsText(file);
-        }
+        };
 
-        // Enhanced Upload Data Features
         window.importExcel = function(event) {
             if (!permissions[currentUser.role].create) {
                 showNotification('Permission denied to import data.', true);
@@ -2249,7 +2115,8 @@
                                     department: row.department,
                                     name: row.name,
                                     serial: row.serial || '',
-                                    location: row.location
+                                    location: row.location,
+                                    attachment: null
                                 };
                                 data.assets.push(newAsset);
                                 importedCount++;
@@ -2257,7 +2124,7 @@
                         });
                     }
 
-                    // Import WorkOrders sheet (simplified: assume asset name, match by name)
+                    // Import Work Orders sheet (simplified: assume asset name, match by name)
                     if (workbook.Sheets['WorkOrders']) {
                         const wos = XLSX.utils.sheet_to_json(workbook.Sheets['WorkOrders']);
                         wos.forEach(row => {
@@ -2415,237 +2282,638 @@
             document.getElementById('pdf-import').value = '';
         };
 
-        // Google Sheets Integration
-        function gapiLoaded() {
-            gapi.load('client', initializeGapiClient);
-        }
-
-        async function initializeGapiClient() {
-            if (!API_KEY) return;
-            await gapi.client.init({
-                apiKey: API_KEY,
-                discoveryDocs: [DISCOVERY_DOC],
-            });
-            gapiInited = true;
-            maybeEnableButtons();
-        }
-
-        function gisLoaded() {
-            if (!CLIENT_ID) return;
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: '',
-            });
-            gisInited = true;
-            maybeEnableButtons();
-        }
-
-        function maybeEnableButtons() {
-            if (gapiInited && gisInited) {
-                document.getElementById('gs-authorize-btn').style.display = 'inline-block';
-                updateAuthStatus(gapi.client.getToken() !== null);
-            }
-        }
-
-        window.handleAuthClick = async function() {
-            if (!tokenClient) {
-                showNotification('Google config not set. Please enter Client ID, API Key, and Spreadsheet ID.', true);
-                return;
-            }
-            tokenClient.callback = async (resp) => {
-                if (resp.error !== undefined) {
-                    throw (resp);
-                }
-                updateAuthStatus(true, 'Authenticated - Ready to sync');
-                await syncStatusCheck(); // Optional: check if can access sheet
-            };
-
-            if (gapi.client.getToken() === null) {
-                tokenClient.requestAccessToken({prompt: 'consent'});
-            } else {
-                tokenClient.requestAccessToken({prompt: ''});
-            }
-        };
-
-        window.handleSignoutClick = function() {
-            const token = gapi.client.getToken();
-            if (token !== null) {
-                google.accounts.oauth2.revoke(token.access_token);
-                gapi.client.setToken('');
-                updateAuthStatus(false, 'Signed out');
-            }
-        };
-
-        async function syncStatusCheck() {
-            try {
-                await gapi.client.sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID });
-                showNotification('Google Sheets access confirmed.');
-            } catch (err) {
-                showNotification(`Error accessing sheet: ${err.message}`, true);
-            }
-        }
-
-        window.syncToSheets = async function() {
-            if (!gapi.client.getToken()) {
-                showNotification('Please authorize first.', true);
-                return;
-            }
-            if (!SPREADSHEET_ID) {
-                showNotification('Spreadsheet ID required.', true);
-                return;
-            }
-            showNotification('Syncing to Google Sheets...');
-            try {
-                // Clear and append Assets (skip attachments as they are binary)
-                await syncSheet('Assets', [
-                    ['ID', 'Department', 'Name', 'Serial', 'Location'],
-                    ...data.assets.map(a => [a.id, a.department, a.name, a.serial || '', a.location])
-                ]);
-
-                // Clear and append WorkOrders
-                await syncSheet('WorkOrders', [
-                    ['ID', 'Department', 'AssetId', 'Description', 'Priority', 'AssignedTo', 'Status', 'CreatedBy', 'CreatedAt'],
-                    ...data.workOrders.map(w => [w.id, w.department, w.assetId, w.description, w.priority, w.assignedTo, w.status, w.createdBy, w.createdAt])
-                ]);
-
-                // Clear and append PM
-                await syncSheet('PM', [
-                    ['ID', 'AssetId', 'Description', 'Frequency', 'NextDue', 'Department', 'Status'],
-                    ...data.pmSchedules.map(p => [p.id, p.assetId, p.description, p.frequency, p.nextDue, p.department, p.status])
-                ]);
-
-                // Clear and append Inventory
-                await syncSheet('Inventory', [
-                    ['ID', 'Department', 'Name', 'Qty', 'Reorder'],
-                    ...data.inventory.map(i => [i.id, i.department, i.name, i.qty, i.reorder])
-                ]);
-
-                // Skip users for security
-                showNotification('Sync to Google Sheets completed!');
-            } catch (err) {
-                showNotification(`Sync error: ${err.message}`, true);
-                console.error(err);
-            }
-        };
-
-        window.syncFromSheets = async function() {
-            if (!gapi.client.getToken()) {
-                showNotification('Please authorize first.', true);
-                return;
-            }
-            if (!SPREADSHEET_ID) {
-                showNotification('Spreadsheet ID required.', true);
-                return;
-            }
-            showNotification('Syncing from Google Sheets...');
-            try {
-                // Load Assets
-                const assetsData = await getSheetData('Assets');
-                if (assetsData.length > 1) { // Skip header
-                    data.assets = assetsData.slice(1).map(row => ({
-                        id: parseInt(row[0]),
-                        department: row[1],
-                        name: row[2],
-                        serial: row[3] || '',
-                        location: row[4],
-                        attachment: null // Reset attachments on sync from sheets
-                    }));
-                    data.nextIds.asset = Math.max(...data.assets.map(a => a.id), 0) + 1;
-                }
-
-                // Load WorkOrders
-                const woData = await getSheetData('WorkOrders');
-                if (woData.length > 1) {
-                    data.workOrders = woData.slice(1).map(row => ({
-                        id: parseInt(row[0]),
-                        department: row[1],
-                        assetId: parseInt(row[2]),
-                        description: row[3],
-                        priority: row[4],
-                        assignedTo: row[5],
-                        status: row[6],
-                        createdBy: row[7],
-                        createdAt: row[8]
-                    }));
-                    data.nextIds.wo = Math.max(...data.workOrders.map(w => w.id), 0) + 1;
-                }
-
-                // Load PM
-                const pmData = await getSheetData('PM');
-                if (pmData.length > 1) {
-                    data.pmSchedules = pmData.slice(1).map(row => ({
-                        id: parseInt(row[0]),
-                        assetId: parseInt(row[1]),
-                        description: row[2],
-                        frequency: row[3],
-                        nextDue: row[4],
-                        department: row[5],
-                        status: row[6]
-                    }));
-                    data.nextIds.pm = Math.max(...data.pmSchedules.map(p => p.id), 0) + 1;
-                }
-
-                // Load Inventory
-                const invData = await getSheetData('Inventory');
-                if (invData.length > 1) {
-                    data.inventory = invData.slice(1).map(row => ({
-                        id: parseInt(row[0]),
-                        department: row[1],
-                        name: row[2],
-                        qty: parseInt(row[3]),
-                        reorder: parseInt(row[4])
-                    }));
-                    data.nextIds.inv = Math.max(...data.inventory.map(i => i.id), 0) + 1;
-                }
-
-                // Retain local users
-                saveData();
-                populateAssetSelects();
-                renderWorkOrders();
-                renderAssets();
-                renderPmSchedules();
-                renderInventory();
-                renderDashboard();
-                showNotification('Sync from Google Sheets completed!');
-            } catch (err) {
-                showNotification(`Sync error: ${err.message}`, true);
-                console.error(err);
-            }
-        };
-
-        async function syncSheet(sheetName, values) {
-            const range = `${sheetName}!A:Z`;
-            // Clear existing data
-            await gapi.client.sheets.spreadsheets.values.clear({
-                spreadsheetId: SPREADSHEET_ID,
-                range: range
-            });
-            // Append new data
-            await gapi.client.sheets.spreadsheets.values.append({
-                spreadsheetId: SPREADSHEET_ID,
-                range: range,
-                valueInputOption: 'RAW',
-                resource: { values }
-            });
-        }
-
-        async function getSheetData(sheetName) {
-            const range = `${sheetName}!A:Z`;
-            const response = await gapi.client.sheets.spreadsheets.values.get({
-                spreadsheetId: SPREADSHEET_ID,
-                range: range
-            });
-            return response.result.values || [];
-        }
-        
         window.clearAllData = function() {
             if (confirm('DANGER: Are you absolutely sure you want to clear ALL local application data? This cannot be undone!')) {
                 localStorage.removeItem(storageKey);
                 showNotification('All local data cleared. Restarting application.', true);
                 setTimeout(() => window.location.reload(), 2000);
             }
+        };
+
+        // PM Schedules
+        function handlePmSubmit(e) {
+            e.preventDefault();
+            if (!permissions[currentUser.role].create && !document.getElementById('pm-id').value) { 
+                showNotification('Permission denied to manage PMs.', true); 
+                return; 
+            }
+
+            const id = document.getElementById('pm-id').value;
+            const assetId = document.getElementById('pm-asset').value;
+            const description = document.getElementById('pm-description').value;
+            const frequency = document.getElementById('pm-frequency').value;
+            const nextDue = document.getElementById('pm-due').value;
+
+            const asset = data.assets.find(a => a.id == assetId);
+            if (!asset) { 
+                showNotification('Invalid asset selected.', true); 
+                return; 
+            }
+
+            if (id) {
+                // UPDATE
+                const pm = data.pmSchedules.find(p => p.id == id);
+                if (!pm || !permissions[currentUser.role].edit) { 
+                    showNotification('Permission denied or PM not found.', true); 
+                    return; 
+                }
+                pm.assetId = assetId;
+                pm.description = description;
+                pm.frequency = frequency;
+                pm.nextDue = nextDue;
+                showNotification(`PM Schedule P${id} updated successfully!`);
+                document.getElementById('pm-submit-btn').textContent = 'Create Schedule';
+            } else {
+                // CREATE
+                const newPm = {
+                    id: data.nextIds.pm++,
+                    assetId,
+                    description,
+                    frequency,
+                    nextDue,
+                    department: asset.department, // Link department for reports
+                    status: 'Active'
+                };
+                data.pmSchedules.push(newPm);
+                showNotification(`PM Schedule P${newPm.id} created successfully!`);
+            }
+
+            document.getElementById('pm-form').reset();
+            document.getElementById('pm-id').value = '';
+            currentEditingPm = null;
+            saveData();
+            renderPmSchedules();
         }
+
+        window.editPm = function(id) {
+            if (!permissions[currentUser.role].edit) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
+            const pm = data.pmSchedules.find(p => p.id === id);
+            if (!pm) return;
+
+            currentEditingPm = pm;
+            document.getElementById('pm-id').value = pm.id;
+            document.getElementById('pm-asset').value = pm.assetId;
+            document.getElementById('pm-description').value = pm.description;
+            document.getElementById('pm-frequency').value = pm.frequency;
+            document.getElementById('pm-due').value = pm.nextDue;
+            document.getElementById('pm-submit-btn').textContent = `Update Schedule P${id}`;
+            document.getElementById('preventive').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.deletePm = function(id) {
+            if (!permissions[currentUser.role].delete) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
+            if (confirm(`Are you sure you want to delete PM Schedule P${id}?`)) {
+                data.pmSchedules = data.pmSchedules.filter(p => p.id !== id);
+                saveData();
+                renderPmSchedules();
+                showNotification(`PM Schedule P${id} deleted.`);
+            }
+        }
+
+        function renderPmSchedules() {
+            const tbody = document.getElementById('pm-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            const p = permissions[currentUser.role];
+
+            data.pmSchedules.sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue)).forEach(pm => {
+                const tr = document.createElement('tr');
+                const asset = data.assets.find(a => a.id == pm.assetId) || { name: 'N/A', department: 'N/A' };
+                const dueDate = new Date(pm.nextDue);
+                const isOverdue = dueDate < new Date(new Date().setHours(0,0,0,0));
+                
+                let actionsHTML = '';
+                if (p.edit) actionsHTML += `<button class="action-btn edit" onclick="editPm(${pm.id})">Edit</button>`;
+                if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deletePm(${pm.id})">Delete</button>`;
+                if (!actionsHTML) actionsHTML = 'No Actions';
+
+                tr.innerHTML = `
+                    <td>P${pm.id}</td>
+                    <td>${pm.department}</td>
+                    <td>A${pm.assetId} - ${asset.name}</td>
+                    <td>${pm.description.substring(0, 30)}...</td>
+                    <td>${pm.frequency}</td>
+                    <td style="color: ${isOverdue ? '#dc3545' : '#28a745'}; font-weight: 700;">${pm.nextDue} ${isOverdue ? '(Overdue)' : ''}</td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Inventory
+        function handleInventorySubmit(e) {
+            e.preventDefault();
+            if (!permissions[currentUser.role].create && !document.getElementById('inv-id').value) { 
+                showNotification('Permission denied to manage inventory.', true); 
+                return; 
+            }
+
+            const id = document.getElementById('inv-id').value;
+            const department = document.getElementById('inv-department').value;
+            const name = document.getElementById('inv-name').value;
+            const qty = parseInt(document.getElementById('inv-qty').value);
+            const reorder = parseInt(document.getElementById('inv-reorder').value);
+
+            if (id) {
+                // UPDATE
+                const inv = data.inventory.find(i => i.id == id);
+                if (!inv || !permissions[currentUser.role].edit) { 
+                    showNotification('Permission denied or item not found.', true); 
+                    return; 
+                }
+                inv.department = department;
+                inv.name = name;
+                inv.qty = qty;
+                inv.reorder = reorder;
+                showNotification(`Inventory Item I${id} updated successfully!`);
+                document.getElementById('inv-submit-btn').textContent = 'Add Item';
+            } else {
+                // CREATE
+                const newInv = {
+                    id: data.nextIds.inv++,
+                    department,
+                    name,
+                    qty,
+                    reorder
+                };
+                data.inventory.push(newInv);
+                showNotification(`Inventory Item I${newInv.id} added successfully!`);
+            }
+
+            document.getElementById('inv-form').reset();
+            document.getElementById('inv-id').value = '';
+            currentEditingInv = null;
+            saveData();
+            renderInventory();
+        }
+
+        window.editInventory = function(id) {
+            if (!permissions[currentUser.role].edit) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
+            const inv = data.inventory.find(i => i.id === id);
+            if (!inv) return;
+
+            currentEditingInv = inv;
+            document.getElementById('inv-id').value = inv.id;
+            document.getElementById('inv-department').value = inv.department;
+            document.getElementById('inv-name').value = inv.name;
+            document.getElementById('inv-qty').value = inv.qty;
+            document.getElementById('inv-reorder').value = inv.reorder;
+            document.getElementById('inv-submit-btn').textContent = `Update Item I${id}`;
+            document.getElementById('inventory').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.deleteInventory = function(id) {
+            if (!permissions[currentUser.role].delete) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
+            if (confirm(`Are you sure you want to delete Inventory Item I${id}?`)) {
+                data.inventory = data.inventory.filter(i => i.id !== id);
+                saveData();
+                renderInventory();
+                showNotification(`Inventory Item I${id} deleted.`);
+            }
+        }
+
+        function renderInventory() {
+            const tbody = document.getElementById('inv-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            const p = permissions[currentUser.role];
+
+            data.inventory.sort((a, b) => b.id - a.id).forEach(inv => {
+                const tr = document.createElement('tr');
+                const isLow = inv.qty <= inv.reorder;
+                const status = isLow ? 'Low Stock' : 'OK';
+                
+                let actionsHTML = '';
+                if (p.edit) actionsHTML += `<button class="action-btn edit" onclick="editInventory(${inv.id})">Edit</button>`;
+                if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deleteInventory(${inv.id})">Delete</button>`;
+                if (!actionsHTML) actionsHTML = 'No Actions';
+
+                tr.innerHTML = `
+                    <td>I${inv.id}</td>
+                    <td>${inv.department}</td>
+                    <td>${inv.name}</td>
+                    <td>${inv.qty}</td>
+                    <td>${inv.reorder}</td>
+                    <td style="color: ${isLow ? '#dc3545' : '#28a745'}; font-weight: 700;">${status}</td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Users
+        function handleUserSubmit(e) {
+            e.preventDefault();
+            if (!permissions[currentUser.role].manageUsers) { 
+                showNotification('Permission denied to manage users.', true); 
+                return; 
+            }
+
+            const index = document.getElementById('user-edit-index').value;
+            const username = document.getElementById('user-username').value.trim();
+            const password = document.getElementById('user-password').value;
+            const role = document.getElementById('user-role').value;
+
+            if (index !== '-1') {
+                // UPDATE
+                const idx = parseInt(index);
+                data.users[idx].username = username;
+                data.users[idx].password = password;
+                data.users[idx].role = role;
+                showNotification(`User ${username} updated successfully!`);
+                document.getElementById('user-submit-btn').textContent = 'Add User';
+            } else {
+                // CREATE
+                const existing = data.users.find(u => u.username === username);
+                if (existing) {
+                    showNotification('Username already exists.', true);
+                    return;
+                }
+                const newUser = { username, password, role };
+                data.users.push(newUser);
+                showNotification(`User ${username} added successfully!`);
+            }
+
+            document.getElementById('user-form').reset();
+            document.getElementById('user-edit-index').value = '-1';
+            currentEditingUserIndex = -1;
+            saveData();
+            renderUsers();
+        }
+
+        window.editUser = function(index) {
+            if (!permissions[currentUser.role].manageUsers) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
+            const user = data.users[index];
+            if (!user) return;
+
+            currentEditingUserIndex = index;
+            document.getElementById('user-edit-index').value = index;
+            document.getElementById('user-username').value = user.username;
+            document.getElementById('user-password').value = user.password;
+            document.getElementById('user-role').value = user.role;
+            document.getElementById('user-submit-btn').textContent = `Update User ${user.username}`;
+            document.getElementById('users').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.deleteUser = function(index) {
+            if (!permissions[currentUser.role].manageUsers) { 
+                showNotification('Permission denied.', true); 
+                return; 
+            }
+            const user = data.users[index];
+            if (!user) return;
+            if (user.username === currentUser.username) { 
+                showNotification("Cannot delete yourself.", true); 
+                return; 
+            }
+
+            if (confirm(`Are you sure you want to delete user ${user.username}?`)) {
+                data.users.splice(index, 1);
+                saveData();
+                renderUsers();
+                showNotification(`User ${user.username} deleted.`);
+            }
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('user-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            const p = permissions[currentUser.role];
+            
+            data.users.forEach((user, index) => {
+                const tr = document.createElement('tr');
+                
+                let actionsHTML = '';
+                if (p.manageUsers) {
+                    actionsHTML += `<button class="action-btn edit" onclick="editUser(${index})">Edit</button>`;
+                    if (user.username !== 'admin') { // Prevent deleting the default admin
+                        actionsHTML += `<button class="action-btn delete" onclick="deleteUser(${index})">Delete</button>`;
+                    }
+                }
+                if (!actionsHTML) actionsHTML = 'No Actions';
+
+                tr.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.role}</td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Work Orders render (full implementation)
+        function renderWorkOrders() {
+            const tbody = document.getElementById('wo-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            const p = permissions[currentUser.role];
+
+            data.workOrders.sort((a, b) => b.id - a.id).forEach(wo => {
+                const tr = document.createElement('tr');
+                const asset = data.assets.find(a => a.id == wo.assetId) || { name: 'N/A' };
+                const isSelf = wo.assignedTo === currentUser.username;
+
+                let actionsHTML = '';
+                if (p.edit || (p.edit === 'self' && isSelf)) {
+                    actionsHTML += `<button class="action-btn edit" onclick="editWorkOrder(${wo.id})">Edit</button>`;
+                }
+                if (p.delete) actionsHTML += `<button class="action-btn delete" onclick="deleteWorkOrder(${wo.id})">Delete</button>`;
+                if (wo.status !== 'Closed' && (p.edit || (p.edit === 'self' && isSelf))) {
+                    actionsHTML += `<button class="action-btn close" data-wo-id="${wo.id}" onclick="closeWorkOrder(${wo.id})">Close</button>`;
+                }
+                if (!actionsHTML) actionsHTML = 'No Actions';
+
+                tr.innerHTML = `
+                    <td>WO${wo.id}</td>
+                    <td>${wo.department}</td>
+                    <td>A${wo.assetId} - ${asset.name}</td>
+                    <td>${wo.description.substring(0, 40)}...</td>
+                    <td style="color: ${wo.priority === 'High' ? '#dc3545' : wo.priority === 'Medium' ? '#ffc107' : '#28a745'};">${wo.priority}</td>
+                    <td style="font-weight: 700;">${wo.status}</td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.editWorkOrder = function(id) {
+            const wo = data.workOrders.find(w => w.id === id);
+            if (!wo) return;
+            if (permissions[currentUser.role].edit === 'self' && wo.assignedTo !== currentUser.username) {
+                showNotification('Can only edit your own work orders.', true);
+                return;
+            }
+
+            currentEditingWo = wo;
+            document.getElementById('wo-id').value = wo.id;
+            document.getElementById('wo-department').value = wo.department;
+            document.getElementById('wo-asset').value = wo.assetId;
+            document.getElementById('wo-description').value = wo.description;
+            document.getElementById('wo-priority').value = wo.priority;
+            document.getElementById('wo-assigned-to').value = wo.assignedTo;
+            document.getElementById('wo-status').value = wo.status;
+            document.getElementById('wo-status-label').style.display = 'block';
+            document.getElementById('wo-status').style.display = 'block';
+            document.getElementById('wo-submit-btn').textContent = `Update WO${id}`;
+            document.getElementById('work-orders').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.closeWorkOrder = function(id) {
+            if (confirm('Close this work order?')) {
+                const wo = data.workOrders.find(w => w.id === id);
+                if (wo && (permissions[currentUser.role].edit || (permissions[currentUser.role].edit === 'self' && wo.assignedTo === currentUser.username))) {
+                    wo.status = 'Closed';
+                    saveData();
+                    renderWorkOrders();
+                    renderDashboard();
+                    showNotification(`Work Order WO${id} closed.`);
+                } else {
+                    showNotification('Permission denied.', true);
+                }
+            }
+        };
+
+        window.deleteWorkOrder = function(id) {
+            if (!permissions[currentUser.role].delete) {
+                showNotification('Permission denied.', true);
+                return;
+            }
+            if (confirm('Delete this work order?')) {
+                data.workOrders = data.workOrders.filter(w => w.id !== id);
+                saveData();
+                renderWorkOrders();
+                renderDashboard();
+                showNotification(`Work Order deleted.`);
+            }
+        };
+
+        // Dashboard
+        function renderDashboard() {
+            const stats = {
+                totalWO: data.workOrders.length,
+                openWO: data.workOrders.filter(w => w.status === 'Open').length,
+                highPriority: data.workOrders.filter(w => w.status !== 'Closed' && w.priority === 'High').length,
+                totalAssets: data.assets.length,
+                overduePM: data.pmSchedules.filter(p => new Date(p.nextDue) < new Date(new Date().setHours(0,0,0,0))).length,
+                lowInventory: data.inventory.filter(i => i.qty <= i.reorder).length
+            };
+
+            const statsContainer = document.getElementById('dashboard-stats');
+            statsContainer.innerHTML = `
+                <div class="stat-card"><h3>${stats.totalWO}</h3><p>Total WOs</p></div>
+                <div class="stat-card" style="border-color: #dc3545;"><h3 style="color:#dc3545;">${stats.openWO}</h3><p>Open WOs</p></div>
+                <div class="stat-card" style="border-color: #ffc107;"><h3 style="color:#ffc107;">${stats.highPriority}</h3><p>High Priority</p></div>
+                <div class="stat-card"><h3>${stats.totalAssets}</h3><p>Total Assets</p></div>
+                <div class="stat-card" style="border-color: #dc3545;"><h3 style="color:#dc3545;">${stats.overduePM}</h3><p>Overdue PMs</p></div>
+                <div class="stat-card" style="border-color: #ffc107;"><h3 style="color:#ffc107;">${stats.lowInventory}</h3><p>Low Inventory</p></div>
+            `;
+
+            // Critical Open Work Orders
+            const tbody = document.getElementById('dashboard-wo-table').querySelector('tbody');
+            tbody.innerHTML = '';
+            data.workOrders
+                .filter(w => w.status === 'Open' && w.priority === 'High')
+                .sort((a, b) => b.id - a.id)
+                .slice(0, 5)
+                .forEach(wo => {
+                    const tr = document.createElement('tr');
+                    const asset = data.assets.find(a => a.id == wo.assetId) || { name: 'N/A' };
+                    tr.innerHTML = `
+                        <td>WO${wo.id}</td>
+                        <td>${wo.department}</td>
+                        <td>A${wo.assetId} - ${asset.name}</td>
+                        <td>${wo.description.substring(0, 40)}...</td>
+                        <td style="color: #dc3545; font-weight: 700;">${wo.priority}</td>
+                        <td style="color: #dc3545; font-weight: 700;">${wo.status}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+        }
+
+        // Reports Overview
+        function renderReportsOverview() {
+            const totalWO = data.workOrders.length;
+            const totalAsset = data.assets.length;
+            const belowReorder = data.inventory.filter(i => i.qty <= i.reorder).length;
+            
+            document.getElementById('report-total-wo').textContent = totalWO;
+            document.getElementById('report-total-asset').textContent = totalAsset;
+            document.getElementById('report-below-reorder').textContent = belowReorder;
+        }
+
+        // Generate Report
+        function generateReport(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('report-title').value;
+            const departmentFilter = document.getElementById('report-department').value;
+            const startDate = document.getElementById('report-start').value;
+            const endDate = document.getElementById('report-end').value;
+            const reportType = document.getElementById('report-type-full').value;
+            
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            end.setDate(end.getDate() + 1); // Make end date inclusive
+
+            // Filter Data
+            const filteredWO = data.workOrders.filter(wo => {
+                const woDate = new Date(wo.createdAt);
+                const deptMatch = !departmentFilter || wo.department === departmentFilter;
+                const dateMatch = woDate >= start && woDate <= end;
+                return deptMatch && dateMatch;
+            });
+
+            const filteredPM = data.pmSchedules.filter(pm => {
+                const pmDate = new Date(pm.nextDue);
+                const asset = data.assets.find(a => a.id == pm.assetId);
+                const deptMatch = !departmentFilter || (asset && asset.department === departmentFilter);
+                const dateMatch = pmDate >= start && pmDate <= end; 
+                return deptMatch && dateMatch;
+            });
+            
+            const filteredAssets = data.assets.filter(asset => !departmentFilter || asset.department === departmentFilter);
+            const filteredInv = data.inventory.filter(inv => !departmentFilter || inv.department === departmentFilter || inv.department === 'general');
+
+            // Generate Summary Stats
+            const summaryStats = {
+                'Total WOs': filteredWO.length,
+                'Completed WOs': filteredWO.filter(w => w.status === 'Completed' || w.status === 'Closed').length,
+                'Open WOs': filteredWO.filter(w => w.status === 'Open').length,
+                'Total PM Schedules': filteredPM.length,
+                'Overdue PMs': filteredPM.filter(p => new Date(p.nextDue) < new Date(new Date().setHours(0,0,0,0))).length,
+                'Total Assets': filteredAssets.length
+            };
+
+            const summaryHtml = Object.entries(summaryStats).map(([key, value]) => `
+                <div class="stat-card"><h3>${value}</h3><p>${key}</p></div>
+            `).join('');
+            document.getElementById('report-summary').innerHTML = summaryHtml;
+
+            // Populate Tables
+            function populateTable(dataArray, tableId, columns, formatter) {
+                const tbody = document.getElementById(tableId).querySelector('tbody');
+                tbody.innerHTML = '';
+                if (reportType === 'summary' && tableId !== 'report-inv-table') return; // Skip detailed tables for summary report
+
+                dataArray.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = columns.map(col => `<td>${formatter(item, col)}</td>`).join('');
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // WO Table
+            populateTable(filteredWO, 'report-wo-table', ['id', 'department', 'description', 'asset', 'priority', 'status'], (wo, col) => {
+                const asset = data.assets.find(a => a.id == wo.assetId) || { name: 'N/A' };
+                if (col === 'id') return `WO${wo.id}`;
+                if (col === 'asset') return `A${wo.assetId} - ${asset.name}`;
+                if (col === 'description') return wo.description.substring(0, 50) + (wo.description.length > 50 ? '...' : '');
+                return wo[col];
+            });
+            
+            // PM Table
+            populateTable(filteredPM, 'report-pm-table', ['id', 'department', 'asset', 'frequency', 'nextDue', 'status'], (pm, col) => {
+                const asset = data.assets.find(a => a.id == pm.assetId) || { name: 'N/A', department: 'N/A' };
+                if (col === 'id') return `P${pm.id}`;
+                if (col === 'department') return asset.department;
+                if (col === 'asset') return `A${pm.assetId} - ${asset.name}`;
+                if (col === 'status') return new Date(pm.nextDue) < new Date(new Date().setHours(0,0,0,0)) ? 'Overdue' : 'Scheduled';
+                return pm[col];
+            });
+            
+            // Asset Table
+            populateTable(filteredAssets, 'report-assets-table', ['id', 'department', 'name', 'serial', 'location'], (asset, col) => {
+                if (col === 'id') return `A${asset.id}`;
+                return asset[col];
+            });
+
+            // Inventory Table
+            populateTable(filteredInv, 'report-inv-table', ['id', 'department', 'name', 'qty', 'reorder', 'status'], (inv, col) => {
+                if (col === 'id') return `I${inv.id}`;
+                if (col === 'status') return inv.qty <= inv.reorder ? 'Low Stock' : 'OK';
+                return inv[col];
+            });
+
+            // Update Report Metadata
+            document.getElementById('print-title').textContent = title;
+            document.getElementById('generated-date').textContent = `${startDate} to ${endDate}`;
+            const generatedTime = new Date().toLocaleString();
+            document.getElementById('generated-time').textContent = generatedTime;
+            document.getElementById('generated-by').textContent = `${currentUser.username} (${currentUser.role})`;
+
+            document.getElementById('maintenance-report-content').style.display = 'block';
+            
+            // Store the full report content for emailing
+            const reportContentDiv = document.getElementById('maintenance-report-content').cloneNode(true);
+            reportContentDiv.querySelectorAll('.action-btn').forEach(el => el.remove());
+            reportContentDiv.querySelectorAll('th').forEach(th => th.style.backgroundColor = '#f0f0f0');
+            reportContentDiv.querySelectorAll('.stats-grid .stat-card').forEach(card => card.style.boxShadow = 'none');
+
+            currentReportHTML = `<div style="font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ddd;">
+                ${reportContentDiv.innerHTML}
+            </div>`;
+            
+            showNotification('Report Generated!');
+        }
+
+        window.openEmailModal = () => {
+            if (!currentReportHTML) { 
+                showNotification('Please generate the report first!', true); 
+                return; 
+            }
+            document.getElementById('email-modal').style.display = 'flex';
+        };
+
+        window.closeEmailModal = () => {
+            document.getElementById('email-modal').style.display = 'none';
+            document.getElementById('email-form').reset();
+        };
+
+        function handleEmailSubmit(e) {
+            e.preventDefault();
+            if (EMAILJS_USER_ID === 'YOUR_USER_ID_HERE') {
+                showNotification('EmailJS is not configured. Please check your settings.', true);
+                return;
+            }
+
+            const to = document.getElementById('email-to').value;
+            const subject = document.getElementById('email-subject').value;
+            const message = document.getElementById('email-message').value;
+
+            const templateParams = {
+                to_email: to,
+                subject: subject,
+                message: message,
+                report_title: document.getElementById('print-title').textContent,
+                report_date_range: document.getElementById('generated-date').textContent,
+                report_content: currentReportHTML
+            };
+            
+            showNotification('Sending email...');
+
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(() => {
+                    showNotification('Report sent successfully!');
+                    closeEmailModal();
+                }, (error) => {
+                    console.error('Email failed to send:', error);
+                    showNotification('Email failed. Check EmailJS console for errors.', true);
+                });
+        }
+
+        window.printReport = () => window.print();
     </script>
 </body>
 </html>
